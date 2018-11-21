@@ -1,8 +1,8 @@
 package net.noboard.fastconverter.handler;
 
-import com.fuqin.base.converter.fastconverter.ConvertException;
-import com.fuqin.base.converter.fastconverter.Converter;
-import com.fuqin.base.converter.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.ConvertException;
+import net.noboard.fastconverter.Converter;
+import net.noboard.fastconverter.ConverterFilter;
 
 import java.util.HashMap;
 import java.util.Map;
