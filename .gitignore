@@ -1,0 +1,9 @@
+target/
+*.project
+*.settings/
+*.classpath
+*.iml
+.idea/
+bin/
+*Test.java
+META-INF/
