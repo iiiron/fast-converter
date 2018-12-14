@@ -12,7 +12,7 @@ public class CommonConverterFilter extends AbstractConverterFilter {
         converters.add(new NumberToStringConverterHandler());
         converters.add(new BooleanToStringConverterHandler());
         converters.add(new DateToTimeStampStringConverterHandler());
-        converters.add(new NullToEmptyStringConverterHandler());
+        converters.add(new NullConverterHandler());
 
         converters.add(new MapToMapConverterHandler<>(this));
         converters.add(new ArrayToListConverterHandler<>(this));
