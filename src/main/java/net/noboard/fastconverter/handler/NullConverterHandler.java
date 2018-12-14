@@ -13,6 +13,10 @@ public class NullConverterHandler extends AbstractConverterHandler<Object, Strin
         super("2");
     }
 
+    public NullConverterHandler(String tip) {
+        super(tip);
+    }
+
     @Override
     protected String converting(Object value, String tip) {
         if ("1".equals(tip)) {
