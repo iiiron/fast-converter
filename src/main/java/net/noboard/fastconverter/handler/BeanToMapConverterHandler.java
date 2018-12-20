@@ -68,7 +68,7 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
             if (annotation == null) {
                 Converter converter = this.getConverter(fieldValue);
                 if (converter != null) {
-                    mapValue = converter.convert(fieldValue, tip);
+                    mapValue = converter.convert(fieldValue);
                 }
             } else {
                 try {
