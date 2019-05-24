@@ -1,4 +1,4 @@
-package net.noboard.fastconverter.handler.annotation;
+package net.noboard.fastconverter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
