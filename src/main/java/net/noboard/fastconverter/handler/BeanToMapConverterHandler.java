@@ -10,8 +10,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 用以将对象转换为map
@@ -20,6 +19,8 @@ import java.util.Map;
  * @author wanxm
  */
 public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandler<Object, Map<String,Object>> {
+
+    private static List<Converter> converters = new ArrayList<>();
 
     public BeanToMapConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
@@ -72,7 +73,20 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                 }
             } else {
                 try {
-                    mapValue = annotation.converter().newInstance().convert(fieldValue, annotation.tip());
+                    boolean isConvert = false;
+                    for (Converter converter : converters) {
+                        if (converter.getClass().equals(annotation.converter())) {
+                            mapValue = converter.convert(fieldValue, annotation.tip());
+                            isConvert = true;
+                            break;
+                        }
+                    }
+                    if (!isConvert) {
+                        Converter converter = annotation.converter().newInstance();
+                        converters.add(converter);
+                        mapValue = converter.convert(fieldValue, annotation.tip());
+                    }
+
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                     throw new ConvertException(e.getMessage());
