@@ -15,10 +15,10 @@ import java.util.*;
 /**
  * 用以将对象转换为map
  *
- * @return
  * @author wanxm
+ * @return
  */
-public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandler<Object, Map<String,Object>> {
+public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandler<Object, Map<String, Object>> {
 
     private static List<Converter> converters = new ArrayList<>();
 
@@ -73,20 +73,18 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                 }
             } else {
                 try {
-                    boolean isConvert = false;
+                    Converter cc = null;
                     for (Converter converter : converters) {
                         if (converter.getClass().equals(annotation.converter())) {
-                            mapValue = converter.convert(fieldValue, annotation.tip());
-                            isConvert = true;
+                            cc = converter;
                             break;
                         }
                     }
-                    if (!isConvert) {
-                        Converter converter = annotation.converter().newInstance();
-                        converters.add(converter);
-                        mapValue = converter.convert(fieldValue, annotation.tip());
+                    if (cc == null) {
+                        cc = annotation.converter().newInstance();
+                        converters.add(cc);
                     }
-
+                    mapValue = cc.convert(fieldValue, annotation.tip());
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                     throw new ConvertException(e.getMessage());

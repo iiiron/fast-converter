@@ -13,11 +13,14 @@ public class DateToFormatStringConverterHandler extends AbstractConverterHandler
 
     @Override
     protected String converting(Date value, String tip) {
+        if (value == null) {
+            return "";
+        }
         return new SimpleDateFormat(tip).format(value);
     }
 
     @Override
     public boolean supports(Date value) {
-        return value != null;
+        return true;
     }
 }
