@@ -84,7 +84,12 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                         cc = annotation.converter().newInstance();
                         converters.add(cc);
                     }
-                    mapValue = cc.convert(fieldValue, annotation.tip());
+                    if ("".equals(annotation.tip())) {
+                        mapValue = cc.convert(fieldValue);
+                    } else {
+                        mapValue = cc.convert(fieldValue, annotation.tip());
+                    }
+
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                     throw new ConvertException(e.getMessage());

@@ -1,2 +1,3 @@
 # fast-converter
-FastConverter
+
+在main方法中有使用示例

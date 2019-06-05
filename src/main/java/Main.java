@@ -1,50 +1,47 @@
 import com.alibaba.fastjson.JSON;
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.filter.CommonConverterFilter;
 import net.noboard.fastconverter.handler.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
 
-    private static class Test {
-        private boolean isSuccess;
+    public static class MyBean {
+        @Field(name = "chineseName")
+        private String name;
 
-        private Boolean isOk;
+        @FieldConverter(converter = DateToFormatStringConverterHandler.class)
+        private Date birthday;
 
-        public Boolean getOk() {
-            return isOk;
+        public String getName() {
+            return name;
         }
 
-        public void setOk(Boolean ok) {
-            isOk = ok;
+        public void setName(String name) {
+            this.name = name;
         }
 
-        public boolean isSuccess() {
-            return isSuccess;
+        public Date getBirthday() {
+            return birthday;
         }
 
-        public void setSuccess(boolean success) {
-            isSuccess = success;
+        public void setBirthday(Date birthday) {
+            this.birthday = birthday;
         }
     }
 
     public static void main(String[] args) {
-       Test test = new Test();
-       test.setSuccess(true);
+        MyBean myBean = new MyBean();
+        myBean.setName("万相明");
+        myBean.setBirthday(new Date());
 
         try {
-            new BeanToMapConverterHandler(new ConverterFilter() {
-                @Override
-                public <T> Converter getConverter(T value) {
-                    return new BooleanToNumberStringConverterHandler();
-                }
-            }).convert(test);
+            System.out.println(new ObjectToJsonStringConverterHandler(new CommonConverterFilter()).convert(myBean));
         } catch (ConvertException e) {
             e.printStackTrace();
         }
