@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import net.noboard.fastconverter.ConvertException;
 
 /**
- *
+ * 这个转换器能将json字符串格式化为缩进和折行的形式
  */
 public class JsonStringToFormatJsonStringConverterHandler extends AbstractConverterHandler<String, String> {
     @Override

@@ -6,7 +6,7 @@
 
     <groupId>net.noboard</groupId>
     <artifactId>fast-converter</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <build>
         <plugins>
             <plugin>

@@ -9,7 +9,7 @@ public class NumberToStringConverterHandler extends AbstractConverterHandler<Obj
 
     @Override
     protected String converting(Object value, String tip) {
-        return value.toString();
+        return String.valueOf(value);
     }
 
     @Override

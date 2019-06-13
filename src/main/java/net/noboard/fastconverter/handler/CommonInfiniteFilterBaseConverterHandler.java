@@ -10,7 +10,7 @@ import net.noboard.fastconverter.ConverterFilter;
  * 该转换器将使用ConverterFilter中注册的转换器进行无限次数的转换，直到没有适配的
  * 转换器可用为止。由于此转换器会进行无限次数的转换，所以你要确保你的ConverterFilter
  * 链路中，一定会转换出一种没有任何转换器可以对它继续进行转换的数据类型，且要保证
- * 不出现某个转换器的结果是另一个转换器supports的情况。
+ * 不出现两个转换器互相supports各自转换结果的情况。
  *
  * @param <T>
  * @param <K>
