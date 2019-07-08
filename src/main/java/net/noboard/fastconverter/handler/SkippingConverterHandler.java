@@ -10,7 +10,7 @@ public class SkippingConverterHandler extends AbstractConverterHandler<Object, O
     private Class[] classes;
 
     public static Class[] BASIC_DATA_TYPE = {Integer.class, Double.class, Float.class,
-            Long.class, Byte.class, Short.class, Character.class, String.class};
+            Long.class, Byte.class, Short.class, Character.class, String.class, Boolean.class};
 
     public SkippingConverterHandler(Class... classes) {
         this.classes = classes;
