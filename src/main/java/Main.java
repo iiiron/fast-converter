@@ -40,10 +40,19 @@ public class Main {
         myBean.setName("万相明");
         myBean.setBirthday(new Date());
 
-        try {
-            System.out.println(new ObjectToJsonStringConverterHandler(new CommonConverterFilter()).convert(myBean));
-        } catch (ConvertException e) {
-            e.printStackTrace();
+        System.out.println(new ObjectToJsonStringConverterHandler(new CommonConverterFilter()).convert(myBean));
+    }
+
+    private class A extends AbstractConverterHandler<String, String> {
+
+        @Override
+        protected String converting(String value, String tip) throws ConvertException {
+            return null;
+        }
+
+        @Override
+        public boolean supports(String value) {
+            return false;
         }
     }
 }

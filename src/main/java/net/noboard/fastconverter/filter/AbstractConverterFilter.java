@@ -2,6 +2,10 @@ package net.noboard.fastconverter.filter;
 
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.handler.ArrayToListConverterHandler;
+import net.noboard.fastconverter.handler.BeanToMapConverterHandler;
+import net.noboard.fastconverter.handler.CollectionToListConverterHandler;
+import net.noboard.fastconverter.handler.MapToMapConverterHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +29,18 @@ public abstract class AbstractConverterFilter implements ConverterFilter {
 
     protected abstract void initConverters(List<Converter<?, ?>> converters);
 
-    @Override
-    public <T> Converter getConverter(T value) {
-        for (Converter converter : converters) {
-            try {
-                if (converter.supports(value)) {
-                    return converter;
-                }
-            } catch (ClassCastException ignored) {
+    protected void addContainerConverter() {
+        converters.add(new MapToMapConverterHandler<>(this));
+        converters.add(new ArrayToListConverterHandler<>(this));
+        converters.add(new CollectionToListConverterHandler<>(this));
+        converters.add(new BeanToMapConverterHandler(this));
+    }
 
+    @Override
+    public Converter getConverter(Object value) {
+        for (Converter converter : converters) {
+            if (converter.supports(value)) {
+                return converter;
             }
         }
 

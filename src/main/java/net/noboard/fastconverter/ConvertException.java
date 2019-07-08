@@ -3,7 +3,7 @@ package net.noboard.fastconverter;
 /**
  * @author wanxm
  */
-public class ConvertException extends Exception {
+public class ConvertException extends RuntimeException {
     public ConvertException(String message) {
         super(message);
     }

@@ -8,5 +8,5 @@ public interface Converter<T, K> {
 
     K convert(T value) throws ConvertException;
 
-    boolean supports(T value);
+    boolean supports(Object value);
 }

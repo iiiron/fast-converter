@@ -11,5 +11,5 @@ package net.noboard.fastconverter;
  * @author wanxm
  */
 public interface ConverterFilter {
-    <T> Converter getConverter(T value);
+    Converter getConverter(Object value);
 }

@@ -25,7 +25,7 @@ public class CommonInfiniteFilterBaseConverterHandler<T, K> extends AbstractFilt
     @Override
     protected K converting(T value, String tip) throws ConvertException {
         Object obj = value;
-        Converter converter = null;
+        Converter converter;
         while ((converter = this.getConverter(obj)) != null) {
             obj = converter.convert(obj);
         }
@@ -33,7 +33,7 @@ public class CommonInfiniteFilterBaseConverterHandler<T, K> extends AbstractFilt
     }
 
     @Override
-    public boolean supports(T value) {
-        return value != null;
+    public boolean supports(Object value) {
+        return this.getConverter(value) != null;
     }
 }

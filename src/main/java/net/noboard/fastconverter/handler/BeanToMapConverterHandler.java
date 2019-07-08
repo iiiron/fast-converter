@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * 用以将对象转换为map
+ * 用以将对象转换为map，丢弃值为null的数据
  *
  * @author wanxm
  * @return
@@ -31,21 +31,6 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
         Map<String, Object> map = new HashMap<>();
 
         for (java.lang.reflect.Field field : value.getClass().getDeclaredFields()) {
-            // 对域名 及 是否隐藏的处理
-            String mapKey;
-            Field docField = field.getAnnotation(Field.class);
-            if (docField != null) {
-                if (docField.isHide()) {
-                    continue;
-                }
-
-                mapKey = "".equals(docField.name())
-                        ? field.getName()
-                        : docField.name();
-            } else {
-                mapKey = field.getName();
-            }
-
             // 获取域值
             Object fieldValue;
             try {
@@ -53,6 +38,9 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                 Method reader = pd.getReadMethod();
                 if (reader != null) {
                     fieldValue = reader.invoke(value);
+                    if (fieldValue == null) {
+                        continue;
+                    }
                 } else {
                     continue;
                 }
@@ -94,6 +82,21 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                     e.printStackTrace();
                     throw new ConvertException(e.getMessage());
                 }
+            }
+
+            // 对域名 及 是否隐藏的处理
+            String mapKey;
+            Field docField = field.getAnnotation(Field.class);
+            if (docField != null) {
+                if (docField.isHide()) {
+                    continue;
+                }
+
+                mapKey = "".equals(docField.name())
+                        ? field.getName()
+                        : docField.name();
+            } else {
+                mapKey = field.getName();
             }
 
             map.put(mapKey, mapValue);

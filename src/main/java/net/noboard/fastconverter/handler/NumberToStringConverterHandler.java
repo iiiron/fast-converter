@@ -22,6 +22,8 @@ public class NumberToStringConverterHandler extends AbstractConverterHandler<Obj
                 || value.getClass().isAssignableFrom(Integer.class)
                 || value.getClass().isAssignableFrom(Double.class)
                 || value.getClass().isAssignableFrom(Float.class)
-                || value.getClass().isAssignableFrom(Long.class);
+                || value.getClass().isAssignableFrom(Long.class)
+                || value.getClass().isAssignableFrom(Short.class)
+                || value.getClass().isAssignableFrom(Byte.class);
     }
 }

@@ -15,14 +15,9 @@ public class ObjectToJsonStringConverterHandler extends AbstractFilterBaseConver
     }
 
     @Override
-    protected String converting(Object value, String tip) {
-        try {
-            Converter converter = new CommonFilterBaseConverterHandler(this.getConverterFilter());
-            return JSON.toJSONString(converter.convert(value));
-        } catch (ConvertException e) {
-            e.printStackTrace();
-            return "";
-        }
+    protected String converting(Object value, String tip) throws ConvertException  {
+        Converter converter = new CommonFilterBaseConverterHandler(this.getConverterFilter());
+        return JSON.toJSONString(converter.convert(value));
     }
 
     @Override

@@ -19,8 +19,8 @@ public class MapToMapConverterHandler<T, K> extends AbstractFilterBaseConverterH
     }
 
     @Override
-    public boolean supports(Map<Object, T> value) {
-        return value != null;
+    public boolean supports(Object value) {
+        return value != null && value.getClass().isAssignableFrom(Map.class);
     }
 
     @Override

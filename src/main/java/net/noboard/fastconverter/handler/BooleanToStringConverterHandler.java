@@ -9,7 +9,7 @@ public class BooleanToStringConverterHandler extends AbstractConverterHandler<Bo
     }
 
     @Override
-    public boolean supports(Boolean value) {
-        return value != null;
+    public boolean supports(Object value) {
+        return value != null && value.getClass().isAssignableFrom(Boolean.class);
     }
 }

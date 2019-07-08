@@ -1,3 +1,25 @@
 # fast-converter
 
 在main方法中有使用示例
+
+# 各类必要性
+
+## Converter接口的supports方法
+
+supports方法具有存在必要性，否则ConverterFilter没有充分的手段对Converter进行筛选。supports方法的参数有三种可行的方案
+
+    boolean supports(Class clazz)
+
+    boolean supports(Object value)
+
+    boolean supports(T value)
+
+Class太狭窄，它会使得supports函数仅能从类型入手筛选被转换数据，而我想要的是，转换器可以根据具体的数据来工作。泛型则会导致ConverterFilter的实现必须使用try catch包裹supports方法，否则它会有抛出ClassCastException的危险。所以接收Object成为了比较合适的选择。
+
+## BeanToMapConverterHandler
+
+由于BeanToMapConverterHandler提供了@FieldConverter的解释器，这意味着，你可以通过该注解指定特定的Converter到域上，而这些Converter也可能在ConverterFilter中使用，我们将null也当成一种数据存在形式（这意味着你可以通过向ConverterFilter注册一个排位靠前的null值转换器而使得整个转换过程对null都有统一的处理方式，就像CommonConverterFilter所做的那样），使得普遍的Converter没有支持null值得必要（也就是说除了NullConverterHandler之外，其他的Converter其实并没有必要实现对null值的兼容，就像StringConverterHandler的supports函数一样，它并不支持null值）。
+
+为了让不支持null值的Converter可以和@FieldConverter很好的配合，BeanToMapConverterHandler将自己对null值进行处理，以确保指定到域上的Converter不会因为域是一个null值而抛出异常。
+
+BeanToMapConverterHandler 将丢弃值为null的域，这意味着，通过该转换器转换的Bean，其结果Map中，将不包含值为null的部分。

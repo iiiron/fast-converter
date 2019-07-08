@@ -36,7 +36,7 @@ public class CollectionToListConverterHandler<T, K> extends AbstractFilterBaseCo
     }
 
     @Override
-    public boolean supports(Collection<T> value) {
-        return value != null;
+    public boolean supports(Object value) {
+        return value != null && value.getClass().isAssignableFrom(Collection.class);
     }
 }

@@ -10,7 +10,7 @@ public class StringConverterHandler extends AbstractConverterHandler<String, Str
     }
 
     @Override
-    public boolean supports(String value) {
-        return value != null;
+    public boolean supports(Object value) {
+        return value != null && value.getClass().isAssignableFrom(String.class);
     }
 }
