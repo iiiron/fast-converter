@@ -51,7 +51,7 @@ public class Main {
         }
 
         @Override
-        public boolean supports(String value) {
+        public boolean supports(Object value) {
             return false;
         }
     }
