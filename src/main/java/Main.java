@@ -4,10 +4,7 @@ import net.noboard.fastconverter.filter.CommonConverterFilter;
 import net.noboard.fastconverter.handler.*;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
 
@@ -39,6 +36,11 @@ public class Main {
         MyBean myBean = new MyBean();
         myBean.setName("万相明");
         myBean.setBirthday(new Date());
+
+        List<String> list = new ArrayList<>();
+        Converter c = new CollectionToListConverterHandler<>(new CommonConverterFilter());
+        boolean d = List.class.isAssignableFrom(list.getClass());
+        List b = (List) c.convert(list);
 
         System.out.println(new ObjectToJsonStringConverterHandler(new CommonConverterFilter()).convert(myBean));
     }

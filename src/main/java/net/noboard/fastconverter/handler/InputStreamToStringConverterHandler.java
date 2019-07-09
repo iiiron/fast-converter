@@ -28,6 +28,6 @@ public class InputStreamToStringConverterHandler extends AbstractConverterHandle
 
     @Override
     public boolean supports(Object value) {
-        return value != null && value.getClass().isAssignableFrom(InputStream.class);
+        return value != null && InputStream.class.isAssignableFrom(value.getClass());
     }
 }

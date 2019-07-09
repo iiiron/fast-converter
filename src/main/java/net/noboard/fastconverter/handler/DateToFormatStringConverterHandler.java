@@ -18,6 +18,6 @@ public class DateToFormatStringConverterHandler extends AbstractConverterHandler
 
     @Override
     public boolean supports(Object value) {
-        return value != null && value.getClass().isAssignableFrom(Date.class);
+        return value != null && Date.class.isAssignableFrom(value.getClass());
     }
 }

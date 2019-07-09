@@ -18,12 +18,14 @@ public class NumberToStringConverterHandler extends AbstractConverterHandler<Obj
             return false;
         }
 
-        return value.getClass().isAssignableFrom(BigDecimal.class)
-                || value.getClass().isAssignableFrom(Integer.class)
-                || value.getClass().isAssignableFrom(Double.class)
-                || value.getClass().isAssignableFrom(Float.class)
-                || value.getClass().isAssignableFrom(Long.class)
-                || value.getClass().isAssignableFrom(Short.class)
-                || value.getClass().isAssignableFrom(Byte.class);
+        Class clazz = value.getClass();
+
+        return BigDecimal.class.isAssignableFrom(clazz)
+                || Integer.class.isAssignableFrom(clazz)
+                || Double.class.isAssignableFrom(clazz)
+                || Float.class.isAssignableFrom(clazz)
+                || Long.class.isAssignableFrom(clazz)
+                || Short.class.isAssignableFrom(clazz)
+                || Byte.class.isAssignableFrom(clazz);
     }
 }

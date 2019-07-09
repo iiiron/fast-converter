@@ -13,6 +13,6 @@ public class DateToTimeStampStringConverterHandler extends AbstractConverterHand
 
     @Override
     public boolean supports(Object value) {
-        return value != null && value.getClass().isAssignableFrom(Date.class);
+        return value != null && Date.class.isAssignableFrom(value.getClass());
     }
 }

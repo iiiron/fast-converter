@@ -38,9 +38,6 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                 Method reader = pd.getReadMethod();
                 if (reader != null) {
                     fieldValue = reader.invoke(value);
-                    if (fieldValue == null) {
-                        continue;
-                    }
                 } else {
                     continue;
                 }
@@ -60,28 +57,30 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                     mapValue = converter.convert(fieldValue);
                 }
             } else {
-                try {
-                    Converter cc = null;
-                    for (Converter converter : converters) {
-                        if (converter.getClass().equals(annotation.converter())) {
-                            cc = converter;
-                            break;
-                        }
-                    }
-                    if (cc == null) {
-                        cc = annotation.converter().newInstance();
-                        converters.add(cc);
-                    }
-                    if ("".equals(annotation.tip())) {
-                        mapValue = cc.convert(fieldValue);
-                    } else {
-                        mapValue = cc.convert(fieldValue, annotation.tip());
-                    }
-
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                    throw new ConvertException(e.getMessage());
+                if (fieldValue == null) {
+                    continue;
                 }
+                Converter cc = null;
+                for (Converter converter : converters) {
+                    if (converter.getClass().equals(annotation.converter())) {
+                        cc = converter;
+                        break;
+                    }
+                }
+                if (cc == null) {
+                    try {
+                        cc = annotation.converter().newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new ConvertException("创建" + annotation.converter().getName() + "实例失败：" + e.getMessage());
+                    }
+                    converters.add(cc);
+                }
+                if ("".equals(annotation.tip())) {
+                    mapValue = cc.convert(fieldValue);
+                } else {
+                    mapValue = cc.convert(fieldValue, annotation.tip());
+                }
+
             }
 
             // 对域名 及 是否隐藏的处理
