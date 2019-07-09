@@ -1,9 +1,6 @@
 package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-
-import java.math.BigDecimal;
 
 public class SkippingConverterHandler extends AbstractConverterHandler<Object, Object> {
 
