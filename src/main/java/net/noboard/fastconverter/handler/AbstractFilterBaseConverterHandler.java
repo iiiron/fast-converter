@@ -15,6 +15,12 @@ public abstract class AbstractFilterBaseConverterHandler<T, K> extends AbstractC
     private ConverterFilter converterFilter;
 
     public AbstractFilterBaseConverterHandler(ConverterFilter converterFilter) {
+        super();
+        this.converterFilter = converterFilter;
+    }
+
+    public AbstractFilterBaseConverterHandler(ConverterFilter converterFilter, String tip) {
+        super(tip);
         this.converterFilter = converterFilter;
     }
 
