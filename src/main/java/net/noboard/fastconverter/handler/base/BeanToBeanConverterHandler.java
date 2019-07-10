@@ -29,11 +29,27 @@ import java.util.List;
  *
  *
  */
-public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
+public class BeanToBeanConverterHandler<T,K> extends AbstractFilterBaseConverterHandler<T, K> {
 
     private static FieldConverterHandler fieldConverterHandler = new FieldConverterHandler();
 
-    private static BeanToBeanConverterHandler beanCopy = null;
+    /**
+     * 一个专门用于复制Bean的BeanToBeanConverterHandler实例，它不会对数据做任何修改，除非
+     * 你通过@FieldConverter指定了转换器。由于该转换器使用了无参的构造函数实例化，它将无法
+     * 处理方法convert(Object)，你必须使用该方法的其他重载方法，明确指出转换的目标类型才可以。
+     */
+    public final static BeanToBeanConverterHandler beanCopy = new BeanToBeanConverterHandler(new AbstractConverterFilter() {
+        @Override
+        protected void initConverters(List<Converter<?, ?>> converters) {
+            converters.add(new NullConverterHandler());
+            converters.add(new SkippingConverterHandler(SkippingConverterHandler.BASIC_DATA_TYPE));
+            converters.add(new SkippingConverterHandler(SkippingConverterHandler.COMMON_DATA_TYPE));
+            converters.add(new MapToMapConverterHandler<>(this));
+            converters.add(new ArrayToArrayConverterHandler<>(this));
+            converters.add(new CollectionToCollectionConverterHandler<>(this));
+            converters.add(new BeanToBeanConverterHandler(this));
+        }
+    });
 
     private BeanToBeanConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
@@ -47,35 +63,17 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
         super(converterFilter, clazz.getName());
     }
 
-    public static BeanToBeanConverterHandler beanCopy() {
-        if (beanCopy == null) {
-            beanCopy = new BeanToBeanConverterHandler(new AbstractConverterFilter() {
-                @Override
-                protected void initConverters(List<Converter<?, ?>> converters) {
-                    converters.add(new NullConverterHandler());
-                    converters.add(new SkippingConverterHandler(SkippingConverterHandler.BASIC_DATA_TYPE));
-                    converters.add(new SkippingConverterHandler(SkippingConverterHandler.COMMON_DATA_TYPE));
-                    converters.add(new MapToMapConverterHandler<>(this));
-                    converters.add(new ArrayToListConverterHandler<>(this));
-                    converters.add(new CollectionToListConverterHandler<>(this));
-                    converters.add(new BeanToBeanConverterHandler(this));
-                }
-            });
-        }
-        return beanCopy;
-    }
-
     @Override
     public boolean supports(Object value) {
         return value != null;
     }
 
-    public Object convert(Object value, Class clazz) {
+    public K convert(T value, Class<K> clazz) {
         return this.convert(value, clazz.getName());
     }
 
     @Override
-    public Object convert(Object value) throws ConvertException {
+    public K convert(T value) throws ConvertException {
         if ("".equals(getDefaultTip())) {
             throw new ConvertException("缺少必要的目标类型信息。请检查构造器参数，或使用带tip参数的convert方法。");
         }
@@ -83,12 +81,13 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
     }
 
     @Override
-    protected Object converting(Object value, String tip) throws ConvertException {
+    protected K converting(T value, String tip) throws ConvertException {
         BeanInfo beanF, beanT;
-        Object objF, objT;
+        T objF;
+        K objT;
         try {
             objF = value;
-            objT = Class.forName(tip).newInstance();
+            objT = (K) Class.forName(tip).newInstance();
             beanF = Introspector.getBeanInfo(objF.getClass());
             beanT = Introspector.getBeanInfo(objT.getClass());
         } catch (IntrospectionException | IllegalAccessException | InstantiationException | ClassNotFoundException e) {
