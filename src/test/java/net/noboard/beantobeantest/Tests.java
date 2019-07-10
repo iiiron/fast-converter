@@ -1,15 +1,13 @@
-import net.noboard.fastconverter.Field;
+package net.noboard.beantobeantest;
+
 import net.noboard.fastconverter.FieldConverter;
-import net.noboard.fastconverter.filter.CommonConverterFilter;
-import net.noboard.fastconverter.handler.BeanConverterContainer;
-import net.noboard.fastconverter.handler.BeanToBeanConverterHandler;
 import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
 
 import java.util.Date;
 
 public class Tests {
 
-    public class BeanA{
+    public class BeanA {
         private String value;
 
         private String valueb;
@@ -31,7 +29,7 @@ public class Tests {
         }
     }
 
-    public class BeanB{
+    public class BeanB {
 
         private Date valueB;
 
@@ -56,15 +54,22 @@ public class Tests {
     }
 
     public void test() {
-        BeanB b = new BeanB();
-        b.setValue(new Date());
-        b.setValueB(new Date());
-        BeanConverterContainer container = new BeanConverterContainer(b, new BeanA());
-        new BeanToBeanConverterHandler(new CommonConverterFilter()).convert(container);
-        System.out.println(container);
+//        BeanB b = new BeanB();
+//        b.setValue(new Date());
+//        b.setValueB(new Date());
+//        BeanConverterContainer container = new BeanConverterContainer(new BeanA(),b );
+//        new BeanToBeanConverterHandler(new CommonConverterFilter()).convert(container,BeanToBeanConverterHandler.NEGATIVE);
+//        System.out.println(container);
     }
 
     public static void main(String[] args) {
+        HumanA humanA = new HumanA();
+//        net.noboard.beantobeantest.Man man = new net.noboard.beantobeantest.Man();
+//        man.setName("wanxm");
+//        man.setBirthday(new Date());
+//        humanA.setHuman(man);
+//        net.noboard.beantobeantest.HumanB humanB = (net.noboard.beantobeantest.HumanB) BeanToBeanConverterHandler.beanCopy().convert(humanA, net.noboard.beantobeantest.HumanB.class);
+        humanA.setA(new int[]{1,2,3});
         new Tests().test();
     }
 }

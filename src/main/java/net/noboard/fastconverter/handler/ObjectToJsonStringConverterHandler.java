@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.handler.base.AbstractFilterBaseConverterHandler;
+import net.noboard.fastconverter.handler.base.CommonFilterBaseConverterHandler;
 
 /**
  * @author wanxm

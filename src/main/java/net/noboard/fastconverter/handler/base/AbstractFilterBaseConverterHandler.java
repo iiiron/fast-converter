@@ -1,4 +1,4 @@
-package net.noboard.fastconverter.handler;
+package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;

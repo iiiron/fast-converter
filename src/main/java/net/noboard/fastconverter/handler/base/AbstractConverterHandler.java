@@ -1,4 +1,4 @@
-package net.noboard.fastconverter.handler;
+package net.noboard.fastconverter.handler.base;
 
 
 import net.noboard.fastconverter.ConvertException;
@@ -10,21 +10,25 @@ import net.noboard.fastconverter.Converter;
  * @param <K>
  */
 public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> {
-    private String tip;
+    private String defaultTip;
 
     public AbstractConverterHandler() {
-        this.tip = "";
+        this.defaultTip = "";
     }
 
-    public AbstractConverterHandler(String tip) {
-        this.tip = tip;
+    public AbstractConverterHandler(String defaultTip) {
+        this.defaultTip = defaultTip;
     }
 
     protected abstract K converting(T value, String tip) throws ConvertException;
 
+    protected String getDefaultTip() {
+        return this.defaultTip;
+    }
+
     @Override
     public K convert(T value) throws ConvertException {
-        return this.convert(value, this.tip);
+        return this.convert(value, this.defaultTip);
     }
 
     @Override

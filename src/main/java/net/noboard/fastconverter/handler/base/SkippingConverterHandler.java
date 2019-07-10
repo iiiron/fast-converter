@@ -1,13 +1,25 @@
-package net.noboard.fastconverter.handler;
+package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.ConvertException;
+import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 public class SkippingConverterHandler extends AbstractConverterHandler<Object, Object> {
 
     private Class[] classes;
 
+    /**
+     * 8中基本数据类型的包装类 + String
+     */
     public static Class[] BASIC_DATA_TYPE = {Integer.class, Double.class, Float.class,
             Long.class, Byte.class, Short.class, Character.class, String.class, Boolean.class};
+
+    /**
+     * 常见数据类型
+     */
+    public static Class[] COMMON_DATA_TYPE = {Date.class, BigDecimal.class};
 
     public SkippingConverterHandler(Class... classes) {
         this.classes = classes;

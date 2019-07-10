@@ -1,4 +1,6 @@
-package net.noboard.fastconverter.handler;
+package net.noboard.fastconverter.handler.base;
+
+import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
 
 /**
  * null值转换

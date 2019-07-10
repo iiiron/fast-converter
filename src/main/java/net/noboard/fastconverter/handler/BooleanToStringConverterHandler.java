@@ -1,6 +1,7 @@
 package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.ConvertException;
+import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
 
 public class BooleanToStringConverterHandler extends AbstractConverterHandler<Boolean, String> {
     @Override

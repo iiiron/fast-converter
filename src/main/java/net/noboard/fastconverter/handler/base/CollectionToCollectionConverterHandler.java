@@ -1,29 +1,32 @@
-package net.noboard.fastconverter.handler;
+package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.handler.base.AbstractFilterBaseConverterHandler;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
- * Collection<T> -> List<K>
+ * Collection<T> -> Collection<K>
  *
  * @author wanxm
  */
-@Deprecated
-public class CollectionToListConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<Collection<T>, List<K>> {
+public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<Collection<T>, Collection<K>> {
 
-    public CollectionToListConverterHandler(ConverterFilter converterFilter) {
+    public CollectionToCollectionConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
     }
 
     @Override
-    protected List<K> converting(Collection<T> value, String tip) throws ConvertException {
-        ArrayList<K> list = new ArrayList<>();
+    protected Collection<K> converting(Collection<T> value, String tip) throws ConvertException {
+        Collection<K> list = null;
+        try {
+            list = value.getClass().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new ConvertException("实例化" + value.getClass() + "失败");
+
+        }
 
         for (T obj : value) {
             Converter converter = this.getConverter(obj);

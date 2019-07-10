@@ -1,7 +1,7 @@
 package net.noboard.fastconverter.handler;
 
-import com.alibaba.fastjson.JSON;
 import net.noboard.fastconverter.ConvertException;
+import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
 
 /**
  * 这个转换器能将json字符串格式化为缩进和折行的形式
