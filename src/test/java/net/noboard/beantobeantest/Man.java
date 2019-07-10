@@ -11,6 +11,26 @@ public class Man {
     @FieldConverter(converter = DateToFormatStringConverterHandler.class)
     private Date birthday;
 
+    private Integer age;
+
+    private Boolean sex;
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Boolean getSex() {
+        return sex;
+    }
+
+    public void setSex(Boolean sex) {
+        this.sex = sex;
+    }
+
     public Date getBirthday() {
         return birthday;
     }

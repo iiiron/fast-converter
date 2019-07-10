@@ -8,6 +8,26 @@ public class Woman {
 
     private String birthday;
 
+    private String sex;
+
+    private int age;
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
     public String getBirthday() {
         return birthday;
     }
