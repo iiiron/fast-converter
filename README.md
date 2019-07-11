@@ -1,6 +1,22 @@
 # fast-converter
 
-在main方法中有使用示例
+（测试用例很全面）
+
+3.0版的fast-converter和之前的版本有较大的区别，不兼容！不兼容！不兼容！
+
+# fast-converter的架构
+
+稳定点：
+
+- fast-converter需要具有递归的能力，因此fast-converter提供了net.noboard.fastconverter.handler.base包。
+
+    fast-converter的递归能力并不是与生俱来的，或者说由特定的主类实现的，它的递归能力由base包中几个AbstractFilterBaseConverterHandler的实现类完成。
+
+    例如，ArrayToArrayConverterHandler提供了数组递归的能力，MapToMapConverterHandler提供了Map递归的能力，这些转换器可以通过ConverterFilter的实现类聚合在一起，ArrayToArrayConverterHandler和MapToMapConverterHandler聚合在一起，就能同时提供对数组和Map的递归能力。CommonConverterFilter提供了一种对ConverterFilter的实现，它通过将多种具有递归能力的转换器聚合起来，对外提供一种普适性的递归能力。
+
+变化点：
+
+- 具体的数据转化由一众AbstractConverterHandler的实现类完成
 
 # 各类必要性
 

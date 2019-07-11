@@ -12,4 +12,8 @@ package net.noboard.fastconverter;
  */
 public interface ConverterFilter {
     Converter getConverter(Object value);
+
+    void addFirst(Converter converter);
+
+    void addLast(Converter converter);
 }

@@ -4,11 +4,8 @@ import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.FieldConverter;
-import net.noboard.fastconverter.filter.AbstractConverterFilter;
-import net.noboard.fastconverter.handler.ArrayToListConverterHandler;
-import net.noboard.fastconverter.handler.CollectionToListConverterHandler;
+import net.noboard.fastconverter.filter.CommonConverterFilter;
 import net.noboard.fastconverter.handler.support.FieldConverterHandler;
-import net.noboard.fastconverter.handler.support.PutConverterHandler;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -16,7 +13,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 /**
  * 将指定Bean对象转换为一个新的指定类型的Bean（深度复制）
@@ -43,18 +39,7 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
      */
     public static BeanToBeanConverterHandler beanCopy() {
         if (beanCopy == null) {
-            beanCopy = new BeanToBeanConverterHandler(new AbstractConverterFilter() {
-                @Override
-                protected void initConverters(List<Converter<?, ?>> converters) {
-                    converters.add(new NullConverterHandler());
-                    converters.add(new SkippingConverterHandler(SkippingConverterHandler.BASIC_DATA_TYPE));
-                    converters.add(new SkippingConverterHandler(SkippingConverterHandler.COMMON_DATA_TYPE));
-                    converters.add(new MapToMapConverterHandler<>(this));
-                    converters.add(new ArrayToArrayConverterHandler<>(this));
-                    converters.add(new CollectionToCollectionConverterHandler<>(this));
-                    converters.add(new BeanToBeanConverterHandler(this));
-                }
-            });
+            beanCopy = new BeanToBeanConverterHandler(new CommonConverterFilter());
         }
 
         return beanCopy;
@@ -62,6 +47,7 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
 
     private BeanToBeanConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
+        converterFilter.addLast(this);
     }
 
     public BeanToBeanConverterHandler(ConverterFilter converterFilter, String tip) {
@@ -83,16 +69,6 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
     public BeanToBeanConverterHandler(ConverterFilter converterFilter, Class from, Class to) {
         super(converterFilter, to.getName());
         this.from = from;
-    }
-
-    public BeanToBeanConverterHandler(PutConverterHandler putConverterHandler) {
-        this(new AbstractConverterFilter() {
-            @Override
-            protected void initConverters(List<Converter<?, ?>> converters) {
-                putConverterHandler.put(converters);
-                converters.add(new BeanToBeanConverterHandler(this));
-            }
-        });
     }
 
     @Override

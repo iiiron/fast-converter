@@ -12,6 +12,6 @@ public class CommonConverterFilter extends AbstractConverterFilter {
         converters.add(new NullConverterHandler("2"));
         converters.add(new SkippingConverterHandler(SkippingConverterHandler.BASIC_DATA_TYPE));
         converters.add(new SkippingConverterHandler(SkippingConverterHandler.COMMON_DATA_TYPE));
-        this.addContainerConverter();
+        this.addContainerConverter(converters);
     }
 }
