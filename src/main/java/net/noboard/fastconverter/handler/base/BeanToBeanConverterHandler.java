@@ -72,6 +72,14 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
         super(converterFilter, to.getName());
     }
 
+    /**
+     * 该构造函数同其他的区别在于，它接收一个标识beanFrom的类型的class对象参数，使用该
+     * 构造函数实例化的BeanToBean转换器，会在验证中检查beanFrom的类型是否是该构造器
+     * 参数类型的子类，本类或接口实现类，是则验证通过，否则验证不通过。
+     * @param converterFilter
+     * @param from
+     * @param to
+     */
     public BeanToBeanConverterHandler(ConverterFilter converterFilter, Class from, Class to) {
         super(converterFilter, to.getName());
         this.from = from;
