@@ -1,5 +1,7 @@
 package net.noboard.fastconverter;
 
+import java.util.function.Function;
+
 /**
  * 转换器过滤器
  *
@@ -13,7 +15,11 @@ package net.noboard.fastconverter;
 public interface ConverterFilter {
     Converter getConverter(Object value);
 
-    void addFirst(Converter converter);
+    ConverterFilter addFirst(Converter converter);
 
-    void addLast(Converter converter);
+    ConverterFilter addFirst(Function<ConverterFilter,Converter> add);
+
+    ConverterFilter addLast(Converter converter);
+
+    ConverterFilter addLast(Function<ConverterFilter,Converter> add);
 }

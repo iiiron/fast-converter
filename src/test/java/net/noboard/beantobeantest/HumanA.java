@@ -1,17 +1,13 @@
 package net.noboard.beantobeantest;
 
+import lombok.Data;
 import net.noboard.fastconverter.FieldConverter;
-import net.noboard.fastconverter.handler.base.BeanToBeanConverterHandler;
 
+import java.util.List;
+import java.util.Set;
+
+@Data
 public class HumanA {
 
     private Man human;
-
-    public Man getHuman() {
-        return human;
-    }
-
-    public void setHuman(Man human) {
-        this.human = human;
-    }
 }

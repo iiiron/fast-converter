@@ -23,7 +23,7 @@ public class CollectionTest {
         map.put("b",2);
         map.put("c",3);
 
-        ArrayToArrayConverterHandler<Integer, Integer> arrayToArrayConverterHandler = new ArrayToArrayConverterHandler<>(new AbstractConverterFilter() {
+        ArrayToArrayConverterHandler arrayToArrayConverterHandler = new ArrayToArrayConverterHandler(new AbstractConverterFilter() {
             @Override
             protected void initConverters(List<Converter<?, ?>> converters) {
                 converters.add(new SkippingConverterHandler(SkippingConverterHandler.BASIC_DATA_TYPE));
@@ -45,7 +45,7 @@ public class CollectionTest {
             }
         });
 
-        Integer[] o = arrayToArrayConverterHandler.convert(a);
+        Integer[] o = (Integer[]) arrayToArrayConverterHandler.convert(a);
         Object o2 = collectionToCollectionConverterHandler.convert(array);
         Object o3 = mapToMapConverterHandler.convert(map);
         System.out.println("1");

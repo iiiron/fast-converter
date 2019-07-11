@@ -5,38 +5,34 @@ import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
 
-/**
- * [] -> List[K]
- *
- * @author wanxm
- */
-public class ArrayToArrayConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<T[], K[]> {
+public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
 
     public ArrayToArrayConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
     }
 
     @Override
-    protected K[] converting(T[] value, String tip) throws ConvertException {
-        int index = 0;
+    protected Object converting(Object value, String tip) throws ConvertException {
         Converter converter = null;
         Object newArray = null;
-        for (T obj : value) {
+        for (int index = 0; index < Array.getLength(value); index++) {
+            Object obj = Array.get(value, index);
             if (converter == null) {
                 converter = this.getConverter(obj);
                 if (converter == null) {
                     throw new ConvertException("没有转换器能够处理数据" + obj);
                 } else {
                     Object result = converter.convert(obj, tip);
-                    newArray = Array.newInstance(result.getClass(), value.length);
-                    Array.set(newArray, index++, result);
+                    newArray = Array.newInstance(result.getClass(), Array.getLength(value));
+                    Array.set(newArray, index, result);
                 }
             } else {
-                Array.set(newArray, index++, converter.convert(obj, tip));
+                Array.set(newArray, index, converter.convert(obj, tip));
             }
         }
-        return (K[]) newArray;
+        return newArray;
     }
 
     @Override

@@ -1,7 +1,13 @@
 package net.noboard.beantobeantest;
 
-import java.util.Date;
+import lombok.Data;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@Data
 public class Woman {
 
     private String name;
@@ -12,35 +18,13 @@ public class Woman {
 
     private int age;
 
-    public int getAge() {
-        return age;
-    }
+    private int[] aaa;
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+    private Integer[] bbb;
 
-    public String getSex() {
-        return sex;
-    }
+    private Set ccc;
 
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
+    private List<String>[] ddd;
 
-    public String getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private Map<String, Date> eee;
 }

@@ -5,8 +5,11 @@ import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.Field;
 import net.noboard.fastconverter.FieldConverter;
+import net.noboard.fastconverter.handler.support.FieldConverterHandler;
 
+import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,6 +25,8 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
 
     private static List<Converter> converters = new ArrayList<>();
 
+    private final FieldConverterHandler fieldConverterHandler = new FieldConverterHandler();
+
     public BeanToMapConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
     }
@@ -30,27 +35,54 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
     protected Map<String, Object> converting(Object value, String tip) throws ConvertException {
         Map<String, Object> map = new HashMap<>();
 
-        for (java.lang.reflect.Field field : value.getClass().getDeclaredFields()) {
+        BeanInfo beanInfo;
+        try {
+            beanInfo = Introspector.getBeanInfo(value.getClass());
+        } catch (IntrospectionException e) {
+            throw new ConvertException("获取" + value.getClass() + "的bean info时出错。" + e.getMessage());
+        }
+
+        for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors()) {
+            if ("class".equals(descriptor.getName())) {
+                continue;
+            }
+
             // 获取域值
             Object fieldValue;
             try {
-                PropertyDescriptor pd = new PropertyDescriptor(field.getName(), value.getClass());
-                Method reader = pd.getReadMethod();
-                if (reader != null) {
-                    fieldValue = reader.invoke(value);
-                } else {
+                fieldValue = descriptor.getReadMethod().invoke(value);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new ConvertException(e);
+            }
+
+            // 对域名 及 是否隐藏的处理
+            String mapKey;
+            Field docField = null;
+            try {
+                docField = value.getClass().getDeclaredField(descriptor.getName()).getAnnotation(Field.class);
+            } catch (NoSuchFieldException e) {
+                throw new ConvertException(e);
+            }
+            if (docField != null) {
+                if (docField.isHide()) {
                     continue;
                 }
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                throw new ConvertException("ObjectToMapConverterHandler对数据转换过程中发生异常：" + e.getMessage());
-            } catch (IntrospectionException e) {
-                continue;
+
+                mapKey = "".equals(docField.name())
+                        ? descriptor.getName()
+                        : docField.name();
+            } else {
+                mapKey = descriptor.getName();
             }
 
             // 转换域值
             Object mapValue = fieldValue;
-            FieldConverter annotation = field.getAnnotation(FieldConverter.class);
+            FieldConverter annotation = null;
+            try {
+                annotation = value.getClass().getDeclaredField(descriptor.getName()).getAnnotation(FieldConverter.class);
+            } catch (NoSuchFieldException e) {
+                throw new ConvertException(e);
+            }
             if (annotation == null) {
                 Converter converter = this.getConverter(fieldValue);
                 if (converter != null) {
@@ -60,42 +92,7 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                 if (fieldValue == null) {
                     continue;
                 }
-                Converter cc = null;
-                for (Converter converter : converters) {
-                    if (converter.getClass().equals(annotation.converter())) {
-                        cc = converter;
-                        break;
-                    }
-                }
-                if (cc == null) {
-                    try {
-                        cc = annotation.converter().newInstance();
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        throw new ConvertException("创建" + annotation.converter().getName() + "实例失败：" + e.getMessage());
-                    }
-                    converters.add(cc);
-                }
-                if ("".equals(annotation.tip())) {
-                    mapValue = cc.convert(fieldValue);
-                } else {
-                    mapValue = cc.convert(fieldValue, annotation.tip());
-                }
-
-            }
-
-            // 对域名 及 是否隐藏的处理
-            String mapKey;
-            Field docField = field.getAnnotation(Field.class);
-            if (docField != null) {
-                if (docField.isHide()) {
-                    continue;
-                }
-
-                mapKey = "".equals(docField.name())
-                        ? field.getName()
-                        : docField.name();
-            } else {
-                mapKey = field.getName();
+                mapValue = fieldConverterHandler.handler(annotation, fieldValue);
             }
 
             map.put(mapKey, mapValue);

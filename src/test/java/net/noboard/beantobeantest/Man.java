@@ -1,11 +1,18 @@
 package net.noboard.beantobeantest;
 
+import lombok.Data;
 import net.noboard.fastconverter.FieldConverter;
+import net.noboard.fastconverter.handler.BooleanToStringConverterHandler;
 import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+@Data
 public class Man {
+
     private String name;
 
     @FieldConverter(converter = DateToFormatStringConverterHandler.class)
@@ -13,37 +20,17 @@ public class Man {
 
     private Integer age;
 
+    @FieldConverter(converter = BooleanToStringConverterHandler.class)
     private Boolean sex;
 
-    public Integer getAge() {
-        return age;
-    }
 
-    public void setAge(Integer age) {
-        this.age = age;
-    }
+    private int[] aaa;
 
-    public Boolean getSex() {
-        return sex;
-    }
+    private Integer[] bbb;
 
-    public void setSex(Boolean sex) {
-        this.sex = sex;
-    }
+    private Set ccc;
 
-    public Date getBirthday() {
-        return birthday;
-    }
+    private List<String>[] ddd;
 
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private Map<String, Date> eee;
 }

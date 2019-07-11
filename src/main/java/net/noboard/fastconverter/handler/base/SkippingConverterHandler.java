@@ -3,6 +3,7 @@ package net.noboard.fastconverter.handler.base;
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -25,6 +26,10 @@ public class SkippingConverterHandler extends AbstractConverterHandler<Object, O
         this.classes = classes;
     }
 
+    public SkippingConverterHandler() {
+
+    }
+
     @Override
     protected Object converting(Object value, String tip) throws ConvertException {
         return value;
@@ -32,14 +37,18 @@ public class SkippingConverterHandler extends AbstractConverterHandler<Object, O
 
     @Override
     public boolean supports(Object value) {
-        if (value == null) {
+        if (classes == null || Array.getLength(classes) == 0) {
+            return true;
+        } else {
+            if (value == null) {
+                return false;
+            }
+            for (Class clazz : classes) {
+                if (clazz.isAssignableFrom(value.getClass())) {
+                    return true;
+                }
+            }
             return false;
         }
-        for (Class clazz : classes) {
-            if (clazz.isAssignableFrom(value.getClass())) {
-                return true;
-            }
-        }
-        return false;
     }
 }
