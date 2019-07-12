@@ -11,7 +11,7 @@ public class BeanToBeanTest {
     @Test
     public void a() {
         BeanToBeanConverterHandler beanToBeanConverterHandler =
-                BeanToBeanConverterHandler.beanCopyCustom(new CommonConverterFilter());
+                BeanToBeanConverterHandler.transferCustom(new CommonConverterFilter());
 
         HumanA humanA = init();
         HumanB humanB = (HumanB) beanToBeanConverterHandler.convert(humanA, "net.noboard.beantobeantest.HumanB");
@@ -47,6 +47,13 @@ public class BeanToBeanTest {
         Map<String, Date> map = new HashMap<>();
         map.put("wanxm", new Date());
         man.setEee(map);
+
+        List<ChildA> list = new ArrayList<>();
+        ChildA childA = new ChildA();
+        childA.setName("heiheihei");
+        childA.setBirthday(new Date());
+        list.add(childA);
+        humanA.setChildren(list);
 
         humanA.setHuman(man);
         return humanA;

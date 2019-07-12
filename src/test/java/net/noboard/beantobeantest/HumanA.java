@@ -10,4 +10,6 @@ import java.util.Set;
 public class HumanA {
 
     private Man human;
+
+    private List<ChildA> children;
 }
