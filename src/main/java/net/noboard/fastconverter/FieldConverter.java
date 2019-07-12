@@ -1,15 +1,13 @@
 package net.noboard.fastconverter;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author wanxm
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
+@Repeatable(FieldConverterContainer.class)
 public @interface FieldConverter {
     String tip() default "";
 

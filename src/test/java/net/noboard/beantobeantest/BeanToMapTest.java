@@ -6,7 +6,6 @@ import net.noboard.fastconverter.handler.base.CommonFilterBaseConverterHandler;
 import org.junit.Test;
 
 import java.util.Map;
-import java.util.function.Predicate;
 
 public class BeanToMapTest {
     @Test
@@ -14,7 +13,7 @@ public class BeanToMapTest {
         CommonFilterBaseConverterHandler commonFilterBaseConverterHandler =
                 new CommonFilterBaseConverterHandler(new CommonConverterFilter().addLast(BeanToMapConverterHandler::new));
 
-        HumanA humanA = BeanTest.init();
+        HumanA humanA = BeanToBeanTest.init();
 
         Map map = (Map) commonFilterBaseConverterHandler.convert(humanA);
 

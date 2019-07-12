@@ -2,8 +2,7 @@ package net.noboard.beantobeantest;
 
 import lombok.Data;
 import net.noboard.fastconverter.FieldConverter;
-import net.noboard.fastconverter.handler.BooleanToStringConverterHandler;
-import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
+import net.noboard.fastconverter.handler.*;
 
 import java.util.Date;
 import java.util.List;
@@ -33,4 +32,8 @@ public class Man {
     private List<String>[] ddd;
 
     private Map<String, Date> eee;
+
+    @FieldConverter(converter = BooleanToNumberConverterHandler.class)
+    @FieldConverter(converter = NumberToBigDecimalConverterHandler.class)
+    private Boolean fff;
 }

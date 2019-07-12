@@ -2,6 +2,7 @@ package net.noboard.beantobeantest;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,4 +28,6 @@ public class Woman {
     private List<String>[] ddd;
 
     private Map<String, Date> eee;
+
+    private BigDecimal fff;
 }

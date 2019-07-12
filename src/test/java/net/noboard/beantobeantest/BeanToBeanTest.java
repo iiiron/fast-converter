@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.util.*;
 
-public class BeanTest {
+public class BeanToBeanTest {
 
     @Test
     public void a() {
@@ -29,6 +29,7 @@ public class BeanTest {
         man.setSex(true);
 //        man.setAaa(new int[]{1, 2, 3});
         man.setBbb(new Integer[]{1, 2, 3});
+        man.setFff(true);
 
         Set sets = new HashSet();
         sets.add("a");

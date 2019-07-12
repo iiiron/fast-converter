@@ -77,13 +77,13 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
 
             // 转换域值
             Object mapValue = fieldValue;
-            FieldConverter annotation = null;
+            FieldConverter[] annotations = null;
             try {
-                annotation = value.getClass().getDeclaredField(descriptor.getName()).getAnnotation(FieldConverter.class);
+                annotations = value.getClass().getDeclaredField(descriptor.getName()).getAnnotationsByType(FieldConverter.class);
             } catch (NoSuchFieldException e) {
                 throw new ConvertException(e);
             }
-            if (annotation == null) {
+            if (annotations == null || annotations.length == 0) {
                 Converter converter = this.getConverter(fieldValue);
                 if (converter != null) {
                     mapValue = converter.convert(fieldValue);
@@ -92,7 +92,11 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                 if (fieldValue == null) {
                     continue;
                 }
-                mapValue = fieldConverterHandler.handler(annotation, fieldValue);
+                Object v = mapValue;
+                for (FieldConverter annotation : annotations) {
+                    v = fieldConverterHandler.handler(annotation, v);
+                }
+                mapValue = v;
             }
 
             map.put(mapKey, mapValue);

@@ -1,5 +1,6 @@
 package net.noboard.fastconverter.handler.base;
 
+import com.sun.javafx.binding.StringFormatter;
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
@@ -13,6 +14,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 /**
  * 将指定Bean对象转换为一个新的指定类型的Bean（深度复制）
@@ -23,13 +25,13 @@ import java.lang.reflect.InvocationTargetException;
  * 所以A,B不需要是相同的类型，转换器仅针对A，B中相同域名的域进行A->B的转换，转换过程可通过@FieldConverter
  * 注解干预，也可根据注册到ConverterFilter中的默认转换器来进行默认转换（域名相同，但未通过@FieldConverter
  * 指定转换器的域，会被默认转换器转换）。
- *
+ * <p>
  * 由于从一个Bean转换到另一个Bean的转换过程存在较强的类型限制（较强的目的性），使用BeanToBeanConverterHandler
  * 时，必须为其提供目标类型信息。BeanToBeanConverterHandler有两种方式设置目标类型信息，其一是通过构造函数，其
  * 二是通过convert方法提供tip信息（用tip指定目标类的全限定类名）。但BeanToBeanConverterHandler在递归转换过程
  * 中具有自动探明目标类型的能力，也就是说，你仅需指定最外层的目标类型，当目标类中包含其他Bean时，转换器会自动适配
  * 并完成转换工作。
- *
+ * <p>
  * 这也导致了一个问题，当你试图将BeanToBeanConverterHandler添加到ConverterFilter中，企图赋予一个转换
  * 链处理Bean的能力时，你并不能简单的 new BeanToBeanConverterHandler(converterFilter) ，因为这样构造出来的
  * BeanToBeanConverterHandler不知道要将它遇到的Bean转换成什么类型（这个问题有部分要归罪到java的泛型机制上），
@@ -37,7 +39,7 @@ import java.lang.reflect.InvocationTargetException;
  * 这样的能力。为了让BeanToBeanConverterHandler的使用者认识到它的限制，我将其构造函数
  * BeanToBeanConverterHandler(ConverterFilter)设为了私有的，转而提供了两个静态方法，beanCopy和beanCopyCustom。
  * 方法比构造器更有具体性，由它来承载这些是更合适的选择。
- *
+ * <p>
  * 谨记，只有BeanToBeanConverterHandler自身具备目标类型探明的能力
  */
 public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<T, K> {
@@ -65,10 +67,10 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
 
     /**
      * 该方法返回的是beanCopy的定制版本
-     *
+     * <p>
      * beanCopyCustom会在用户提供的ConverterFilter末尾添加BeanToBeanConverterHandler实例来
      * 增强转换链。使其可以处理递归的Bean To Bean转换。
-     *
+     * <p>
      * 要注意，BeanToBeanConverterHandler的类型探查能力对泛型不起作用。换句话说，它无法在没有
      * tip的情况下对List,Map等类似的泛型容器中的元素进行转换。
      *
@@ -151,16 +153,24 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
                 if (fD.getName().toLowerCase().equals(tD.getName().toLowerCase())) {
                     try {
                         Field field = objF.getClass().getDeclaredField(fD.getName());
-                        FieldConverter fieldConverter = field.getAnnotation(FieldConverter.class);
+                        FieldConverter[] fieldConverters = field.getAnnotationsByType(FieldConverter.class);
                         Object r = fD.getReadMethod().invoke(objF);
-                        if (fieldConverter != null) {
+                        if (fieldConverters != null && fieldConverters.length > 0) {
                             if (r != null) {
+                                Object v = r;
+                                for (FieldConverter fieldConverter : fieldConverters) {
+                                    v = fieldConverterHandler.handler(fieldConverter, v);
+                                }
                                 try {
-                                    tD.getWriteMethod().invoke(objT, fieldConverterHandler.handler(fieldConverter, r));
+                                    tD.getWriteMethod().invoke(objT, v);
                                 } catch (IllegalArgumentException e) {
-                                    throw new ConvertException("数据转换后类型不符合beanTo对应域的类型。  域:"
-                                            + tD.getName() + "  目标类型:" + tD.getPropertyType().getName()
-                                            + "  转换器:" + fieldConverter.converter().getName());
+                                    StringBuilder stringBuilder = new StringBuilder();
+                                    stringBuilder.append("[");
+                                    Arrays.stream(fieldConverters).forEach(fieldConverter -> stringBuilder.append(fieldConverter.converter().getName()));
+                                    stringBuilder.append("]");
+                                    throw new ConvertException(
+                                            StringFormatter.format("数据转换后类型不符合beanTo对应域的类型。域:{0},目标类型:{1},转换器:{2}",
+                                                    tD.getName(), tD.getPropertyType().getName(), stringBuilder).toString());
                                 }
                             }
                         } else {
