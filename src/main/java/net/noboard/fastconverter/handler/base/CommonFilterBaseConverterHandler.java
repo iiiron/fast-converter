@@ -27,7 +27,7 @@ public class CommonFilterBaseConverterHandler<T, K> extends AbstractFilterBaseCo
         if (converter != null) {
             return (K) converter.convert(value);
         } else {
-            throw new ConvertException("没有转换器可以处理" + value);
+            return (K) value;
         }
     }
 }
