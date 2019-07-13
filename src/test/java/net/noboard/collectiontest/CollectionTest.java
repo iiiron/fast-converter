@@ -20,9 +20,9 @@ public class CollectionTest {
         array.add(false);
         array.add(null);
         Map map = new HashMap<>();
-        map.put("a",1);
+        map.put("a",null);
         map.put("b",2);
-        map.put("c",null);
+        map.put("c",3);
 
         ArrayToArrayConverterHandler arrayToArrayConverterHandler = new ArrayToArrayConverterHandler(new AbstractConverterFilter() {
             @Override

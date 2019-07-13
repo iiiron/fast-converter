@@ -4,6 +4,7 @@ import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 
 /**
@@ -20,24 +21,37 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
 
     @Override
     protected Collection<K> converting(Collection<T> value, String tip) throws ConvertException {
-        Collection<K> list;
+        Collection<K> collection;
         try {
-            list = value.getClass().newInstance();
+            collection = value.getClass().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ConvertException("实例化" + value.getClass() + "失败", e);
 
         }
 
-        for (T obj : value) {
-            Converter converter = this.getConverter(obj);
-            if (converter == null) {
-                list.add((K) obj);
-            } else {
-                list.add((K) converter.convert(obj, tip));
+        Converter converter = null;
+        Object newV = null,oldV = null;
+        try {
+            for (T obj : value) {
+                converter = this.getConverter(obj);
+                oldV = obj;
+                newV = converter == null ? oldV : converter.convert(oldV, tip);
+                collection.add((K) newV);
             }
+        } catch (Exception e) {
+            throw new ConvertException(
+                    MessageFormat.format(
+                            "旧容器类型：{0}，旧元素类型：{1}，新容器类型：{2}，新元素类型：{3}，转换器类型：{4}，",
+                            value.getClass().getName(),
+                            oldV == null ? "null" : oldV.getClass().getName(),
+                            collection == null ? "null" : collection.getClass().getName(),
+                            newV == null ? "null" : newV.getClass().getName(),
+                            converter == null ? "null" : converter.getClass().getName()),
+                    e);
         }
 
-        return list;
+
+        return collection;
     }
 
     @Override

@@ -4,6 +4,7 @@ import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 
@@ -33,13 +34,26 @@ public class MapToMapConverterHandler<T, K> extends AbstractFilterBaseConverterH
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ConvertException("实例化" + value.getClass() + "失败", e);
         }
-        for (Object key : value.keySet()) {
-            Converter converter = this.getConverter(value.get(key));
-            if (converter != null) {
-                newMap.put(key, (K) converter.convert(value.get(key), tip));
-            } else {
-                newMap.put(key, (K) value.get(key));
+
+        Converter converter = null;
+        Object newV = null, oldV = null;
+        try {
+            for (Map.Entry entry : value.entrySet()) {
+                converter = this.getConverter(entry.getValue());
+                oldV = entry.getValue();
+                newV = converter == null ? oldV : converter.convert(oldV, tip);
+                newMap.put(entry.getKey(), (K) newV);
             }
+        } catch (Exception e) {
+            throw new ConvertException(
+                    MessageFormat.format(
+                            "旧容器类型：{0}，旧元素类型：{1}，新容器类型：{2}，新元素类型：{3}，转换器类型：{4}，",
+                            value.getClass().getName(),
+                            oldV == null ? "null" : oldV.getClass().getName(),
+                            newMap == null ? "null" : newMap.getClass().getName(),
+                            newV == null ? "null" : newV.getClass().getName(),
+                            converter == null ? "null" : converter.getClass().getName()),
+                    e);
         }
 
         return newMap;

@@ -1,10 +1,8 @@
-package net.noboard.beantobeantest;
+package net.noboard.bean;
 
 import lombok.Data;
-import net.noboard.fastconverter.FieldConverter;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class HumanA {

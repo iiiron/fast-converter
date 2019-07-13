@@ -24,25 +24,35 @@ public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHan
 
     @Override
     protected Object converting(Object value, String tip) throws ConvertException {
-        Converter converter;
-        Object newArray = null;
-        for (int index = 0; index < Array.getLength(value); index++) {
-            Object obj = Array.get(value, index);
-            converter = this.getConverter(obj);
-            if (converter != null) {
-                obj = converter.convert(obj, tip);
+        Converter converter = null;
+        Object newArray = null, newV = null, oldV = null;
+        try {
+            for (int index = 0; index < Array.getLength(value); index++) {
+                oldV = Array.get(value, index);
+                newV = oldV;
+                converter = this.getConverter(newV);
+                if (converter != null) {
+                    newV = converter.convert(newV, tip);
+                }
+                if (newArray == null && newV != null) {
+                    newArray = Array.newInstance(newV.getClass(), Array.getLength(value));
+                }
+                if (newArray != null) {
+                    Array.set(newArray, index, newV);
+                }
             }
-            if (newArray == null) {
-                newArray = Array.newInstance(obj.getClass(), Array.getLength(value));
-            }
-            try {
-                Array.set(newArray, index, obj);
-            } catch (IllegalArgumentException e) {
-                throw new ConvertException(
-                        MessageFormat.format("数组类型：{0}，插入失败元素：{1}", newArray.getClass(), obj), e);
-            }
-
+        } catch (Exception e) {
+            throw new ConvertException(
+                    MessageFormat.format(
+                            "旧容器类型：{0}，旧元素类型：{1}，新容器类型：{2}，新元素类型：{3}，转换器类型：{4}，",
+                            value.getClass().getName(),
+                            oldV == null ? "null" : oldV.getClass().getName(),
+                            newArray == null ? "null" : newArray.getClass().getName(),
+                            newV == null ? "null" : newV.getClass().getName(),
+                            converter == null ? "null" : converter.getClass().getName()),
+                    e);
         }
+
 
         return newArray;
     }
