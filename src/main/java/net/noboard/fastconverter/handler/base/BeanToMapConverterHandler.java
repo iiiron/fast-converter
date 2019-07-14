@@ -12,7 +12,6 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -90,7 +89,7 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
                 throw new ConvertException(e);
             }
             if (annotations == null || annotations.length == 0) {
-                Converter converter = this.getConverter(fieldValue);
+                Converter converter = this.filter(fieldValue);
                 if (converter != null) {
                     mapValue = converter.convert(fieldValue);
                 }

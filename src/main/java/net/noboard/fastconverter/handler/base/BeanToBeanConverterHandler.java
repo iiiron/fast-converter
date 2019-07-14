@@ -4,7 +4,6 @@ import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.FieldConverter;
-import net.noboard.fastconverter.filter.CommonConverterFilter;
 import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
 import net.noboard.fastconverter.handler.support.FieldConverterHandler;
 
@@ -153,7 +152,7 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                                 }
                             }
                         } else {
-                            Converter converter = this.getConverter(r);
+                            Converter converter = this.filter(r);
                             try {
                                 if (converter == null) {
                                     tD.getWriteMethod().invoke(objT, r);

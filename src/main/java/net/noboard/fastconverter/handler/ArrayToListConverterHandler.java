@@ -27,7 +27,7 @@ public class ArrayToListConverterHandler<K> extends AbstractFilterBaseConverterH
 
         for (int i = 0; i < Array.getLength(value); i++) {
             Object t = Array.get(value, i);
-            Converter converter = this.getConverter(t);
+            Converter converter = this.filter(t);
             if (converter == null) {
                 throw new ConvertException("没有转换器能够处理数据" + t);
             } else {

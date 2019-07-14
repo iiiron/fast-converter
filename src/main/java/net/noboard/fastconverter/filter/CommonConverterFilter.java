@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CommonConverterFilter extends AbstractConverterFilter {
     @Override
-    protected void initConverters(List<Converter<?, ?>> converters) {
+    protected void initConverters(List<Converter> converters) {
         this.addContainerConverter(converters);
     }
 }

@@ -3,7 +3,6 @@ package net.noboard.fastconverter.handler.base;
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
-import net.noboard.fastconverter.handler.base.AbstractFilterBaseConverterHandler;
 
 /**
  * 无限转换转换器
@@ -27,7 +26,7 @@ public class CommonInfiniteFilterBaseConverterHandler<T, K> extends AbstractFilt
     protected K converting(T value, String tip) throws ConvertException {
         Object obj = value;
         Converter converter;
-        while ((converter = this.getConverter(obj)) != null) {
+        while ((converter = this.filter(obj)) != null) {
             obj = converter.convert(obj);
         }
         return (K) obj;
@@ -35,6 +34,6 @@ public class CommonInfiniteFilterBaseConverterHandler<T, K> extends AbstractFilt
 
     @Override
     public boolean supports(Object value) {
-        return this.getConverter(value) != null;
+        return this.filter(value) != null;
     }
 }

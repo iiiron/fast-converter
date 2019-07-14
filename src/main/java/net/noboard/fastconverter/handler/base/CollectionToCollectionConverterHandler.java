@@ -33,7 +33,7 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
         Object newV = null,oldV = null;
         try {
             for (T obj : value) {
-                converter = this.getConverter(obj);
+                converter = this.filter(obj);
                 oldV = obj;
                 newV = converter == null ? oldV : converter.convert(oldV, tip);
                 collection.add((K) newV);

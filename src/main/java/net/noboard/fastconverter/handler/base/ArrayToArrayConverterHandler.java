@@ -30,7 +30,7 @@ public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHan
             for (int index = 0; index < Array.getLength(value); index++) {
                 oldV = Array.get(value, index);
                 newV = oldV;
-                converter = this.getConverter(newV);
+                converter = this.filter(newV);
                 if (converter != null) {
                     newV = converter.convert(newV, tip);
                 }
