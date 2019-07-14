@@ -27,21 +27,21 @@ public class CollectionTest {
 
         ArrayToArrayConverterHandler arrayToArrayConverterHandler = new ArrayToArrayConverterHandler(new AbstractConverterFilter() {
             @Override
-            protected void initConverters(List<Converter<?, ?>> converters) {
+            protected void initConverters(List<Converter> converters) {
                 converters.add(new NumberToBigDecimalConverterHandler());
             }
         });
 
         CollectionToCollectionConverterHandler collectionToCollectionConverterHandler = new CollectionToCollectionConverterHandler(new AbstractConverterFilter() {
             @Override
-            protected void initConverters(List<Converter<?, ?>> converters) {
+            protected void initConverters(List<Converter> converters) {
                 converters.add(new BooleanToStringConverterHandler());
             }
         });
 
         MapToMapConverterHandler mapToMapConverterHandler = new MapToMapConverterHandler(new AbstractConverterFilter() {
             @Override
-            protected void initConverters(List<Converter<?, ?>> converters) {
+            protected void initConverters(List<Converter> converters) {
 
             }
         });
