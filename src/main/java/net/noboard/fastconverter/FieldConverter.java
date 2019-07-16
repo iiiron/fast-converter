@@ -12,4 +12,6 @@ public @interface FieldConverter {
     String tip() default "";
 
     Class<? extends Converter> converter();
+
+    Class<? extends Validator> afterConvert() default Validator.class;
 }

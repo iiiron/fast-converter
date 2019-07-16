@@ -7,9 +7,11 @@ import net.noboard.fastconverter.handler.NumberToBigDecimalConverterHandler;
 import net.noboard.fastconverter.handler.base.ArrayToArrayConverterHandler;
 import net.noboard.fastconverter.handler.base.CollectionToCollectionConverterHandler;
 import net.noboard.fastconverter.handler.base.MapToMapConverterHandler;
-import net.noboard.fastconverter.handler.base.SkippingConverterHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CollectionTest {
 
