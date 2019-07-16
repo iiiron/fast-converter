@@ -1,7 +1,5 @@
 package net.noboard.fastconverter;
 
 public interface Validator {
-    boolean validate(Object field, Object bean);
-
-    VerifyInfo verifyInfo();
+    VerifyInfo validate(Object value);
 }

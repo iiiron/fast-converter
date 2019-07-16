@@ -39,15 +39,7 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
                 collection.add((K) newV);
             }
         } catch (Exception e) {
-            throw new ConvertException(
-                    MessageFormat.format(
-                            "旧容器类型：{0}，旧元素类型：{1}，新容器类型：{2}，新元素类型：{3}，转换器类型：{4}，",
-                            value.getClass().getName(),
-                            oldV == null ? "null" : oldV.getClass().getName(),
-                            collection == null ? "null" : collection.getClass().getName(),
-                            newV == null ? "null" : newV.getClass().getName(),
-                            converter == null ? "null" : converter.getClass().getName()),
-                    e);
+            ConverterExceptionHelper.factory(value, oldV, collection, newV, converter, e);
         }
 
 

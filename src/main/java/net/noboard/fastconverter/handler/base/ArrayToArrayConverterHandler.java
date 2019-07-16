@@ -42,15 +42,7 @@ public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHan
                 }
             }
         } catch (Exception e) {
-            throw new ConvertException(
-                    MessageFormat.format(
-                            "旧容器类型：{0}，旧元素类型：{1}，新容器类型：{2}，新元素类型：{3}，转换器类型：{4}，",
-                            value.getClass().getName(),
-                            oldV == null ? "null" : oldV.getClass().getName(),
-                            newArray == null ? "null" : newArray.getClass().getName(),
-                            newV == null ? "null" : newV.getClass().getName(),
-                            converter == null ? "null" : converter.getClass().getName()),
-                    e);
+            ConverterExceptionHelper.factory(value, oldV, newArray, newV, converter, e);
         }
 
 

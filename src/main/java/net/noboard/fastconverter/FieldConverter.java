@@ -13,5 +13,5 @@ public @interface FieldConverter {
 
     Class<? extends Converter> converter();
 
-    Class<? extends Validator> afterConvert() default Validator.class;
+    Class<? extends FieldValidator> afterConvert() default FieldValidator.class;
 }
