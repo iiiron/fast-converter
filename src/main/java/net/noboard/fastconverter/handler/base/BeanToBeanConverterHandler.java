@@ -147,9 +147,12 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
                                     } else {
                                         afterConvertValue = converter.convert(afterConvertValue, fieldConverter.tip());
                                     }
-                                    VerifyInfo verifyInfo = fieldConverterHandler.getValidator(fieldConverter).validate(afterConvertValue, objF);
-                                    if (!verifyInfo.isPass()) {
-                                        verifyMessage.append("{").append(verifyInfo.getErrMessage()).append("}");
+                                    FieldValidator validator = fieldConverterHandler.getValidator(fieldConverter);
+                                    if (validator != null) {
+                                        VerifyInfo verifyInfo = validator.validate(afterConvertValue, objF);
+                                        if (!verifyInfo.isPass()) {
+                                            verifyMessage.append("{").append(verifyInfo.getErrMessage()).append("}");
+                                        }
                                     }
                                 }
                             }
@@ -158,7 +161,12 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
                             if (converter == null) {
 
                             } else if (BeanToBeanConverterHandler.class.isAssignableFrom(converter.getClass())) {
-                                afterConvertValue = converter.convert(fieldOriginalValue, tD.getPropertyType().getName());
+                                VerifyResult verifyResult = converter.convert(fieldOriginalValue, tD.getPropertyType().getName(), null);
+                                afterConvertValue = verifyResult.getValue();
+                                if (!verifyResult.isPass()) {
+                                    verifyMessage.append(fD.getName()).append(":");
+                                    verifyMessage.append("{").append(verifyResult.getErrMessage()).append("}");
+                                }
                             } else {
                                 afterConvertValue = converter.convert(fieldOriginalValue);
                             }

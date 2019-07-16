@@ -44,10 +44,10 @@ public class FieldConverterHandler {
         if (cc == null) {
             try {
                 cc = annotation.converter().newInstance();
+                converters.add(cc);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ConvertException("创建" + annotation.converter().getName() + "实例失败：", e);
             }
-            converters.add(cc);
         }
         return cc;
     }
@@ -63,11 +63,11 @@ public class FieldConverterHandler {
             try {
                 if (!annotation.afterConvert().isInterface()) {
                     vv = annotation.afterConvert().newInstance();
+                    validators.add(vv);
                 }
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new ConvertException("创建" + annotation.converter().getName() + "实例失败：", e);
             }
-            validators.add(vv);
         }
         return vv;
     }

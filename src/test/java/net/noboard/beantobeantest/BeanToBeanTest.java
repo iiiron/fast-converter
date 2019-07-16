@@ -18,7 +18,7 @@ public class BeanToBeanTest {
                 BeanToBeanConverterHandler.transferCustom(new CommonSkipConverterFilter());
 
         HumanA humanA = init();
-        HumanB humanB = (HumanB) beanToBeanConverterHandler.convert(humanA, "net.noboard.bean.HumanB");
+        Object humanB = beanToBeanConverterHandler.convert(humanA, "net.noboard.bean.HumanB",null);
 
         System.out.println(humanB);
     }
@@ -29,7 +29,8 @@ public class BeanToBeanTest {
         Man man = new Man();
         man.setName("wanxm");
         man.setBirthday(new Date());
-        man.setAge(25);
+        man.setAge(17);
+        man.setAge2(61);
         man.setSex(true);
 //        man.setAaa(new int[]{1, 2, 3});
         man.setBbb(new Integer[]{1, 2, 3});

@@ -30,4 +30,6 @@ public class Woman {
     private Map<String, Date> eee;
 
     private BigDecimal fff;
+
+    private Integer age2;
 }
