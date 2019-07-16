@@ -1,7 +1,11 @@
+package net.noboard.collectiontest;
+
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.filter.CommonConverterFilter;
+import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
 import net.noboard.fastconverter.handler.*;
 import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
+import net.noboard.fastconverter.handler.base.BeanToMapConverterHandler;
 
 import java.util.*;
 
@@ -36,12 +40,10 @@ public class Main {
         myBean.setName("万相明");
         myBean.setBirthday(new Date());
 
-        List<String> list = new ArrayList<>();
-        Converter c = new CollectionToListConverterHandler<>(new CommonConverterFilter());
-        boolean d = List.class.isAssignableFrom(list.getClass());
-        List b = (List) c.convert(list);
+        Converter converter = new BeanToMapConverterHandler(new CommonSkipConverterFilter());
+        Object o = converter.convert(myBean);
 
-        System.out.println(new ObjectToJsonStringConverterHandler(new CommonConverterFilter()).convert(myBean));
+        System.out.println(new ObjectToJsonStringConverterHandler(new CommonSkipConverterFilter()).convert(myBean));
     }
 
     private class A extends AbstractConverterHandler<String, String> {

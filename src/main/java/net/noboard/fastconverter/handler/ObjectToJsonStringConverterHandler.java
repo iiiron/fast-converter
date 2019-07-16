@@ -5,6 +5,7 @@ import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.handler.base.AbstractFilterBaseConverterHandler;
+import net.noboard.fastconverter.handler.base.BeanToMapConverterHandler;
 import net.noboard.fastconverter.handler.base.CommonFilterBaseConverterHandler;
 
 /**
@@ -12,18 +13,20 @@ import net.noboard.fastconverter.handler.base.CommonFilterBaseConverterHandler;
  */
 public class ObjectToJsonStringConverterHandler extends AbstractFilterBaseConverterHandler<Object, String> {
 
+    CommonFilterBaseConverterHandler converterHandler;
+
     public ObjectToJsonStringConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
+        converterHandler = new CommonFilterBaseConverterHandler(converterFilter.addLast(BeanToMapConverterHandler::new));
     }
 
     @Override
     protected String converting(Object value, String tip) throws ConvertException  {
-        Converter converter = new CommonFilterBaseConverterHandler(this.getConverterFilter());
-        return JSON.toJSONString(converter.convert(value));
+        return JSON.toJSONString(converterHandler.convert(value));
     }
 
     @Override
     public boolean supports(Object value) {
-        return true;
+        return converterHandler.supports(value);
     }
 }

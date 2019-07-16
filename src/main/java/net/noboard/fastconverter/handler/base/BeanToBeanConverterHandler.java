@@ -4,7 +4,7 @@ import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.FieldConverter;
-import net.noboard.fastconverter.filter.CommonConverterFilter;
+import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
 import net.noboard.fastconverter.handler.support.FieldConverterHandler;
 
 import java.beans.BeanInfo;
@@ -19,6 +19,10 @@ import java.util.Arrays;
 /**
  * 将指定Bean对象转换为一个新类型的Bean
  * <p>
+ * ConverterFilter不支持的域将照搬原值。如果不指定转换目标类型，则转换目标类型=被转换Bean的类型（转换过程
+ * 会按照转换器一一进行）。
+ *
+ * <p>
  * 下面描述中，将待转换Bean叫做A，转换结果叫做B。
  * <p>
  * 该转换器并不要求A和B是相同的类型，由于转换器基于Bean中域的名字（非大小写敏感）来进行数据的映射，
@@ -29,8 +33,6 @@ import java.util.Arrays;
  * 如果不指定转换结果类型，则B的类型将等同A的类型。在这种情况下不能将BeanToBeanConverterHandler的行为
  * 理解为浅复制或者深复制。BeanToBeanConverterHandler的行为受到ConverterFilter中注册的各种转换器的
  * 实现的影响。而这些转换器并不一定会在转换后返回新的对象（例如SkippingConverterHandler）。
- *
- * BeanToBeanConverterHandler的类型预测
  */
 public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
 
@@ -46,7 +48,7 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
      */
     public static BeanToBeanConverterHandler transfer() {
         if (beanTransfer == null) {
-            ConverterFilter converterFilter = new CommonConverterFilter();
+            ConverterFilter converterFilter = new CommonSkipConverterFilter();
             beanTransfer = new BeanToBeanConverterHandler(converterFilter);
             converterFilter.addLast(beanTransfer);
         }
@@ -110,15 +112,14 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
     @Override
     protected Object converting(Object value, String tip) throws ConvertException {
         BeanInfo beanF, beanT;
-        Object objF;
-        Object objT;
+        Object objF, objT;
         try {
             objF = value;
             objT = (tip == null || "".equals(tip)) ? value.getClass().newInstance() : Class.forName(tip).newInstance();
             beanF = Introspector.getBeanInfo(objF.getClass());
             beanT = Introspector.getBeanInfo(objT.getClass());
         } catch (IntrospectionException | IllegalAccessException | InstantiationException | ClassNotFoundException e) {
-            throw new ConvertException("BeanInfo初始化错误，请检查Bean的申明是否正确" + e);
+            throw new ConvertException("BeanInfo初始化错误，请检查Bean的申明是否正确", e);
         }
 
         for (PropertyDescriptor fD : beanF.getPropertyDescriptors()) {
@@ -147,14 +148,14 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                                     stringBuilder.append("]");
                                     throw new ConvertException(
                                             MessageFormat.format("数据转换后类型不符合接收对象对应域的类型。域:{0},目标类型:{1},转换器:{2}",
-                                                    tD.getName(), tD.getPropertyType().getName(), stringBuilder));
+                                                    tD.getName(), tD.getPropertyType().getName(), stringBuilder), e);
                                 }
                             }
                         } else {
-                            Converter converter = this.getConverter(r);
+                            Converter converter = this.filter(r);
                             try {
                                 if (converter == null) {
-                                    throw new ConvertException("没有转换器可以处理数据类型：" + r.getClass().getName());
+                                    tD.getWriteMethod().invoke(objT, r);
                                 } else if (BeanToBeanConverterHandler.class.isAssignableFrom(converter.getClass())) {
                                     tD.getWriteMethod().invoke(objT, converter.convert(r, tD.getPropertyType().getName()));
                                 } else {
@@ -163,13 +164,15 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                             } catch (ConvertException | IllegalArgumentException e) {
                                 throw new ConvertException(MessageFormat.format("域:{0},类型:{1},转换器类型:{2} ---> {3}",
                                         fD.getName(), fD.getPropertyType().getName(), converter.getClass().getName(),
-                                        e.getMessage()));
+                                        e.getMessage()), e);
                             }
                         }
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         throw new ConvertException(e);
                     } catch (NoSuchFieldException e) {
-                        throw new ConvertException(e.getMessage());
+                        throw new ConvertException(
+                                MessageFormat.format("BeanToBeanConverterHandler反射获取对象域时发生异常：NoSuchFieldException  {0}.{1}  通常是因为在转换器过滤器中没有添加对相关类的支持，导致某些非Bean的java类被错误的抛给了BeanToBeanConverterHandler去处理", objF.getClass().getName(), fD.getName()),
+                                e);
                     }
                     break;
                 }

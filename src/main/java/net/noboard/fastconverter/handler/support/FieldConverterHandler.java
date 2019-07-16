@@ -24,7 +24,7 @@ public class FieldConverterHandler {
             try {
                 cc = annotation.converter().newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new ConvertException("创建" + annotation.converter().getName() + "实例失败：" + e.getMessage());
+                throw new ConvertException("创建" + annotation.converter().getName() + "实例失败：", e);
             }
             converters.add(cc);
         }

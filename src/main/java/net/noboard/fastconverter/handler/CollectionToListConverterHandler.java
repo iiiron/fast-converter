@@ -26,7 +26,7 @@ public class CollectionToListConverterHandler<T, K> extends AbstractFilterBaseCo
         ArrayList<K> list = new ArrayList<>();
 
         for (T obj : value) {
-            Converter converter = this.getConverter(obj);
+            Converter converter = this.filter(obj);
             if (converter == null) {
                 throw new ConvertException("没有转换器可以处理" + obj);
             } else{

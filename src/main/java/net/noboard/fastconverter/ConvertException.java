@@ -8,7 +8,11 @@ public class ConvertException extends RuntimeException {
         super(message);
     }
 
-    public ConvertException(Exception e) {
+    public ConvertException(Throwable e) {
         super(e);
+    }
+
+    public ConvertException(String message, Throwable e) {
+        super(message,e);
     }
 }

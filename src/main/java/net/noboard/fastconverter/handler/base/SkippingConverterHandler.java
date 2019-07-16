@@ -1,12 +1,16 @@
 package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * 越过转换器
+ * <p>
+ * 该转换器不对数据进行任何转换，它的存在是为了让过滤器转换器提供对某些类型的数据的跳过逻辑。
+ */
 public class SkippingConverterHandler extends AbstractConverterHandler<Object, Object> {
 
     private Class[] classes;

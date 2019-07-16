@@ -1,6 +1,10 @@
 package net.noboard.beantobeantest;
 
-import net.noboard.fastconverter.filter.CommonConverterFilter;
+import net.noboard.bean.ChildA;
+import net.noboard.bean.HumanA;
+import net.noboard.bean.HumanB;
+import net.noboard.bean.Man;
+import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
 import net.noboard.fastconverter.handler.base.BeanToBeanConverterHandler;
 import org.junit.Test;
 
@@ -11,10 +15,10 @@ public class BeanToBeanTest {
     @Test
     public void a() {
         BeanToBeanConverterHandler beanToBeanConverterHandler =
-                BeanToBeanConverterHandler.transferCustom(new CommonConverterFilter());
+                BeanToBeanConverterHandler.transferCustom(new CommonSkipConverterFilter());
 
         HumanA humanA = init();
-        HumanB humanB = (HumanB) beanToBeanConverterHandler.convert(humanA, "net.noboard.beantobeantest.HumanB");
+        HumanB humanB = (HumanB) beanToBeanConverterHandler.convert(humanA, "net.noboard.bean.HumanB");
 
         System.out.println(humanB);
     }

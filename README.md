@@ -1,22 +1,32 @@
 # fast-converter
 
-（看测试用例）
+（大家可以通过测试来查看基本使用方法。测试用例中使用了lombok，所以请给你的IDE安装lombok插件）
 
 3.0版的fast-converter和之前的版本有较大的区别，不兼容！不兼容！不兼容！
 
-# fast-converter的架构
+在fast-converter的整个架构中，将转换器区分为两类。一类是AbstractConverterHandler的实现；一类是AbstractFilterBaseConverterHandler的实现。
 
-稳定点：
+AbstractConverterHandler的实现可以单独工作，而AbstractFilterBaseConverterHandler的实现需要与ConverterFilter的实现配合工作。
 
-- fast-converter需要具有递归的能力，因此fast-converter提供了net.noboard.fastconverter.handler.base包。
+AbstractConverterHandler的实现就不多说了，它就是很纯粹的一类转换器，进来A，返回B，整个转换过程由其自己实现。
 
-    fast-converter的递归能力并不是与生俱来的，或者说由特定的主类实现的，它的递归能力由base包中几个AbstractFilterBaseConverterHandler的实现类完成。
+而AbstractFilterBaseConverterHandler稍微复杂一些。但其复杂也不是它本身复杂，是由于它的灵活使其具有无限多可能性而造成的。ConverterFilter描述的是一种转换器过滤器，它可以从事先注册到它内部的一堆Converter中筛选出可以对某数据进行转换的一个。所以AbstractFilterBaseConverterHandler将不仅能转换自己所支持的数据，它还可以转换ConverterFilter所支持的数据。例如CommonSkipConverterFilter，它被注册了：基本数据类型转换器，Date，BigDecimal转换器（SkippingConverterHandler）；数组转换器（ArrayToArrayConverterHandler）；聚集转换器（CollectionToCollectionConverterHandler）；Map转换器（MapToMapConverterHandler）。你可以用它作为参数创建BeanToMapConverterHandler，该实例将可以处理某个bean中的基本数据类型域，Date域，BigDecimal域，数组域，Collection实现类的域，Map实现类的域。（但不能处理bean中的Bean域（嵌套Bean），因为你没有将BeanToMapConverterHandler注册到CommonConverterFilter中）
 
-    例如，ArrayToArrayConverterHandler提供了数组递归的能力，MapToMapConverterHandler提供了Map递归的能力，这些转换器可以通过ConverterFilter的实现类聚合在一起，ArrayToArrayConverterHandler和MapToMapConverterHandler聚合在一起，就能同时提供对数组和Map的递归能力。CommonConverterFilter提供了一种对ConverterFilter的实现，它通过将多种具有递归能力的转换器聚合起来，对外提供一种普适性的递归能力。
+另外，CommonSkipConverterFilter在注册数组转换器（ArrayToArrayConverterHandler）；聚集转换器（CollectionToCollectionConverterHandler）；Map转换器（MapToMapConverterHandler）时，使用了其自身（this）作为参数。这意味着，提供给数组转换器（ArrayToArrayConverterHandler）的转换器过滤器（CommonConverterFilter）也具备数组转换器功能。由此数组转换器将具备嵌套处理的能力（数组中嵌套数组）。其他两个原理同此。
 
-变化点：
+展开到更一般来说，任何AbstractFilterBaseConverterHandler的实现，可以通过在其所接收的转换器过滤器中添加自身，而获得嵌套处理的能力。例如BeanToBeanConverterHandler中的transfer方法就是通过这样的方式实现Bean的嵌套转换的。
 
-- 具体的数据转化由一众AbstractConverterHandler的实现类完成
+    public static BeanToBeanConverterHandler transfer() {
+        if (beanTransfer == null) {
+            ConverterFilter converterFilter = new CommonSkipConverterFilter();
+            beanTransfer = new BeanToBeanConverterHandler(converterFilter);
+            converterFilter.addLast(beanTransfer);
+        }
+
+        return beanTransfer;
+    }
+
+**为了使fast-converter具有统一的模式，三个用以实现递归的ArrayToArrayConverterHandler，CollectionToCollectionConverterHandler，MapToMapConverterHandler，均有如下特性：当筛选器中没有对某个值的转换器时，使用原值填充新容器。**
 
 # 各类必要性
 

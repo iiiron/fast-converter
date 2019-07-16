@@ -13,30 +13,27 @@ import java.util.function.Function;
 /**
  * 转换器过滤器
  *
- * 注意：该转换器过滤器使用List<Converter<?, ?>>存储转换器，
- * 这将导致转换器丢失泛型信息。
- *
  * @author wanxm
  */
 public abstract class AbstractConverterFilter implements ConverterFilter {
 
-    private List<Converter<?, ?>> converters;
+    private List<Converter> converters;
 
     public AbstractConverterFilter() {
         converters = new ArrayList<>();
         this.initConverters(converters);
     }
 
-    protected abstract void initConverters(List<Converter<?, ?>> converters);
+    protected abstract void initConverters(List<Converter> converters);
 
-    protected void addContainerConverter(List<Converter<?, ?>> converters) {
-        converters.add(new MapToMapConverterHandler<>(this));
+    protected void addContainerConverter(List<Converter> converters) {
         converters.add(new CollectionToCollectionConverterHandler<>(this));
+        converters.add(new MapToMapConverterHandler<>(this));
         converters.add(new ArrayToArrayConverterHandler(this));
     }
 
     @Override
-    public Converter getConverter(Object value) {
+    public Converter filter(Object value) {
         for (Converter converter : converters) {
             if (converter.supports(value)) {
                 return converter;

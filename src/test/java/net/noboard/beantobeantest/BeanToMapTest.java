@@ -1,6 +1,7 @@
 package net.noboard.beantobeantest;
 
-import net.noboard.fastconverter.filter.CommonConverterFilter;
+import net.noboard.bean.HumanA;
+import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
 import net.noboard.fastconverter.handler.base.BeanToMapConverterHandler;
 import net.noboard.fastconverter.handler.base.CommonFilterBaseConverterHandler;
 import org.junit.Test;
@@ -11,7 +12,7 @@ public class BeanToMapTest {
     @Test
     public void a() {
         CommonFilterBaseConverterHandler commonFilterBaseConverterHandler =
-                new CommonFilterBaseConverterHandler(new CommonConverterFilter().addLast(BeanToMapConverterHandler::new));
+                new CommonFilterBaseConverterHandler(new CommonSkipConverterFilter().addLast(BeanToMapConverterHandler::new));
 
         HumanA humanA = BeanToBeanTest.init();
 

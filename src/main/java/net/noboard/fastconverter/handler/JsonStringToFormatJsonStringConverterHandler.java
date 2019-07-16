@@ -46,7 +46,7 @@ public class JsonStringToFormatJsonStringConverterHandler extends AbstractConver
                 }
             }
         } catch (Exception e) {
-            throw new ConvertException("格式化JSON字符串时出错：" + e.getMessage());
+            throw new ConvertException("格式化JSON字符串时出错：" + e.getMessage(), e);
         }
 
         return jsonForMatStr.toString();

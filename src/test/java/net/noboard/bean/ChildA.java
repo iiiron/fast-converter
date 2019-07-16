@@ -1,4 +1,4 @@
-package net.noboard.beantobeantest;
+package net.noboard.bean;
 
 import lombok.Data;
 
