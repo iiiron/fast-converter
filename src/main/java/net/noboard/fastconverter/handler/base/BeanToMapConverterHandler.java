@@ -27,13 +27,13 @@ public class BeanToMapConverterHandler extends AbstractBeanConverterHandler<Obje
 
     @Override
     protected Map<String, Object> converting(Object value, String tip) throws ConvertException {
-        return this.converting(value, tip, null).getValue();
+        return this.convertingAndVerify(value, tip, null).getValue();
     }
 
     @Override
-    protected VerifyResult<Map<String, Object>> converting(Object value, String tip, Validator afterConvert) throws ConvertException {
+    protected VerifyResult<Map<String, Object>> convertingAndVerify(Object value, String tip, Validator afterConvert) throws ConvertException {
         Map<String, Object> map = new HashMap<>();
-        Map<String, VerifyInfo> errMap = null;
+        Map<String, VerifyInfo> errMap = new HashMap<>();
 
         BeanInfo beanInfo;
         try {
@@ -86,10 +86,16 @@ public class BeanToMapConverterHandler extends AbstractBeanConverterHandler<Obje
             if (annotations == null || annotations.length == 0) {
                 Converter converter = this.filter(fieldValue);
                 // 有转换器取转换后的值，没有转换器取原值
-                if (converter != null) {
-                    mapValue = converter.convert(fieldValue);
-                } else {
+                if (converter == null) {
                     mapValue = fieldValue;
+                } else if (AbstractBeanConverterHandler.class.isAssignableFrom(converter.getClass())) {
+                    VerifyResult verifyResult = converter.convertAndVerify(fieldValue);
+                    mapValue = verifyResult.getValue();
+                    if (!verifyResult.isPass()) {
+                        errMap.put(mapKey, verifyResult);
+                    }
+                } else {
+                    mapValue = converter.convert(fieldValue);
                 }
             } else {
                 // 如果该域指定了转换器，域值为空，则跳过该域
@@ -101,9 +107,6 @@ public class BeanToMapConverterHandler extends AbstractBeanConverterHandler<Obje
                     VerifyResult verifyResult = this.handlerAndVerify(annotation, v);
                     v = verifyResult.getValue();
                     if (!verifyResult.isPass()) {
-                        if (errMap == null) {
-                            errMap = new HashMap<>();
-                        }
                         errMap.put(field.getName(), verifyResult);
                     }
                 }
@@ -115,8 +118,8 @@ public class BeanToMapConverterHandler extends AbstractBeanConverterHandler<Obje
 
         VerifyInfo verifyInfo = null;
         if (afterConvert == null) {
-            ConverterIndicator converterIndicator = value.getClass().getAnnotation(ConverterIndicator.class);
-            if (!converterIndicator.afterConvert().isInterface()) {
+            BeanConverterIndicator converterIndicator = value.getClass().getAnnotation(BeanConverterIndicator.class);
+            if (converterIndicator != null && !converterIndicator.afterConvert().isInterface()) {
                 try {
                     afterConvert = converterIndicator.afterConvert().newInstance();
                 } catch (InstantiationException | IllegalAccessException e) {

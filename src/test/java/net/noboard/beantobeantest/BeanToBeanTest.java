@@ -55,6 +55,7 @@ public class BeanToBeanTest {
 
         List<ChildA> list = new ArrayList<>();
         ChildA childA = new ChildA();
+        childA.setAge(17);
         childA.setName("heiheihei");
         childA.setBirthday(new Date());
         list.add(childA);

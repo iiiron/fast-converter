@@ -11,12 +11,12 @@ import java.util.Map;
 public class BeanToMapTest {
     @Test
     public void a() {
-        CommonFilterBaseConverterHandler commonFilterBaseConverterHandler =
-                new CommonFilterBaseConverterHandler(new CommonSkipConverterFilter().addLast(BeanToMapConverterHandler::new));
+        BeanToMapConverterHandler beanToMapConverterHandler =
+                new BeanToMapConverterHandler(new CommonSkipConverterFilter().addLast(BeanToMapConverterHandler::new));
 
         HumanA humanA = BeanToBeanTest.init();
 
-        Map map = (Map) commonFilterBaseConverterHandler.convert(humanA);
+        Object map = beanToMapConverterHandler.convertAndVerify(humanA);
 
         System.out.println(map);
     }

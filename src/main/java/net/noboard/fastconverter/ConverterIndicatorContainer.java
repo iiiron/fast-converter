@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface FieldConverterContainer {
+public @interface ConverterIndicatorContainer {
     ConverterIndicator[] value();
 }

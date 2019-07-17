@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 可以将一个类型的Bean转换为另一个类型的Bean，Bean中的Bean可以自适应转换
+ * <p>
+ * <p>
  * 将指定Bean对象转换为一个新类型的Bean
  * <p>
  * ConverterFilter不支持的域将照搬原值。如果不指定转换目标类型，则转换目标类型=被转换Bean的类型（转换过程
@@ -107,7 +110,7 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandl
 
     @Override
     protected K converting(T value, String tip) throws ConvertException {
-        return this.converting(value, tip, null).getValue();
+        return this.convertingAndVerify(value, tip, null).getValue();
     }
 
     /**
@@ -120,13 +123,13 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandl
      * @throws ConvertException
      */
     @Override
-    protected VerifyResult<K> converting(T value, String tip, Validator afterConvert) throws ConvertException {
+    protected VerifyResult<K> convertingAndVerify(T value, String tip, Validator afterConvert) throws ConvertException {
         BeanInfo beanF, beanT;
         Object objF = value, objT;
-        ConverterIndicator converterIndicator = value.getClass().getAnnotation(ConverterIndicator.class);
+        BeanConverterIndicator converterIndicator = value.getClass().getAnnotation(BeanConverterIndicator.class);
         if (converterIndicator != null) {
-            if (tip == null || "".equals(tip)) {
-                tip = converterIndicator.tip();
+            if ((tip == null || "".equals(tip)) && !converterIndicator.targetType().equals(Void.class)) {
+                tip = defaultTip(converterIndicator.targetType().getName());
             }
             if (afterConvert == null && !converterIndicator.afterConvert().isInterface()) {
                 try {
@@ -160,35 +163,40 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandl
                         Object afterConvertValue = fieldOriginalValue;
                         Converter converter = null;
                         if (converterIndicators != null && converterIndicators.length > 0) {
+                            // 指定了转换器
                             if (fieldOriginalValue != null) {
+                                // 原值不为null，（原值为null则跳过）
                                 for (ConverterIndicator ci : converterIndicators) {
                                     converter = this.getConverter(ci);
-                                    if ("".equals(ci.tip())) {
-                                        afterConvertValue = converter.convert(afterConvertValue);
-                                    } else {
-                                        afterConvertValue = converter.convert(afterConvertValue, ci.tip());
-                                    }
                                     Validator validator = this.getValidator(ci);
-                                    if (validator != null) {
-                                        VerifyInfo verifyInfo = validator.validate(afterConvertValue);
-                                        if (!verifyInfo.isPass()) {
-                                            errMap.put(tD.getName(), verifyInfo);
-                                        }
+                                    VerifyResult verifyResult;
+                                    if ("".equals(ci.tip())) {
+                                        verifyResult = converter.convertAndVerify(afterConvertValue, validator);
+                                    } else {
+                                        verifyResult = converter.convertAndVerify(afterConvertValue, ci.tip(), validator);
+                                    }
+                                    afterConvertValue = verifyResult.getValue();
+                                    if (!verifyResult.isPass()) {
+                                        errMap.put(tD.getName(), verifyResult);
                                     }
                                 }
                             }
                         } else {
+                            // 没有指定转换器，从转换器过滤器中筛选合适的转换器
                             converter = this.filter(fieldOriginalValue);
-                            if (converter == null) {
+                            if (converter != null) {
+                                VerifyResult verifyResult;
+                                if (this.getClass().equals(converter.getClass())) {
+                                    // 这里是为了赋予BeanToBeanConverter自动转换Bean内部的Bean
+                                    verifyResult = converter.convertAndVerify(fieldOriginalValue, tD.getPropertyType().getName());
+                                } else {
+                                    verifyResult = converter.convertAndVerify(fieldOriginalValue);
+                                }
 
-                            } else if (BeanToBeanConverterHandler.class.isAssignableFrom(converter.getClass())) {
-                                VerifyResult verifyResult = converter.convertAndVerify(fieldOriginalValue, tD.getPropertyType().getName(), null);
                                 afterConvertValue = verifyResult.getValue();
                                 if (!verifyResult.isPass()) {
                                     errMap.put(tD.getName(), verifyResult);
                                 }
-                            } else {
-                                afterConvertValue = converter.convert(fieldOriginalValue);
                             }
                         }
                         try {
@@ -211,7 +219,7 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandl
         if (afterConvert != null) {
             VerifyInfo verifyInfo = afterConvert.validate(objT);
             if (!verifyInfo.isPass()) {
-                errMap.put("对Bean的总验证",verifyInfo);
+                errMap.put("对Bean的总验证", verifyInfo);
             }
         }
 

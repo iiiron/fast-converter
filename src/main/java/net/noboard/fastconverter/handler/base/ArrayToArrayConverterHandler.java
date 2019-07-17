@@ -1,11 +1,11 @@
 package net.noboard.fastconverter.handler.base;
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.handler.support.ConverterExceptionHelper;
 
 import java.lang.reflect.Array;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 数组到数组转换器
@@ -24,15 +24,25 @@ public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHan
 
     @Override
     protected Object converting(Object value, String tip) throws ConvertException {
+        return this.convertingAndVerify(value, tip, null).getValue();
+    }
+
+    @Override
+    protected VerifyResult<Object> convertingAndVerify(Object value, String tip, Validator afterConvert) throws ConvertException {
         Converter converter = null;
         Object newArray = null, newV = null, oldV = null;
+        Map<String, VerifyInfo> errMap = new HashMap<>();
         try {
             for (int index = 0; index < Array.getLength(value); index++) {
                 oldV = Array.get(value, index);
                 newV = oldV;
                 converter = this.filter(newV);
                 if (converter != null) {
-                    newV = converter.convert(newV, tip);
+                    VerifyResult verifyResult = converter.convertAndVerify(newV, tip);
+                    newV = verifyResult.getValue();
+                    if (!verifyResult.isPass()) {
+                        errMap.put(String.valueOf(index), verifyResult);
+                    }
                 }
                 if (newArray == null && newV != null) {
                     newArray = Array.newInstance(newV.getClass(), Array.getLength(value));
@@ -45,8 +55,23 @@ public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHan
             ConverterExceptionHelper.factory(value, oldV, newArray, newV, converter, e);
         }
 
+        VerifyInfo verifyInfo = null;
+        if (afterConvert != null) {
+            verifyInfo = afterConvert.validate(newArray);
+            if (!verifyInfo.isPass()) {
+                errMap.put("Array整体校验结果", verifyInfo);
+            }
+        }
 
-        return newArray;
+        if (errMap.size() > 0) {
+            if (verifyInfo != null) {
+                return new VerifyResult<>(newArray, verifyInfo.getErrCode(), errMap.toString());
+            } else {
+                return new VerifyResult<>(newArray, errMap.toString());
+            }
+        } else {
+            return new VerifyResult<>(newArray);
+        }
     }
 
     @Override

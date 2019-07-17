@@ -33,12 +33,15 @@ public abstract class AbstractBeanConverterHandler<T, K> extends AbstractFilterB
     }
 
     protected VerifyResult handlerAndVerify(ConverterIndicator annotation, Object fieldValue) {
-        // 获取验证器
-        Validator vv = getValidator(annotation);
-
         Object value = this.handler(annotation, fieldValue);
-        VerifyInfo verifyInfo = vv.validate(value);
-        return new VerifyResult(value, verifyInfo.getErrCode(), verifyInfo.getErrMessage());
+
+        Validator vv = getValidator(annotation);
+        if (vv != null) {
+            VerifyInfo verifyInfo = vv.validate(value);
+            return new VerifyResult(value, verifyInfo.getErrCode(), verifyInfo.getErrMessage());
+        } else {
+            return new VerifyResult(value);
+        }
     }
 
     protected Converter getConverter(ConverterIndicator annotation) {

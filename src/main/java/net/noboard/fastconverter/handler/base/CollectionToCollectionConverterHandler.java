@@ -1,11 +1,11 @@
 package net.noboard.fastconverter.handler.base;
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.handler.support.ConverterExceptionHelper;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Collection转换器
@@ -21,6 +21,11 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
 
     @Override
     protected Collection<K> converting(Collection<T> value, String tip) throws ConvertException {
+        return this.convertingAndVerify(value, tip, null).getValue();
+    }
+
+    @Override
+    protected VerifyResult<Collection<K>> convertingAndVerify(Collection<T> value, String tip, Validator afterConvert) throws ConvertException {
         Collection<K> collection;
         try {
             collection = value.getClass().newInstance();
@@ -30,20 +35,41 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
         }
 
         Converter converter = null;
-        Object newV = null,oldV = null;
+        Object newV = null, oldV = null;
+        Map<String, VerifyInfo> errMap = new HashMap<>();
         try {
+            int index = 0;
             for (T obj : value) {
                 converter = this.filter(obj);
                 oldV = obj;
-                newV = converter == null ? oldV : converter.convert(oldV, tip);
+                if (converter == null) {
+                    newV = oldV;
+                } else {
+                    VerifyResult verifyResult = converter.convertAndVerify(oldV, tip);
+                    newV = verifyResult.getValue();
+                    if (!verifyResult.isPass()) {
+                        errMap.put(String.valueOf(index), verifyResult);
+                    }
+                }
                 collection.add((K) newV);
+                index++;
             }
         } catch (Exception e) {
             ConverterExceptionHelper.factory(value, oldV, collection, newV, converter, e);
         }
 
+        if (afterConvert != null) {
+            VerifyInfo verifyInfo = afterConvert.validate(collection);
+            if (!verifyInfo.isPass()) {
+                errMap.put("Collection整体校验结果", verifyInfo);
+            }
+        }
 
-        return collection;
+        if (errMap.size() > 0) {
+            return new VerifyResult<>(collection, errMap.toString());
+        } else {
+            return new VerifyResult<>(collection);
+        }
     }
 
     @Override

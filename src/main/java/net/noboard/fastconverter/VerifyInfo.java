@@ -36,10 +36,10 @@ public class VerifyInfo {
 
     @Override
     public String toString() {
-        return "VerifyInfo:{" +
+        return "{\n" +
                 "errCode:" + errCode +
-                ", errMessage:'" + errMessage + '\'' +
-                ", isPass:" + isPass +
-                '}';
+                ",\n errMessage:'" + errMessage + '\'' +
+                ",\n isPass:" + isPass +
+                "\n}";
     }
 }

@@ -37,16 +37,35 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
         this.validator = validator;
     }
 
+    /**
+     *
+     * @param value
+     * @param tip 要么是有效的用户传入的tip，要么是defaultTip
+     * @return
+     * @throws ConvertException
+     */
     protected abstract K converting(T value, String tip) throws ConvertException;
 
-    protected VerifyResult<K> converting(T value, String tip, Validator afterConvert) throws ConvertException {
-        Objects.requireNonNull(afterConvert);
-        K k = converting(value, tip);
-        VerifyInfo verifyInfo = afterConvert.validate(k);
-        if (verifyInfo.isPass()) {
-            return new VerifyResult<>(k);
+    /**
+     *
+     * @param value
+     * @param tip 要么是有效的用户传入的tip，要么是defaultTip
+     * @param afterConvert 要么是有效的用户传入的Validator，要么是默认的Validator
+     * @return
+     * @throws ConvertException
+     */
+    protected VerifyResult<K> convertingAndVerify(T value, String tip, Validator afterConvert) throws ConvertException {
+        K k = converting(value, defaultTip(tip));
+        Validator validator = defaultValidator(afterConvert);
+        if (validator != null) {
+            VerifyInfo verifyInfo = validator.validate(k);
+            if (verifyInfo.isPass()) {
+                return new VerifyResult<>(k);
+            } else {
+                return new VerifyResult<>(k, verifyInfo.getErrCode(), verifyInfo.getErrMessage());
+            }
         } else {
-            return new VerifyResult<>(k, verifyInfo.getErrCode(), verifyInfo.getErrMessage());
+            return new VerifyResult<>(k);
         }
     }
 
@@ -92,6 +111,14 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
         if (!this.supports(value)) {
             throw new ConvertException(MessageFormat.format("转换器 {0} 不匹配数据 {1}", this.getClass().getName(), value));
         }
-        return this.converting(value, tip, afterConvert);
+        return this.convertingAndVerify(value, tip, afterConvert);
+    }
+
+    protected String defaultTip(String tip) {
+        return (tip == null || "".equals(tip)) ? this.defaultTip : tip;
+    }
+
+    protected Validator defaultValidator(Validator validator) {
+        return validator == null ? this.validator : validator;
     }
 }
