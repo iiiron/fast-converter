@@ -1,19 +1,27 @@
-package net.noboard.fastconverter.handler.support;
+package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FieldConverterHandler {
+public abstract class AbstractBeanConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<T, K> {
 
     //TODO 找一个线程安全的list实现
     private static List<Converter> converters = new ArrayList<>();
 
     //TODO 找一个线程安全的list实现
-    private static List<FieldValidator> validators = new ArrayList<>();
+    private static List<Validator> validators = new ArrayList<>();
 
-    public Object handler(FieldConverter annotation, Object value) {
+    public AbstractBeanConverterHandler(ConverterFilter converterFilter) {
+        super(converterFilter);
+    }
+
+    public AbstractBeanConverterHandler(ConverterFilter converterFilter, String tip) {
+        super(converterFilter, tip);
+    }
+
+    protected Object handler(ConverterIndicator annotation, Object value) {
         // 获取转换器
         Converter cc = getConverter(annotation);
 
@@ -24,16 +32,16 @@ public class FieldConverterHandler {
         }
     }
 
-    public VerifyResult handlerAndVerify(FieldConverter annotation, Object field, Object bean) {
+    protected VerifyResult handlerAndVerify(ConverterIndicator annotation, Object fieldValue) {
         // 获取验证器
-        FieldValidator vv = getValidator(annotation);
+        Validator vv = getValidator(annotation);
 
-        Object value = this.handler(annotation, field);
-        VerifyInfo verifyInfo = vv.validate(value, bean);
+        Object value = this.handler(annotation, fieldValue);
+        VerifyInfo verifyInfo = vv.validate(value);
         return new VerifyResult(value, verifyInfo.getErrCode(), verifyInfo.getErrMessage());
     }
 
-    public Converter getConverter(FieldConverter annotation) {
+    protected Converter getConverter(ConverterIndicator annotation) {
         Converter cc = null;
         for (Converter converter : converters) {
             if (converter.getClass().equals(annotation.converter())) {
@@ -52,9 +60,9 @@ public class FieldConverterHandler {
         return cc;
     }
 
-    public FieldValidator getValidator(FieldConverter annotation) {
-        FieldValidator vv = null;
-        for (FieldValidator validator : validators) {
+    protected Validator getValidator(ConverterIndicator annotation) {
+        Validator vv = null;
+        for (Validator validator : validators) {
             if (validator.getClass().equals(annotation.afterConvert())) {
                 vv = validator;
             }
@@ -71,4 +79,5 @@ public class FieldConverterHandler {
         }
         return vv;
     }
+
 }

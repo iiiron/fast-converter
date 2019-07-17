@@ -1,7 +1,7 @@
 package net.noboard.bean;
 
 import lombok.Data;
-import net.noboard.fastconverter.FieldConverter;
+import net.noboard.fastconverter.ConverterIndicator;
 import net.noboard.fastconverter.handler.*;
 import net.noboard.fastconverter.handler.base.SkippingConverterHandler;
 
@@ -12,16 +12,16 @@ public class Man implements Comparable {
 
     private String name;
 
-    @FieldConverter(converter = DateToFormatStringConverterHandler.class)
+    @ConverterIndicator(converter = DateToFormatStringConverterHandler.class)
     private Date birthday;
 
-    @FieldConverter(converter = SkippingConverterHandler.class, afterConvert = AgeVarify.class)
+    @ConverterIndicator(converter = SkippingConverterHandler.class, afterConvert = AgeVarify.class)
     private Integer age;
 
-    @FieldConverter(converter = BooleanToStringConverterHandler.class)
+    @ConverterIndicator(converter = BooleanToStringConverterHandler.class)
     private Boolean sex;
 
-    @FieldConverter(converter = SkippingConverterHandler.class, afterConvert = AgeVarify2.class)
+    @ConverterIndicator(converter = SkippingConverterHandler.class, afterConvert = AgeVarify2.class)
     private Integer age2;
 
     private int[] aaa;
@@ -34,8 +34,8 @@ public class Man implements Comparable {
 
     private Map<String, Date> eee;
 
-    @FieldConverter(converter = BooleanToNumberConverterHandler.class)
-    @FieldConverter(converter = NumberToBigDecimalConverterHandler.class)
+    @ConverterIndicator(converter = BooleanToNumberConverterHandler.class)
+    @ConverterIndicator(converter = NumberToBigDecimalConverterHandler.class)
     private Boolean fff;
 
     @Override

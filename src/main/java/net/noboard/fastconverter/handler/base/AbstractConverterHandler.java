@@ -16,12 +16,25 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
 
     private String defaultTip;
 
+    private Validator validator;
+
     public AbstractConverterHandler() {
         this.defaultTip = "";
+        this.validator = null;
     }
 
     public AbstractConverterHandler(String defaultTip) {
         this.defaultTip = defaultTip;
+    }
+
+    public AbstractConverterHandler(Validator validator) {
+        this.defaultTip = "";
+        this.validator = validator;
+    }
+
+    public AbstractConverterHandler(String defaultTip, Validator validator) {
+        this.defaultTip = defaultTip;
+        this.validator = validator;
     }
 
     protected abstract K converting(T value, String tip) throws ConvertException;
@@ -33,12 +46,16 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
         if (verifyInfo.isPass()) {
             return new VerifyResult<>(k);
         } else {
-            return new VerifyResult<>(k,verifyInfo.getErrCode(),verifyInfo.getErrMessage());
+            return new VerifyResult<>(k, verifyInfo.getErrCode(), verifyInfo.getErrMessage());
         }
     }
 
     protected String getDefaultTip() {
         return this.defaultTip;
+    }
+
+    protected Validator getDefaultValidator() {
+        return this.validator;
     }
 
     @Override
@@ -56,20 +73,25 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
     }
 
     @Override
-    public VerifyResult<K> convert(T value, Validator afterConvert) throws ConvertException {
-        return this.convert(value, this.defaultTip, afterConvert);
+    public VerifyResult<K> convertAndVerify(T value) throws ConvertException {
+        return this.convertAndVerify(value, this.defaultTip, this.validator);
     }
 
     @Override
-    public VerifyResult<K> convert(T value, String tip, Validator afterConvert) throws ConvertException {
+    public VerifyResult<K> convertAndVerify(T value, String tip) throws ConvertException {
+        return this.convertAndVerify(value, tip, this.validator);
+    }
+
+    @Override
+    public VerifyResult<K> convertAndVerify(T value, Validator afterConvert) throws ConvertException {
+        return this.convertAndVerify(value, this.defaultTip, afterConvert);
+    }
+
+    @Override
+    public VerifyResult<K> convertAndVerify(T value, String tip, Validator afterConvert) throws ConvertException {
         if (!this.supports(value)) {
             throw new ConvertException(MessageFormat.format("转换器 {0} 不匹配数据 {1}", this.getClass().getName(), value));
         }
         return this.converting(value, tip, afterConvert);
-    }
-
-    @Override
-    public List<VerifyResult> verifyInfos() {
-        return null;
     }
 }

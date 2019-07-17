@@ -33,4 +33,13 @@ public class VerifyInfo {
     public boolean isPass() {
         return isPass;
     }
+
+    @Override
+    public String toString() {
+        return "VerifyInfo:{" +
+                "errCode:" + errCode +
+                ", errMessage:'" + errMessage + '\'' +
+                ", isPass:" + isPass +
+                '}';
+    }
 }

@@ -2,7 +2,7 @@ package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
-import net.noboard.fastconverter.handler.support.FieldConverterHandler;
+import net.noboard.fastconverter.handler.support.ConverterExceptionHelper;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -11,6 +11,8 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 将指定Bean对象转换为一个新类型的Bean
@@ -22,17 +24,15 @@ import java.text.MessageFormat;
  * 下面描述中，将待转换Bean叫做A，转换结果叫做B。
  * <p>
  * 该转换器并不要求A和B是相同的类型，由于转换器基于Bean中域的名字（非大小写敏感）来进行数据的映射，
- * 所以A,B不需要是相同的类型，转换器仅针对A，B中相同域名的域进行A->B的转换，转换过程可通过@FieldConverter
- * 注解干预，也可根据注册到ConverterFilter中的默认转换器来进行默认转换（域名相同，但未通过@FieldConverter
+ * 所以A,B不需要是相同的类型，转换器仅针对A，B中相同域名的域进行A->B的转换，转换过程可通过@ConverterIndicator
+ * 注解干预，也可根据注册到ConverterFilter中的默认转换器来进行默认转换（域名相同，但未通过@ConverterIndicator
  * 指定转换器的域，会被默认转换器转换）。
  * <p>
  * 如果不指定转换结果类型，则B的类型将等同A的类型。在这种情况下不能将BeanToBeanConverterHandler的行为
  * 理解为浅复制或者深复制。BeanToBeanConverterHandler的行为受到ConverterFilter中注册的各种转换器的
  * 实现的影响。而这些转换器并不一定会在转换后返回新的对象（例如SkippingConverterHandler）。
  */
-public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<T, K> {
-
-    private static FieldConverterHandler fieldConverterHandler = new FieldConverterHandler();
+public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandler<T, K> {
 
     private static BeanToBeanConverterHandler beanTransfer = null;
 
@@ -107,24 +107,45 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
 
     @Override
     protected K converting(T value, String tip) throws ConvertException {
-        VerifyResult<K> verifyResult = this.converting(value, tip, null);
-        return verifyResult.getValue();
+        return this.converting(value, tip, null).getValue();
     }
 
+    /**
+     * convert函数的tip > Bean ConverterIndicator的tip > 转换为自身类型
+     *
+     * @param value
+     * @param tip
+     * @param afterConvert
+     * @return
+     * @throws ConvertException
+     */
     @Override
     protected VerifyResult<K> converting(T value, String tip, Validator afterConvert) throws ConvertException {
         BeanInfo beanF, beanT;
-        Object objF, objT;
+        Object objF = value, objT;
+        ConverterIndicator converterIndicator = value.getClass().getAnnotation(ConverterIndicator.class);
+        if (converterIndicator != null) {
+            if (tip == null || "".equals(tip)) {
+                tip = converterIndicator.tip();
+            }
+            if (afterConvert == null && !converterIndicator.afterConvert().isInterface()) {
+                try {
+                    afterConvert = converterIndicator.afterConvert().newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new ConvertException("实例化" + converterIndicator.afterConvert() + "失败", e);
+                }
+            }
+        }
+
         try {
-            objF = value;
             objT = (tip == null || "".equals(tip)) ? objF.getClass().newInstance() : Class.forName(tip).newInstance();
             beanF = Introspector.getBeanInfo(objF.getClass());
             beanT = Introspector.getBeanInfo(objT.getClass());
-        } catch (IntrospectionException | IllegalAccessException | InstantiationException | ClassNotFoundException e) {
-            throw new ConvertException("BeanInfo初始化错误，请检查Bean的申明是否正确", e);
+        } catch (Exception e) {
+            throw new ConvertException("实例化Bean失败", e);
         }
 
-        StringBuilder verifyMessage = new StringBuilder();
+        Map<String, VerifyInfo> errMap = new HashMap<>();
         for (PropertyDescriptor fD : beanF.getPropertyDescriptors()) {
             if ("class".equals(fD.getName())) {
                 continue;
@@ -134,24 +155,24 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
                 if (fD.getName().toLowerCase().equals(tD.getName().toLowerCase())) {
                     try {
                         Field field = objF.getClass().getDeclaredField(fD.getName());
-                        FieldConverter[] fieldConverters = field.getAnnotationsByType(FieldConverter.class);
+                        ConverterIndicator[] converterIndicators = field.getAnnotationsByType(ConverterIndicator.class);
                         Object fieldOriginalValue = fD.getReadMethod().invoke(objF);
                         Object afterConvertValue = fieldOriginalValue;
                         Converter converter = null;
-                        if (fieldConverters != null && fieldConverters.length > 0) {
+                        if (converterIndicators != null && converterIndicators.length > 0) {
                             if (fieldOriginalValue != null) {
-                                for (FieldConverter fieldConverter : fieldConverters) {
-                                    converter = fieldConverterHandler.getConverter(fieldConverter);
-                                    if ("".equals(fieldConverter.tip())) {
+                                for (ConverterIndicator ci : converterIndicators) {
+                                    converter = this.getConverter(ci);
+                                    if ("".equals(ci.tip())) {
                                         afterConvertValue = converter.convert(afterConvertValue);
                                     } else {
-                                        afterConvertValue = converter.convert(afterConvertValue, fieldConverter.tip());
+                                        afterConvertValue = converter.convert(afterConvertValue, ci.tip());
                                     }
-                                    FieldValidator validator = fieldConverterHandler.getValidator(fieldConverter);
+                                    Validator validator = this.getValidator(ci);
                                     if (validator != null) {
-                                        VerifyInfo verifyInfo = validator.validate(afterConvertValue, objF);
+                                        VerifyInfo verifyInfo = validator.validate(afterConvertValue);
                                         if (!verifyInfo.isPass()) {
-                                            verifyMessage.append("{").append(verifyInfo.getErrMessage()).append("}");
+                                            errMap.put(tD.getName(), verifyInfo);
                                         }
                                     }
                                 }
@@ -161,11 +182,10 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
                             if (converter == null) {
 
                             } else if (BeanToBeanConverterHandler.class.isAssignableFrom(converter.getClass())) {
-                                VerifyResult verifyResult = converter.convert(fieldOriginalValue, tD.getPropertyType().getName(), null);
+                                VerifyResult verifyResult = converter.convertAndVerify(fieldOriginalValue, tD.getPropertyType().getName(), null);
                                 afterConvertValue = verifyResult.getValue();
                                 if (!verifyResult.isPass()) {
-                                    verifyMessage.append(fD.getName()).append(":");
-                                    verifyMessage.append("{").append(verifyResult.getErrMessage()).append("}");
+                                    errMap.put(tD.getName(), verifyResult);
                                 }
                             } else {
                                 afterConvertValue = converter.convert(fieldOriginalValue);
@@ -191,12 +211,12 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractFilterBaseConverte
         if (afterConvert != null) {
             VerifyInfo verifyInfo = afterConvert.validate(objT);
             if (!verifyInfo.isPass()) {
-                verifyMessage.append("{").append(verifyInfo.getErrMessage()).append("}");
+                errMap.put("对Bean的总验证",verifyInfo);
             }
         }
 
-        if (verifyMessage.length() > 0) {
-            return new VerifyResult<>((K) objT, verifyMessage.toString());
+        if (errMap.size() > 0) {
+            return new VerifyResult<>((K) objT, errMap.toString());
         } else {
             return new VerifyResult<>((K) objT);
         }

@@ -1,11 +1,6 @@
 package net.noboard.fastconverter.handler.base;
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-import net.noboard.fastconverter.ConverterFilter;
-import net.noboard.fastconverter.Field;
-import net.noboard.fastconverter.FieldConverter;
-import net.noboard.fastconverter.handler.support.FieldConverterHandler;
+import net.noboard.fastconverter.*;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -24,11 +19,7 @@ import java.util.*;
  * @author wanxm
  * @return
  */
-public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandler<Object, Map<String, Object>> {
-
-    private static List<Converter> converters = new ArrayList<>();
-
-    private final FieldConverterHandler fieldConverterHandler = new FieldConverterHandler();
+public class BeanToMapConverterHandler extends AbstractBeanConverterHandler<Object, Map<String, Object>> {
 
     public BeanToMapConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
@@ -36,7 +27,13 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
 
     @Override
     protected Map<String, Object> converting(Object value, String tip) throws ConvertException {
+        return this.converting(value, tip, null).getValue();
+    }
+
+    @Override
+    protected VerifyResult<Map<String, Object>> converting(Object value, String tip, Validator afterConvert) throws ConvertException {
         Map<String, Object> map = new HashMap<>();
+        Map<String, VerifyInfo> errMap = null;
 
         BeanInfo beanInfo;
         try {
@@ -61,8 +58,10 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
             // 对域名 及 是否隐藏的处理
             String mapKey;
             Field docField;
+            java.lang.reflect.Field field;
             try {
-                docField = value.getClass().getDeclaredField(descriptor.getName()).getAnnotation(Field.class);
+                field = value.getClass().getDeclaredField(descriptor.getName());
+                docField = field.getAnnotation(Field.class);
             } catch (NoSuchFieldException e) {
                 throw new ConvertException(
                         MessageFormat.format("BeanToMapConverterHandler反射获取对象域时发生异常：NoSuchFieldException  {0}.{1}  通常是因为在转换器过滤器中没有添加对相关类的支持，导致某些非Bean的java类被错误的抛给了BeanToMapConverterHandler去处理", value.getClass().getName(), descriptor.getName()),
@@ -81,25 +80,32 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
             }
 
             // 转换域值
-            Object mapValue = fieldValue;
-            FieldConverter[] annotations;
-            try {
-                annotations = value.getClass().getDeclaredField(descriptor.getName()).getAnnotationsByType(FieldConverter.class);
-            } catch (NoSuchFieldException e) {
-                throw new ConvertException(e);
-            }
+            Object mapValue;
+            ConverterIndicator[] annotations;
+            annotations = field.getAnnotationsByType(ConverterIndicator.class);
             if (annotations == null || annotations.length == 0) {
                 Converter converter = this.filter(fieldValue);
+                // 有转换器取转换后的值，没有转换器取原值
                 if (converter != null) {
                     mapValue = converter.convert(fieldValue);
+                } else {
+                    mapValue = fieldValue;
                 }
             } else {
+                // 如果该域指定了转换器，域值为空，则跳过该域
                 if (fieldValue == null) {
                     continue;
                 }
-                Object v = mapValue;
-                for (FieldConverter annotation : annotations) {
-                    v = fieldConverterHandler.handler(annotation, v);
+                Object v = fieldValue;
+                for (ConverterIndicator annotation : annotations) {
+                    VerifyResult verifyResult = this.handlerAndVerify(annotation, v);
+                    v = verifyResult.getValue();
+                    if (!verifyResult.isPass()) {
+                        if (errMap == null) {
+                            errMap = new HashMap<>();
+                        }
+                        errMap.put(field.getName(), verifyResult);
+                    }
                 }
                 mapValue = v;
             }
@@ -107,7 +113,28 @@ public class BeanToMapConverterHandler extends AbstractFilterBaseConverterHandle
             map.put(mapKey, mapValue);
         }
 
-        return map;
+        VerifyInfo verifyInfo = null;
+        if (afterConvert == null) {
+            ConverterIndicator converterIndicator = value.getClass().getAnnotation(ConverterIndicator.class);
+            if (!converterIndicator.afterConvert().isInterface()) {
+                try {
+                    afterConvert = converterIndicator.afterConvert().newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new ConvertException("实例化验证器" + converterIndicator.afterConvert() + "失败");
+                }
+            }
+        }
+        if (afterConvert != null) {
+            verifyInfo = afterConvert.validate(map);
+        }
+
+        if ((verifyInfo != null && !verifyInfo.isPass()) || errMap != null) {
+            return new VerifyResult<>(map, MessageFormat.format("整体校验结果：{0}。对域的校验结果：{1}",
+                    (verifyInfo == null || verifyInfo.getErrMessage() == null) ? "success" : verifyInfo.getErrMessage(),
+                    errMap == null ? "success" : errMap.toString()));
+        } else {
+            return new VerifyResult<>(map);
+        }
     }
 
     @Override

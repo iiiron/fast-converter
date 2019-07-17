@@ -1,7 +1,6 @@
 package net.noboard.collectiontest;
 
 import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.filter.CommonConverterFilter;
 import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
 import net.noboard.fastconverter.handler.*;
 import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
@@ -15,7 +14,7 @@ public class Main {
         @Field(name = "chineseName")
         private String name;
 
-        @FieldConverter(converter = DateToFormatStringConverterHandler.class)
+        @ConverterIndicator(converter = DateToFormatStringConverterHandler.class)
         private Date birthday;
 
         public String getName() {

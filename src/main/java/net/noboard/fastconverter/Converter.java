@@ -1,7 +1,5 @@
 package net.noboard.fastconverter;
 
-import java.util.List;
-
 /**
  * @author wanxm
  */
@@ -10,11 +8,13 @@ public interface Converter<T, K> {
 
     K convert(T value, String tip) throws ConvertException;
 
-    VerifyResult<K> convert(T value, Validator afterConvert) throws ConvertException;
+    VerifyResult<K> convertAndVerify(T value) throws ConvertException;
 
-    VerifyResult<K> convert(T value, String tip, Validator afterConvert) throws ConvertException;
+    VerifyResult<K> convertAndVerify(T value, String tip) throws ConvertException;
+
+    VerifyResult<K> convertAndVerify(T value, Validator afterConvert) throws ConvertException;
+
+    VerifyResult<K> convertAndVerify(T value, String tip, Validator afterConvert) throws ConvertException;
 
     boolean supports(Object value);
-
-    List<VerifyResult> verifyInfos();
 }
