@@ -8,7 +8,7 @@ import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
 import java.util.Date;
 
 @Data
-@BeanConverterIndicator(targetType = ChildB.class, afterConvert = BeanAgeVarify.class)
+//@BeanConverterIndicator(targetType = ChildB.class, afterConvert = BeanAgeVarify.class)
 public class ChildA {
     private String name;
 

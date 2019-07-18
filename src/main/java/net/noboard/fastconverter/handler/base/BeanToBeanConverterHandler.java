@@ -148,6 +148,7 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandl
             throw new ConvertException("实例化Bean失败", e);
         }
 
+        StringBuilder stringBuilder = new StringBuilder();
         Map<String, VerifyInfo> errMap = new HashMap<>();
         for (PropertyDescriptor fD : beanF.getPropertyDescriptors()) {
             if ("class".equals(fD.getName())) {
@@ -177,7 +178,7 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandl
                                     }
                                     afterConvertValue = verifyResult.getValue();
                                     if (!verifyResult.isPass()) {
-                                        errMap.put(tD.getName(), verifyResult);
+                                        putErrMessage(stringBuilder, tD.getName(), verifyResult.getErrMessage());
                                     }
                                 }
                             }
@@ -195,7 +196,7 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandl
 
                                 afterConvertValue = verifyResult.getValue();
                                 if (!verifyResult.isPass()) {
-                                    errMap.put(tD.getName(), verifyResult);
+                                    putErrMessage(stringBuilder, tD.getName(), verifyResult.getErrMessage());
                                 }
                             }
                         }
@@ -216,17 +217,25 @@ public class BeanToBeanConverterHandler<T, K> extends AbstractBeanConverterHandl
             }
         }
 
-        if (afterConvert != null) {
-            VerifyInfo verifyInfo = afterConvert.validate(objT);
-            if (!verifyInfo.isPass()) {
-                errMap.put("对Bean的总验证", verifyInfo);
-            }
+        if (stringBuilder.length() > 0) {
+            stringBuilder.insert(0, " field verify: ");
         }
 
-        if (errMap.size() > 0) {
-            return new VerifyResult<>((K) objT, errMap.toString());
+        VerifyInfo verifyInfo = afterConvert == null ? null : afterConvert.validate(objT);
+        if (verifyInfo != null && !verifyInfo.isPass()) {
+            stringBuilder.insert(0, " bean verify: " + verifyInfo.getErrMessage() + ". ");
+        }
+
+        if (stringBuilder.length() > 0) {
+            return new VerifyResult<>((K) objT, stringBuilder.insert(0,"{").append("}").toString());
         } else {
             return new VerifyResult<>((K) objT);
         }
+    }
+
+    private void putErrMessage(StringBuilder stringBuilder, String fieldName, String message) {
+        stringBuilder.append(fieldName);
+        stringBuilder.append(":");
+        stringBuilder.append(message).append(" ");
     }
 }

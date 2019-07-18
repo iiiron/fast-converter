@@ -37,6 +37,7 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
         Converter converter = null;
         Object newV = null, oldV = null;
         Map<String, VerifyInfo> errMap = new HashMap<>();
+        StringBuilder stringBuilder = new StringBuilder();
         try {
             int index = 0;
             for (T obj : value) {
@@ -48,7 +49,9 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
                     VerifyResult verifyResult = converter.convertAndVerify(oldV, tip);
                     newV = verifyResult.getValue();
                     if (!verifyResult.isPass()) {
-                        errMap.put(String.valueOf(index), verifyResult);
+                        stringBuilder.append(index);
+                        stringBuilder.append(":");
+                        stringBuilder.append(verifyResult.getErrMessage()).append(" ");
                     }
                 }
                 collection.add((K) newV);
@@ -58,15 +61,17 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
             ConverterExceptionHelper.factory(value, oldV, collection, newV, converter, e);
         }
 
-        if (afterConvert != null) {
-            VerifyInfo verifyInfo = afterConvert.validate(collection);
-            if (!verifyInfo.isPass()) {
-                errMap.put("Collection整体校验结果", verifyInfo);
-            }
+        if (stringBuilder.length() > 0) {
+            stringBuilder.insert(0, " element verify: ");
         }
 
-        if (errMap.size() > 0) {
-            return new VerifyResult<>(collection, errMap.toString());
+        VerifyInfo verifyInfo = afterConvert == null ? null : afterConvert.validate(collection);
+        if (verifyInfo != null && !verifyInfo.isPass()) {
+            stringBuilder.insert(0, " collection verify: " + verifyInfo.getErrMessage() + ". ");
+        }
+
+        if (stringBuilder.length() > 0) {
+            return new VerifyResult<>(collection, stringBuilder.insert(0,"{").append("}").toString());
         } else {
             return new VerifyResult<>(collection);
         }

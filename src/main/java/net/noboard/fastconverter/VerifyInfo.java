@@ -36,10 +36,6 @@ public class VerifyInfo {
 
     @Override
     public String toString() {
-        return "{\n" +
-                "errCode:" + errCode +
-                ",\n errMessage:'" + errMessage + '\'' +
-                ",\n isPass:" + isPass +
-                "\n}";
+        return errMessage;
     }
 }
