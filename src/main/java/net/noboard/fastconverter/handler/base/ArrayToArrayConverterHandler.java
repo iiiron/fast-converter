@@ -13,6 +13,19 @@ import java.lang.reflect.Array;
  * 将原数据推入新数组中
  * <p>
  * 注意，由于java存在自动装箱，int[]经过转换后将变为Integer[]，其他基本数据类型同理。
+ *
+ * 关于该类的写法:
+ *
+ * public class ArrayToArrayConverterHandler<T,K> extends AbstractFilterBaseConverterHandler<T[], K[]>
+ *      这种写法的问题是，当你实例化该类的实例时，不能使用 new ArrayToArrayConverterHandler<int,int>,java
+ *      的泛型不支持这样的写法
+ *
+ * public class ArrayToArrayConverterHandler<T,K> extends AbstractFilterBaseConverterHandler<T, K>
+ *     这种写法会在方法边界处发生强制类型转换，会导致int[]的数据经过转换后变成Integer[]的数据，而
+ *     Integer[]不能被强制类型转换为int[]，则实例 new ArrayToArrayConverterHandler<int[],int[]> 一
+ *     定发生类型转换异常
+ *
+ * 所以该类暂时采用了不使用泛型的写法。如果你有更好的想法，欢迎PR。
  */
 public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
 

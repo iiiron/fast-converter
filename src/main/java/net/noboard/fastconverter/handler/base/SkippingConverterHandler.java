@@ -11,7 +11,7 @@ import java.util.Date;
  * <p>
  * 该转换器不对数据进行任何转换，它的存在是为了让过滤器转换器提供对某些类型的数据的跳过逻辑。
  */
-public class SkippingConverterHandler extends AbstractConverterHandler<Object, Object> {
+public class SkippingConverterHandler<T> extends AbstractConverterHandler<T, T> {
 
     private Class[] classes;
 
@@ -35,7 +35,7 @@ public class SkippingConverterHandler extends AbstractConverterHandler<Object, O
     }
 
     @Override
-    protected Object converting(Object value, String tip) throws ConvertException {
+    protected T converting(T value, String tip) throws ConvertException {
         return value;
     }
 
