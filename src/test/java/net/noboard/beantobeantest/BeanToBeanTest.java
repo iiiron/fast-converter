@@ -17,10 +17,10 @@ public class BeanToBeanTest {
         BeanToBeanConverterHandler beanToBeanConverterHandler =
                 BeanToBeanConverterHandler.transferCustom(new CommonSkipConverterFilter());
 
-        HumanA humanA = init();
-        Object humanB = beanToBeanConverterHandler.convertAndVerify(humanA, "net.noboard.bean.HumanB");
+//        HumanA humanA = init();
+//        Object humanB = beanToBeanConverterHandler.convertAndVerify(humanA, "net.noboard.bean.HumanB");
 
-        System.out.println(humanB);
+//        System.out.println(humanB);
     }
 
     public static HumanA init() {
