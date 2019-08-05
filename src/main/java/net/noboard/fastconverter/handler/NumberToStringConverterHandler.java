@@ -2,6 +2,7 @@ package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
 
+import javax.validation.constraints.Max;
 import java.math.BigDecimal;
 
 /**
@@ -10,7 +11,8 @@ import java.math.BigDecimal;
 public class NumberToStringConverterHandler extends AbstractConverterHandler<Object, String> {
 
     @Override
-    protected String converting(Object value, String tip) {
+    @Max(10)
+    protected String converting(@Max(10) Object value, String tip) {
         return String.valueOf(value);
     }
 

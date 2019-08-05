@@ -1,11 +1,15 @@
 package net.noboard.fastconverter.handler.base;
 
 
-import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.ConvertException;
+import net.noboard.fastconverter.ConvertResult;
+import net.noboard.fastconverter.Converter;
 
+import javax.validation.*;
+import javax.validation.constraints.Max;
+import javax.validation.executable.ExecutableValidator;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @param <T>
@@ -16,65 +20,51 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
 
     private String defaultTip;
 
-    private Validator validator;
+    private ExecutableValidator executableValidator;
 
     public AbstractConverterHandler() {
-        this.defaultTip = "";
-        this.validator = null;
+        this("");
     }
 
     public AbstractConverterHandler(String defaultTip) {
         this.defaultTip = defaultTip;
-    }
-
-    public AbstractConverterHandler(Validator validator) {
-        this.defaultTip = "";
-        this.validator = validator;
-    }
-
-    public AbstractConverterHandler(String defaultTip, Validator validator) {
-        this.defaultTip = defaultTip;
-        this.validator = validator;
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        executableValidator = factory.getValidator().forExecutables();
     }
 
     /**
-     *
      * @param value
-     * @param tip 要么是有效的用户传入的tip，要么是defaultTip
+     * @param tip   要么是有效的用户传入的tip，要么是defaultTip
      * @return
      * @throws ConvertException
      */
-    protected abstract K converting(T value, String tip) throws ConvertException;
+    protected abstract K converting(@Max(1) T value, String tip) throws ConvertException;
 
     /**
-     *
      * @param value
-     * @param tip 要么是有效的用户传入的tip，要么是defaultTip
-     * @param afterConvert 要么是有效的用户传入的Validator，要么是默认的Validator
+     * @param tip   要么是有效的用户传入的tip，要么是defaultTip
      * @return
      * @throws ConvertException
      */
-    protected VerifyResult<K> convertingAndVerify(T value, String tip, Validator afterConvert) throws ConvertException {
+    protected ConvertResult<K> convertingAndVerify(T value, String tip) throws ConvertException {
         K k = converting(value, defaultTip(tip));
-        Validator validator = defaultValidator(afterConvert);
-        if (validator != null) {
-            VerifyInfo verifyInfo = validator.validate(k);
-            if (verifyInfo.isPass()) {
-                return new VerifyResult<>(k);
-            } else {
-                return new VerifyResult<>(k, verifyInfo.getErrCode(), verifyInfo.getErrMessage());
+        ConvertResult<K> convertResult = new ConvertResult<>(k);
+        try {
+            Method method = this.getClass().getDeclaredMethod("converting", Object.class, String.class);
+            for (ConstraintViolation<AbstractConverterHandler<T, K>> constraintValidator : executableValidator.validateParameters(this, method, new Object[]{value})) {
+                convertResult.appendViolation(constraintValidator);
             }
-        } else {
-            return new VerifyResult<>(k);
+            for (ConstraintViolation<AbstractConverterHandler<T, K>> constraintValidator : executableValidator.validateReturnValue(this, method, k)) {
+                convertResult.appendViolation(constraintValidator);
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
+        return convertResult;
     }
 
     protected String getDefaultTip() {
         return this.defaultTip;
-    }
-
-    protected Validator getDefaultValidator() {
-        return this.validator;
     }
 
     @Override
@@ -92,33 +82,18 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
     }
 
     @Override
-    public VerifyResult<K> convertAndVerify(T value) throws ConvertException {
-        return this.convertAndVerify(value, this.defaultTip, this.validator);
+    public ConvertResult<K> convertAndVerify(T value) throws ConvertException {
+        return this.convertAndVerify(value, this.defaultTip);
     }
 
     @Override
-    public VerifyResult<K> convertAndVerify(T value, String tip) throws ConvertException {
-        return this.convertAndVerify(value, tip, this.validator);
+    public ConvertResult<K> convertAndVerify(T value, String tip) throws ConvertException {
+        return this.convertingAndVerify(value, tip);
     }
 
-    @Override
-    public VerifyResult<K> convertAndVerify(T value, Validator afterConvert) throws ConvertException {
-        return this.convertAndVerify(value, this.defaultTip, afterConvert);
-    }
-
-    @Override
-    public VerifyResult<K> convertAndVerify(T value, String tip, Validator afterConvert) throws ConvertException {
-        if (!this.supports(value)) {
-            throw new ConvertException(MessageFormat.format("转换器 {0} 不匹配数据 {1}", this.getClass().getName(), value));
-        }
-        return this.convertingAndVerify(value, tip, afterConvert);
-    }
 
     protected String defaultTip(String tip) {
         return (tip == null || "".equals(tip)) ? this.defaultTip : tip;
     }
 
-    protected Validator defaultValidator(Validator validator) {
-        return validator == null ? this.validator : validator;
-    }
 }

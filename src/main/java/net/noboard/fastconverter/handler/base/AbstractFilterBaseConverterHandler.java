@@ -24,8 +24,8 @@ public abstract class AbstractFilterBaseConverterHandler<T, K> extends AbstractC
         this.converterFilter = converterFilter;
     }
 
-    protected Converter filter(Object value) {
-        return converterFilter.filter(value);
+    protected Converter getConverter(Object value) {
+        return converterFilter.getConverter(value);
     }
 
     protected ConverterFilter getConverterFilter() {

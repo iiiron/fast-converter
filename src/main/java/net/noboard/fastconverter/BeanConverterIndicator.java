@@ -7,5 +7,5 @@ import java.lang.annotation.*;
 public @interface BeanConverterIndicator {
     Class targetType() default Void.class;
 
-    Class<? extends Validator> afterConvert() default Validator.class;
+//    Class<? extends Validator> afterConvert() default Validator.class;
 }

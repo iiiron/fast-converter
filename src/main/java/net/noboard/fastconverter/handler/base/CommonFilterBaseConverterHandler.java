@@ -17,12 +17,12 @@ public class CommonFilterBaseConverterHandler<T, K> extends AbstractFilterBaseCo
 
     @Override
     public boolean supports(Object value) {
-        return this.filter(value) != null;
+        return this.getConverter(value) != null;
     }
 
     @Override
     protected K converting(T value, String tip) throws ConvertException {
-        Converter converter = this.filter(value);
+        Converter converter = this.getConverter(value);
         if (converter != null) {
             return (K) converter.convert(value);
         } else {

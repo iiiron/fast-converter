@@ -14,7 +14,7 @@ public interface ConverterFilter {
      * @param value
      * @return
      */
-    Converter filter(Object value);
+    Converter getConverter(Object value);
 
     ConverterFilter addFirst(Converter converter);
 
