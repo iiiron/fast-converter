@@ -2,13 +2,11 @@ package net.noboard.fastconverter;
 
 import net.noboard.fastconverter.handler.base.SkippingConverterHandler;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
+@Repeatable(Convertibles.class)
 public @interface Convertible {
 
     String group() default "default";

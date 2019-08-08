@@ -1,11 +1,10 @@
 package net.noboard.fastconverter.handler.base;
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-import net.noboard.fastconverter.ConverterFilter;
-import net.noboard.fastconverter.FieldConverter;
+import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
 import net.noboard.fastconverter.handler.support.FieldConverterHandler;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -40,8 +39,6 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
 
     private static BeanToBeanConverterHandler beanTransfer = null;
 
-    private Class from = null;
-
     /**
      * 一个专门用于递归复制Bean的BeanToBeanConverterHandler实例，它不会对数据做任何修改，除非
      * 你通过@FieldConverter指定了转换器。
@@ -71,38 +68,11 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
     }
 
     public BeanToBeanConverterHandler(ConverterFilter converterFilter) {
-        super(converterFilter);
+        super(converterFilter, ConvertBean.defaultGroup);
     }
 
-    public BeanToBeanConverterHandler(ConverterFilter converterFilter, String tip) {
-        super(converterFilter, tip);
-    }
-
-    public BeanToBeanConverterHandler(ConverterFilter converterFilter, Class to) {
-        super(converterFilter, to.getName());
-    }
-
-    /**
-     * 该构造函数同其他的区别在于，它接收一个标识beanFrom的类型的class对象参数，使用该
-     * 构造函数实例化的BeanToBean转换器，会在验证中检查beanFrom的类型是否是该构造器
-     * 参数类型的子类，本类或接口实现类，是则验证通过，否则验证不通过。
-     *
-     * @param converterFilter
-     * @param from
-     * @param to
-     */
-    public BeanToBeanConverterHandler(ConverterFilter converterFilter, Class from, Class to) {
-        super(converterFilter, to.getName());
-        this.from = from;
-    }
-
-    @Override
-    public boolean supports(Object value) {
-        if (this.from != null) {
-            return value != null && value.getClass() == this.from;
-        } else {
-            return value != null;
-        }
+    public BeanToBeanConverterHandler(ConverterFilter converterFilter, String group) {
+        super(converterFilter, group);
     }
 
     public Object convert(Object value, Class clazz) {
@@ -180,5 +150,21 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
         }
 
         return objT;
+    }
+
+    @Override
+    public boolean supports(Object value) {
+        if (value == null) {
+            return false;
+        } else {
+            return AnnotatedElementUtils.getMergedAnnotation(value.getClass(), Convertible.class) != null;
+        }
+    }
+
+    protected Object converting(Object value, String tip, String a) throws ConvertException {
+        AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(value.getClass(),Convertible.class.getName());
+        String group = annotationAttributes.getString("group");
+
+        return null;
     }
 }

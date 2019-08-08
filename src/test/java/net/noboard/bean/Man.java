@@ -1,6 +1,7 @@
 package net.noboard.bean;
 
 import lombok.Data;
+import net.noboard.fastconverter.ConvertBean;
 import net.noboard.fastconverter.ConvertField;
 import net.noboard.fastconverter.Convertible;
 import net.noboard.fastconverter.FieldConverter;
@@ -9,7 +10,8 @@ import net.noboard.fastconverter.handler.*;
 import java.util.*;
 
 @Data
-@Convertible
+@ConvertBean(targetClass = Woman.class)
+@ConvertBean(targetClass = Woman.class, group = "A")
 public class Man implements Comparable {
 
     private String name;
