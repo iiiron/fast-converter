@@ -10,32 +10,49 @@ import java.util.Set;
 /**
  * @Convertible注解分组器
  */
-public class ConvertibleUtils {
+public class ConvertibleAnnotatedUtils {
     /**
-     * 从bean上读取融合后的ConvertBean AnnotatedElement对象
-     *
+     * 根据分组过滤出class上的@ConvertibleBean注解数据
      * @param beanClass
      * @param group
      * @return
      */
     public static ConvertibleBean getMergedConvertBean(AnnotatedElement beanClass, String group) {
-        requireGroup(group);
+//        GroupUtils.requireGroup(group);
 
         Set<ConvertibleBean> set = AnnotatedElementUtils.findMergedRepeatableAnnotations(beanClass, ConvertibleBean.class);
-        if (set == null || set.size() < 1) {
-            return null;
-        }
+        ConvertibleBean convertibleBean = null;
         for (ConvertibleBean bean : set) {
-            requireAnnotationGroup(bean.group(), bean.getClass());
+            GroupUtils.requireGroup(bean.group(), bean.getClass());
             if (GroupUtils.checkGroup(bean.group(), group)) {
-                return bean;
+                convertibleBean = bean;
             }
         }
-        return null;
+
+        if (convertibleBean == null) {
+            throw new ConvertException(String.format("no @ConvertibleBean annotation agree with group '%s', on bean %s",
+                    group,
+                    beanClass.toString()));
+        }
+        if (convertibleBean.targetClass() == Void.class && "".equals(convertibleBean.targetName())) {
+            throw new ConvertException(String.format("you have to declare target of convert on @ConvertibleBean use 'targetName' or 'targetClass' when at BeanToBeanConverterHandler"));
+        }
+        if (convertibleBean.targetClass() != Void.class
+                && !"".equals(convertibleBean.targetName())
+                && !convertibleBean.targetClass().getName().equals(convertibleBean.targetName())) {
+            throw new ConvertException("the attributes 'targetName' and 'targetClass' in annotation @ConvertibleBean must point the same class. or just declare one of the two");
+        }
+        return convertibleBean;
     }
 
+    /**
+     * 根据分组过滤出Field上的@ConvertibleField注解数据，以注解申明顺序排序
+     * @param field
+     * @param group
+     * @return
+     */
     public static LinkedHashSet<ConvertibleField> getMergedConvertField(AnnotatedElement field, String group) {
-        requireGroup(group);
+//        GroupUtils.requireGroup(group);
 
         Set<ConvertibleField> set = AnnotatedElementUtils.findMergedRepeatableAnnotations(field, ConvertibleField.class);
         if (set == null || set.size() < 1) {
@@ -44,7 +61,7 @@ public class ConvertibleUtils {
 
         LinkedHashSet<ConvertibleField> linkedHashSet = new LinkedHashSet<>();
         for (ConvertibleField convertibleField : set) {
-            requireAnnotationGroup(convertibleField.group(), convertibleField.getClass());
+            GroupUtils.requireGroup(convertibleField.group(), convertibleField.getClass());
             if (convertibleField.group().equals(group)) {
                 linkedHashSet.add(convertibleField);
             }
@@ -115,18 +132,21 @@ public class ConvertibleUtils {
             public Converter getConverter() {
                 return converter;
             }
+
+            @Override
+            public void join(ConvertibleMap convertibleMap) {
+
+            }
+
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public ConvertibleMap next() {
+                return null;
+            }
         };
-    }
-
-    private static void requireGroup(String group) {
-        if (group == null || "".equals(group)) {
-            throw new IllegalArgumentException("the string argument named group can not be null or empty string");
-        }
-    }
-
-    private static void requireAnnotationGroup(String group, Class groupOf) {
-        if ("".equals(group)) {
-            throw new IllegalArgumentException(String.format("attribute group of %s can not be empty string", groupOf.getName()));
-        }
     }
 }

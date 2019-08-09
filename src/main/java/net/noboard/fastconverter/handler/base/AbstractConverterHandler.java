@@ -3,6 +3,7 @@ package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
+import net.noboard.fastconverter.Convertible;
 
 /**
  * @author wanxm
@@ -43,5 +44,9 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
     @Override
     public void setDefaultTip(String tip) {
         this.defaultTip = tip;
+    }
+
+    protected boolean isTipHasMessage(String tip) {
+        return !Convertible.defaultTip.equals(tip) && tip != null;
     }
 }

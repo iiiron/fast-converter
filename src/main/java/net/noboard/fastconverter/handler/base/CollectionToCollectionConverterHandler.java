@@ -3,6 +3,7 @@ package net.noboard.fastconverter.handler.base;
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.Convertible;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -35,7 +36,13 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
             for (T obj : value) {
                 converter = this.filter(obj);
                 oldV = obj;
-                newV = converter == null ? oldV : converter.convert(oldV, tip);
+                if (converter == null) {
+                    newV = oldV;
+                } else if (isTipHasMessage(tip)) {
+                    newV = converter.convert(oldV, tip);
+                } else {
+                    newV = converter.convert(oldV);
+                }
                 collection.add((K) newV);
             }
         } catch (ConvertException e) {

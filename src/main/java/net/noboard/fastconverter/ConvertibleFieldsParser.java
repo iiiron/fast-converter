@@ -1,28 +1,35 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.handler.base.PipelineConverterHandler;
-import net.noboard.fastconverter.handler.support.ConvertibleUtils;
+import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedHashSet;
 
-public class ConvertibleFieldsParser extends AbstractConvertibleParser {
+public class ConvertibleFieldsParser implements ConvertibleParser {
     @Override
-    public ConvertibleMap parse() {
-        LinkedHashSet<ConvertibleField> linkedHashSet = ConvertibleUtils.getMergedConvertField(super.annotatedElement, super.group);
-        PipelineConverterHandler pipelineConverterHandler = new PipelineConverterHandler();
-        CMap cMap = new CMap();
+    public ConvertibleMap parse(AnnotatedElement annotatedElement, String tip, String group) {
+        LinkedHashSet<ConvertibleField> linkedHashSet = ConvertibleAnnotatedUtils.getMergedConvertField(annotatedElement, group);
+        CMap first = null, last = null;
         try {
             for (ConvertibleField convertibleField : linkedHashSet) {
-                Converter converter = convertibleField.converter().newInstance();
-                converter.setDefaultTip(convertibleField.tip());
-                pipelineConverterHandler.pushConverter(converter);
+                if (first == null) {
+                    first = new CMap();
+                    last = first;
+                } else {
+                    last.join(new CMap());
+                    last = (CMap) last.next();
+                }
+
+                if (convertibleField.converter() != Converter.class) {
+                    last.setConverter(convertibleField.converter().newInstance());
+                }
+                last.setGroup(group);
+                last.setTip(tip);
             }
-            cMap.setConverter(pipelineConverterHandler);
-            cMap.setGroup(group);
-        }catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
-        return cMap;
+        return first;
     }
 }

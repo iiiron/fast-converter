@@ -1,26 +1,31 @@
 package net.noboard.fastconverter;
 
+import net.noboard.fastconverter.handler.support.GroupUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 
-public class ConvertibleFieldParser extends AbstractConvertibleParser {
+import java.lang.reflect.AnnotatedElement;
+
+public class ConvertibleFieldParser implements ConvertibleParser {
     @Override
-    public ConvertibleMap parse() {
+    public ConvertibleMap parse(AnnotatedElement annotatedElement, String tip, String group) {
         CMap cMap = new CMap();
-        AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(super.annotatedElement, ConvertibleField.class);
+        AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, ConvertibleField.class);
         Class<? extends Converter> converterClass = (Class<? extends Converter>) annotationAttributes.get("converter");
-        if (annotationAttributes.getString("group").equals(super.group)) {
-            try {
-                if (converterClass != Converter.class) {
-                    Converter converter = converterClass.newInstance();
-                    cMap.setConverter(converter);
+        if (GroupUtils.checkGroup(annotationAttributes.getString("group"), group)) {
+            if (converterClass != Converter.class) {
+                try {
+                    cMap.setConverter(converterClass.newInstance());
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new IllegalArgumentException(String.format("the class %s pointed by attribute 'converter' in @ConvertibleField can not be implemented", converterClass.getName()));
                 }
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new IllegalArgumentException(String.format("the class %s pointed by attribute 'converter' in @ConvertibleField can not be implemented", converterClass.getName()));
             }
+            cMap.setTip(annotationAttributes.getString("tip"));
+        } else {
+            cMap.setTip(tip);
         }
-        cMap.setGroup(annotationAttributes.getString("group"));
-        cMap.setTip(annotationAttributes.getString("tip"));
+        cMap.setGroup(group);
+
         return cMap;
     }
 }

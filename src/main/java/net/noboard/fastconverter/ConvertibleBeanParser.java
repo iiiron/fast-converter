@@ -2,18 +2,16 @@ package net.noboard.fastconverter;
 
 import net.noboard.fastconverter.filter.CommonConverterFilter;
 import net.noboard.fastconverter.handler.base.BeanToBeanConverterHandler;
-import net.noboard.fastconverter.handler.support.ConvertibleUtils;
+import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
 
-public class ConvertibleBeanParser extends AbstractConvertibleParser {
+import java.lang.reflect.AnnotatedElement;
+
+public class ConvertibleBeanParser implements ConvertibleParser {
 
     // TODO BeanToMap的支持
     @Override
-    public ConvertibleMap parse() {
-        ConvertibleBean convertibleBean = ConvertibleUtils.getMergedConvertBean(super.annotatedElement, super.group);
-
-        if (convertibleBean == null) {
-            throw new IllegalArgumentException(String.format("the group '%s' must be declared by @ConvertibleBean on %s", super.group, annotatedElement.toString()));
-        }
+    public ConvertibleMap parse(AnnotatedElement annotatedElement, String tip, String group) {
+        ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(annotatedElement, group);
 
         CMap cMap = new CMap();
         if (convertibleBean.converter() != Converter.class) {

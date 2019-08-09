@@ -2,7 +2,7 @@ package net.noboard;
 
 import net.noboard.bean.ChildA;
 import net.noboard.bean.Man;
-import net.noboard.fastconverter.handler.support.ConvertibleUtils;
+import net.noboard.fastconverter.FastConverter;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
@@ -25,8 +25,10 @@ public class SpringTest {
         childA.setName("hello");
         List<ChildA> list = new ArrayList<>();
         list.add(childA);
-        m.setChild(list);
-        Object o = ConvertibleUtils.parse(Man.class, null, "A").getConverter().convert(m);
+        List<List<ChildA>> lists = new ArrayList<>();
+        lists.add(list);
+        m.setChild(lists);
+        Object o = FastConverter.autoConvert(m,"b");
         System.out.println(o);
     }
 }

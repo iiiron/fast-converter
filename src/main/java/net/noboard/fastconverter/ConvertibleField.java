@@ -15,12 +15,12 @@ public @interface ConvertibleField {
     String group() default Convertible.defaultGroup;
 
     @AliasFor(annotation = Convertible.class)
+    String tip() default Convertible.defaultGroup;
+
+    @AliasFor(annotation = Convertible.class)
     Class<? extends Converter> converter() default Converter.class;
 
     boolean abandon() default false;
 
     String nameTo() default "";
-
-    @AliasFor(annotation = Convertible.class)
-    String tip() default Convertible.defaultTip;
 }

@@ -13,6 +13,6 @@ public class Woman {
 
     private String name;
 
-    List<ChildB> child;
+    List<List<ChildB>> child;
 
 }

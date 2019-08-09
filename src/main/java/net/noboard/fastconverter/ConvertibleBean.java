@@ -12,10 +12,10 @@ import java.lang.annotation.*;
 @Convertible
 public @interface ConvertibleBean {
 
-    @AliasFor("tip")
+    @AliasFor(annotation = Convertible.class)
     String group() default Convertible.defaultGroup;
 
-    @AliasFor("group")
+    @AliasFor(annotation = Convertible.class)
     String tip() default Convertible.defaultGroup;
 
     @AliasFor(annotation = Convertible.class)

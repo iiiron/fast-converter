@@ -10,10 +10,12 @@ import net.noboard.fastconverter.handler.base.CollectionToCollectionConverterHan
 import java.util.*;
 
 @Data
-@ConvertibleBean(targetClass = Woman.class, group = "A")
+//@ConvertibleBean(targetClass = Woman.class)
+@ConvertibleBean(targetClass = Woman.class, group = "b")
+//@ConvertibleBean(targetClass = ChildA.class, group = "B")
 public class Man {
     private String name = "wanxm";
 
-    @ConvertibleField(group = "A", tip = "A")
-    List<ChildA> child;
+    @ConvertibleField(group = "b", tip = "toChildC")
+    List<List<ChildA>> child;
 }

@@ -2,11 +2,9 @@ package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
-import net.noboard.fastconverter.handler.support.ConvertibleUtils;
+import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
 import net.noboard.fastconverter.handler.support.FieldConverterHandler;
-import net.noboard.fastconverter.handler.support.GroupUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -14,8 +12,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 /**
@@ -84,19 +80,11 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
 
     @Override
     protected Object converting(Object value, String group) throws ConvertException {
-        ConvertibleBean convertibleBean = ConvertibleUtils.getMergedConvertBean(value.getClass(), group);
+        ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(value.getClass(), group);
         if (convertibleBean == null) {
             throw new ConvertException(String.format("no @ConvertibleBean annotation agree with group '%s', on bean %s",
                     group,
                     value.getClass()));
-        }
-        if (convertibleBean.targetClass() == Void.class && "".equals(convertibleBean.targetName())) {
-            throw new ConvertException(String.format("you have to declare target of convert on @ConvertibleBean use 'targetName' or 'targetClass' when at BeanToBeanConverterHandler"));
-        }
-        if (convertibleBean.targetClass() != Void.class
-                && !"".equals(convertibleBean.targetName())
-                && !convertibleBean.targetClass().getName().equals(convertibleBean.targetName())) {
-            throw new ConvertException("the attributes 'targetName' and 'targetClass' in annotation @ConvertibleBean must point the same class. or just declare one of the two");
         }
 
         Object objT;
@@ -140,7 +128,7 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                         from.getClass().getName()));
             }
 
-            LinkedHashSet<ConvertibleField> convertibleFields = ConvertibleUtils.getMergedConvertField(field, group);
+            LinkedHashSet<ConvertibleField> convertibleFields = ConvertibleAnnotatedUtils.getMergedConvertField(field, group);
             ConvertibleField last = lastConvertibleField(convertibleFields);
             String nameTo = fD.getName();
             if (last != null) {
@@ -158,20 +146,17 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                     try {
                         r = fD.getReadMethod().invoke(from);
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
                         throw new ConvertException(e);
                     }
 
-                    ConvertibleMap convertibleMap = ConvertibleUtils.parse(field, null, group);
+                    ConvertibleMap convertibleMap = ConvertibleAnnotatedUtils.parse(field, null, group);
 
                     Converter converter = convertibleMap.getConverter();
                     if (converter == null) {
                         converter = this.filter(r);
                     }
 
-                    // 没有转换器来处理的值，保留原值插入新的bean中
                     if (converter != null) {
-                        // 这里不能传入tip，因为如果是默认转换器，使用默认值；如果是指定转换器，ConvertibleParser会去处理tip的问题
                         if (convertibleMap.getTip() != null) {
                             r = converter.convert(r, convertibleMap.getTip());
                         } else {
@@ -198,7 +183,8 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
         if (value == null) {
             return false;
         } else {
-            return AnnotatedElementUtils.getMergedAnnotation(value.getClass(), ConvertibleBean.class) != null;
+            return AnnotatedElementUtils.getMergedAnnotation(value.getClass(), ConvertibleBean.class) != null
+                    || AnnotatedElementUtils.getMergedAnnotationAttributes(value.getClass(), ConvertibleBeans.class) != null;
         }
     }
 
@@ -207,12 +193,5 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
             return null;
         }
         return (ConvertibleField) convertibleFields.toArray()[convertibleFields.size() - 1];
-    }
-
-    protected Object converting(Object value, String tip, String a) throws ConvertException {
-        AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(value.getClass(), Convertible.class.getName());
-        String group = annotationAttributes.getString("group");
-
-        return null;
     }
 }
