@@ -13,7 +13,7 @@ import java.util.Date;
 public class ChildA {
     private String name;
 
-    @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy-MM-dd HH:mm:ss", nameTo = "birthday")
     @ConvertibleField(group = "toChildC")
+    @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy-MM-dd HH:mm:ss", nameTo = "birthday")
     private Date birth;
 }

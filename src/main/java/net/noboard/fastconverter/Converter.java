@@ -11,4 +11,8 @@ public interface Converter<T, K> {
     void setDefaultTip(String tip);
 
     boolean supports(Object value);
+
+    static boolean isTipHasMessage(String tip) {
+        return !Convertible.defaultTip.equals(tip) && tip != null;
+    }
 }

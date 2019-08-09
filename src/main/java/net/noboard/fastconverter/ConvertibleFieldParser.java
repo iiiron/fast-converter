@@ -24,7 +24,6 @@ public class ConvertibleFieldParser implements ConvertibleParser {
         } else {
             cMap.setTip(tip);
         }
-        cMap.setGroup(group);
 
         return cMap;
     }

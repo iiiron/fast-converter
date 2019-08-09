@@ -149,20 +149,28 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                         throw new ConvertException(e);
                     }
 
-                    ConvertibleMap convertibleMap = ConvertibleAnnotatedUtils.parse(field, null, group);
-
-                    Converter converter = convertibleMap.getConverter();
-                    if (converter == null) {
-                        converter = this.filter(r);
-                    }
-
-                    if (converter != null) {
-                        if (convertibleMap.getTip() != null) {
-                            r = converter.convert(r, convertibleMap.getTip());
-                        } else {
-                            r = converter.convert(r);
+                    ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, null, group);
+                    do {
+                        Converter converter = currentMap.getConverter();
+                        if (converter == null) {
+                            converter = this.filter(r);
                         }
-                    }
+
+                        if (converter != null) {
+                            if (currentMap.getTip() != null) {
+                                r = converter.convert(r, currentMap.getTip());
+                            } else {
+                                r = converter.convert(r);
+                            }
+                        }
+
+                        if (currentMap.hasNext()) {
+                            currentMap = currentMap.next();
+                        } else {
+                            break;
+                        }
+                    } while (true);
+
                     try {
                         tD.getWriteMethod().invoke(to, r);
                     } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {

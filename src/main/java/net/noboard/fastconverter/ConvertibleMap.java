@@ -1,15 +1,14 @@
 package net.noboard.fastconverter;
 
-import java.util.Iterator;
-
+/**
+ * tip：用于转换的tip
+ * group：用于转换的group
+ * converter：转换器
+ */
 public interface ConvertibleMap {
     void setTip(String tip);
 
     String getTip();
-
-    void setGroup(String group);
-
-    String getGroup();
 
     void setConverter(Converter converter);
 

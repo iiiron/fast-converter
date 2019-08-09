@@ -45,8 +45,4 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
     public void setDefaultTip(String tip) {
         this.defaultTip = tip;
     }
-
-    protected boolean isTipHasMessage(String tip) {
-        return !Convertible.defaultTip.equals(tip) && tip != null;
-    }
 }

@@ -13,6 +13,7 @@ import java.util.Set;
 public class ConvertibleAnnotatedUtils {
     /**
      * 根据分组过滤出class上的@ConvertibleBean注解数据
+     *
      * @param beanClass
      * @param group
      * @return
@@ -47,6 +48,7 @@ public class ConvertibleAnnotatedUtils {
 
     /**
      * 根据分组过滤出Field上的@ConvertibleField注解数据，以注解申明顺序排序
+     *
      * @param field
      * @param group
      * @return
@@ -91,10 +93,7 @@ public class ConvertibleAnnotatedUtils {
                 return factory(tip, group, null);
             }
             ConvertibleParser parser = importParser.clazz().newInstance();
-            parser.setAnnotatedElement(annotatedElement);
-            parser.setGroup(group);
-            parser.setTip(tip);
-            return parser.parse();
+            return parser.parse(annotatedElement, tip, group);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -111,16 +110,6 @@ public class ConvertibleAnnotatedUtils {
             @Override
             public String getTip() {
                 return tip;
-            }
-
-            @Override
-            public void setGroup(String group) {
-
-            }
-
-            @Override
-            public String getGroup() {
-                return group;
             }
 
             @Override

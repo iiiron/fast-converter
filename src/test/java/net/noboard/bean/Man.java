@@ -18,4 +18,8 @@ public class Man {
 
     @ConvertibleField(group = "b", tip = "toChildC")
     List<List<ChildA>> child;
+
+    @ConvertibleField(group = "b",converter = BooleanToNumberConverterHandler.class)
+    @ConvertibleField(group = "b",converter = NumberToBigDecimalConverterHandler.class)
+    private boolean sex = true;
 }

@@ -43,7 +43,7 @@ public class MapToMapConverterHandler<T, K> extends AbstractFilterBaseConverterH
                 oldV = entry.getValue();
                 if (converter == null) {
                     newV = oldV;
-                } else if (isTipHasMessage(tip)) {
+                } else if (Converter.isTipHasMessage(tip)) {
                     newV = converter.convert(oldV, tip);
                 } else {
                     newV = converter.convert(oldV);

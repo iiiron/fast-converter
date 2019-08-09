@@ -38,7 +38,7 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
                 oldV = obj;
                 if (converter == null) {
                     newV = oldV;
-                } else if (isTipHasMessage(tip)) {
+                } else if (Converter.isTipHasMessage(tip)) {
                     newV = converter.convert(oldV, tip);
                 } else {
                     newV = converter.convert(oldV);

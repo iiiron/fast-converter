@@ -32,7 +32,7 @@ public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHan
                 newV = oldV;
                 converter = this.filter(newV);
                 if (converter != null) {
-                    newV = isTipHasMessage(tip) ? converter.convert(newV, tip) : converter.convert(newV);
+                    newV = Converter.isTipHasMessage(tip) ? converter.convert(newV, tip) : converter.convert(newV);
                 }
                 if (newArray == null && newV != null) {
                     newArray = Array.newInstance(newV.getClass(), Array.getLength(value));

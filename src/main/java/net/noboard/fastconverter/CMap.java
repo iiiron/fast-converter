@@ -23,16 +23,6 @@ public class CMap implements ConvertibleMap {
     }
 
     @Override
-    public String getGroup() {
-        return group;
-    }
-
-    @Override
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
-    @Override
     public Converter getConverter() {
         return converter;
     }

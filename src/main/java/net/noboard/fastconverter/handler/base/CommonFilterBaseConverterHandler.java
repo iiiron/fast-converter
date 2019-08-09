@@ -24,7 +24,7 @@ public class CommonFilterBaseConverterHandler<T, K> extends AbstractFilterBaseCo
     protected K converting(T value, String tip) throws ConvertException {
         Converter converter = this.filter(value);
         if (converter != null) {
-            return (K) (isTipHasMessage(tip) ? converter.convert(value, tip) : converter.convert(value));
+            return (K) (Converter.isTipHasMessage(tip) ? converter.convert(value, tip) : converter.convert(value));
         } else {
             return (K) value;
         }

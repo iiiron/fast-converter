@@ -13,6 +13,7 @@ public class Woman {
 
     private String name;
 
-    List<List<ChildB>> child;
+    private List<List<ChildB>> child;
 
+    private BigDecimal sex;
 }

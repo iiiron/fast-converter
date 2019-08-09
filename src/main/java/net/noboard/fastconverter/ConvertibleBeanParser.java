@@ -29,7 +29,6 @@ public class ConvertibleBeanParser implements ConvertibleParser {
             cMap.setConverter(beanToBeanConverterHandler);
         }
         cMap.setTip(convertibleBean.tip());
-        cMap.setGroup(group);
         return cMap;
     }
 }
