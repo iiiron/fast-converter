@@ -13,21 +13,6 @@ public class Woman {
 
     private String name;
 
-    private String birthday;
+    List<ChildB> child;
 
-    private String sex;
-
-    private int age;
-
-    private int[] aaa;
-
-    private Integer[] bbb;
-
-    private Set ccc;
-
-    private List<String>[] ddd;
-
-    private Map<String, Date> eee;
-
-    private BigDecimal fff;
 }

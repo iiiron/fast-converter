@@ -39,4 +39,9 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
 
         return this.converting(value, tip);
     }
+
+    @Override
+    public void setDefaultTip(String tip) {
+        this.defaultTip = tip;
+    }
 }

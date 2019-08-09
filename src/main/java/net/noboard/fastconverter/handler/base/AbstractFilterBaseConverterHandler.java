@@ -2,6 +2,7 @@ package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.FilterBaseConverter;
 
 /**
  * 基于转换器过滤器的转换器
@@ -10,7 +11,7 @@ import net.noboard.fastconverter.ConverterFilter;
  *
  * @author wanxm
  */
-public abstract class AbstractFilterBaseConverterHandler<T, K> extends AbstractConverterHandler<T, K> {
+public abstract class AbstractFilterBaseConverterHandler<T, K> extends AbstractConverterHandler<T, K> implements FilterBaseConverter {
 
     private ConverterFilter converterFilter;
 
@@ -22,6 +23,11 @@ public abstract class AbstractFilterBaseConverterHandler<T, K> extends AbstractC
     public AbstractFilterBaseConverterHandler(ConverterFilter converterFilter, String tip) {
         super(tip);
         this.converterFilter = converterFilter;
+    }
+
+    @Override
+    public ConverterFilter getFilter() {
+        return converterFilter;
     }
 
     protected Converter filter(Object value) {

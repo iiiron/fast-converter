@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface ConvertBeans {
-    ConvertBean[] value();
+@Target({ElementType.TYPE})
+public @interface ImportParser {
+    Class<? extends ConvertibleParser> clazz();
 }

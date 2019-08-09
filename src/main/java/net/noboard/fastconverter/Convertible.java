@@ -6,10 +6,16 @@ import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-@Repeatable(Convertibles.class)
 public @interface Convertible {
 
-    String group() default "default";
+    String defaultGroup = "default";
 
-    Class<? extends Converter> converter() default SkippingConverterHandler.class;
+    String defaultTip = "";
+
+    String group() default defaultGroup;
+
+    Class<? extends Converter> converter() default Converter.class;
+
+    String tip() default defaultTip;
+
 }

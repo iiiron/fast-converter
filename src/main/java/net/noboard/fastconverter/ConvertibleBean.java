@@ -7,18 +7,23 @@ import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Repeatable(ConvertBeans.class)
+@Repeatable(ConvertibleBeans.class)
+@ImportParser(clazz = ConvertibleBeanParser.class)
 @Convertible
-public @interface ConvertBean {
-    public static final String defaultGroup = "default";
+public @interface ConvertibleBean {
+
+    @AliasFor("tip")
+    String group() default Convertible.defaultGroup;
+
+    @AliasFor("group")
+    String tip() default Convertible.defaultGroup;
 
     @AliasFor(annotation = Convertible.class)
-    String group() default defaultGroup;
-
-    @AliasFor(annotation = Convertible.class)
-    Class<? extends Converter> converter() default SkippingConverterHandler.class;
+    Class<? extends Converter> converter() default Converter.class;
 
     String targetName() default "";
 
     Class targetClass() default Void.class;
+
+    boolean nested() default true;
 }

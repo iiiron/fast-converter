@@ -2,7 +2,9 @@ package net.noboard.fastconverter.handler.base;
 
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
+import net.noboard.fastconverter.handler.support.ConvertibleUtils;
 import net.noboard.fastconverter.handler.support.FieldConverterHandler;
+import net.noboard.fastconverter.handler.support.GroupUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 
@@ -14,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 /**
  * 将指定Bean对象转换为一个新类型的Bean
@@ -68,7 +71,7 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
     }
 
     public BeanToBeanConverterHandler(ConverterFilter converterFilter) {
-        super(converterFilter, ConvertBean.defaultGroup);
+        super(converterFilter, Convertible.defaultGroup);
     }
 
     public BeanToBeanConverterHandler(ConverterFilter converterFilter, String group) {
@@ -80,16 +83,46 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
     }
 
     @Override
-    protected Object converting(Object value, String tip) throws ConvertException {
-        BeanInfo beanF, beanT;
-        Object objF, objT;
+    protected Object converting(Object value, String group) throws ConvertException {
+        ConvertibleBean convertibleBean = ConvertibleUtils.getMergedConvertBean(value.getClass(), group);
+        if (convertibleBean == null) {
+            throw new ConvertException(String.format("no @ConvertibleBean annotation agree with group '%s', on bean %s",
+                    group,
+                    value.getClass()));
+        }
+        if (convertibleBean.targetClass() == Void.class && "".equals(convertibleBean.targetName())) {
+            throw new ConvertException(String.format("you have to declare target of convert on @ConvertibleBean use 'targetName' or 'targetClass' when at BeanToBeanConverterHandler"));
+        }
+        if (convertibleBean.targetClass() != Void.class
+                && !"".equals(convertibleBean.targetName())
+                && !convertibleBean.targetClass().getName().equals(convertibleBean.targetName())) {
+            throw new ConvertException("the attributes 'targetName' and 'targetClass' in annotation @ConvertibleBean must point the same class. or just declare one of the two");
+        }
+
+        Object objT;
+        String targetName = null;
         try {
-            objF = value;
-            objT = (tip == null || "".equals(tip)) ? value.getClass().newInstance() : Class.forName(tip).newInstance();
-            beanF = Introspector.getBeanInfo(objF.getClass());
-            beanT = Introspector.getBeanInfo(objT.getClass());
-        } catch (IntrospectionException | IllegalAccessException | InstantiationException | ClassNotFoundException e) {
-            throw new ConvertException("BeanInfo初始化错误，请检查Bean的申明是否正确", e);
+            if (convertibleBean.targetClass() != Void.class) {
+                targetName = convertibleBean.targetClass().getName();
+                objT = convertibleBean.targetClass().newInstance();
+            } else {
+                targetName = convertibleBean.targetName();
+                objT = Class.forName(convertibleBean.targetName()).newInstance();
+            }
+        } catch (IllegalAccessException | ClassNotFoundException | InstantiationException e) {
+            throw new ConvertException(String.format("the target class %s of @ConvertibleBean pointed is can not be implemented", targetName), e);
+        }
+
+        return convert(value, objT, group);
+    }
+
+    private Object convert(Object from, Object to, String group) {
+        BeanInfo beanF, beanT;
+        try {
+            beanF = Introspector.getBeanInfo(from.getClass());
+            beanT = Introspector.getBeanInfo(to.getClass());
+        } catch (IntrospectionException e) {
+            throw new ConvertException(e);
         }
 
         for (PropertyDescriptor fD : beanF.getPropertyDescriptors()) {
@@ -97,59 +130,67 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                 continue;
             }
 
+            Field field;
+            try {
+                field = from.getClass().getDeclaredField(fD.getName());
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                throw new ConvertException(String.format("field named '%s' not exist in %s",
+                        fD.getName(),
+                        from.getClass().getName()));
+            }
+
+            LinkedHashSet<ConvertibleField> convertibleFields = ConvertibleUtils.getMergedConvertField(field, group);
+            ConvertibleField last = lastConvertibleField(convertibleFields);
+            String nameTo = fD.getName();
+            if (last != null) {
+                if (last.abandon()) {
+                    continue;
+                }
+                if (!"".equals(last.nameTo())) {
+                    nameTo = last.nameTo();
+                }
+            }
+
             for (PropertyDescriptor tD : beanT.getPropertyDescriptors()) {
-                if (fD.getName().toLowerCase().equals(tD.getName().toLowerCase())) {
+                if (nameTo.toLowerCase().equals(tD.getName().toLowerCase())) {
+                    Object r = null;
                     try {
-                        Field field = objF.getClass().getDeclaredField(fD.getName());
-                        FieldConverter[] fieldConverters = field.getAnnotationsByType(FieldConverter.class);
-                        Object r = fD.getReadMethod().invoke(objF);
-                        if (fieldConverters != null && fieldConverters.length > 0) {
-                            if (r != null) {
-                                Object v = r;
-                                for (FieldConverter fieldConverter : fieldConverters) {
-                                    v = fieldConverterHandler.handler(fieldConverter, v);
-                                }
-                                try {
-                                    tD.getWriteMethod().invoke(objT, v);
-                                } catch (IllegalArgumentException e) {
-                                    StringBuilder stringBuilder = new StringBuilder();
-                                    stringBuilder.append("[");
-                                    Arrays.stream(fieldConverters).forEach(fieldConverter -> stringBuilder.append(fieldConverter.converter().getName()));
-                                    stringBuilder.append("]");
-                                    throw new ConvertException(
-                                            MessageFormat.format("数据转换后类型不符合接收对象对应域的类型。域:{0},目标类型:{1},转换器:{2}",
-                                                    tD.getName(), tD.getPropertyType().getName(), stringBuilder), e);
-                                }
-                            }
-                        } else {
-                            Converter converter = this.filter(r);
-                            try {
-                                if (converter == null) {
-                                    tD.getWriteMethod().invoke(objT, r);
-                                } else if (BeanToBeanConverterHandler.class.isAssignableFrom(converter.getClass())) {
-                                    tD.getWriteMethod().invoke(objT, converter.convert(r, tD.getPropertyType().getName()));
-                                } else {
-                                    tD.getWriteMethod().invoke(objT, converter.convert(r));
-                                }
-                            } catch (ConvertException | IllegalArgumentException e) {
-                                throw new ConvertException(MessageFormat.format("域:{0},类型:{1},转换器类型:{2} ---> {3}",
-                                        fD.getName(), fD.getPropertyType().getName(), converter.getClass().getName(),
-                                        e.getMessage()), e);
-                            }
-                        }
+                        r = fD.getReadMethod().invoke(from);
                     } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
                         throw new ConvertException(e);
-                    } catch (NoSuchFieldException e) {
-                        throw new ConvertException(
-                                MessageFormat.format("BeanToBeanConverterHandler反射获取对象域时发生异常：NoSuchFieldException  {0}.{1}  通常是因为在转换器过滤器中没有添加对相关类的支持，导致某些非Bean的java类被错误的抛给了BeanToBeanConverterHandler去处理", objF.getClass().getName(), fD.getName()),
-                                e);
                     }
+
+                    ConvertibleMap convertibleMap = ConvertibleUtils.parse(field, null, group);
+
+                    Converter converter = convertibleMap.getConverter();
+                    if (converter == null) {
+                        converter = this.filter(r);
+                    }
+
+                    // 没有转换器来处理的值，保留原值插入新的bean中
+                    if (converter != null) {
+                        // 这里不能传入tip，因为如果是默认转换器，使用默认值；如果是指定转换器，ConvertibleParser会去处理tip的问题
+                        if (convertibleMap.getTip() != null) {
+                            r = converter.convert(r, convertibleMap.getTip());
+                        } else {
+                            r = converter.convert(r);
+                        }
+                    }
+                    try {
+                        tD.getWriteMethod().invoke(to, r);
+                    } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+                        throw new ConvertException(String.format("after convert, value of field '%s' in class %s is not match the field '%s' of target class %s",
+                                fD.getName(), from.getClass().getName(), tD.getName(), to.getClass().getName()));
+                    }
+
                     break;
                 }
             }
         }
 
-        return objT;
+        return to;
     }
 
     @Override
@@ -157,12 +198,19 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
         if (value == null) {
             return false;
         } else {
-            return AnnotatedElementUtils.getMergedAnnotation(value.getClass(), Convertible.class) != null;
+            return AnnotatedElementUtils.getMergedAnnotation(value.getClass(), ConvertibleBean.class) != null;
         }
     }
 
+    private ConvertibleField lastConvertibleField(LinkedHashSet<ConvertibleField> convertibleFields) {
+        if (convertibleFields == null || convertibleFields.size() < 1) {
+            return null;
+        }
+        return (ConvertibleField) convertibleFields.toArray()[convertibleFields.size() - 1];
+    }
+
     protected Object converting(Object value, String tip, String a) throws ConvertException {
-        AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(value.getClass(),Convertible.class.getName());
+        AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(value.getClass(), Convertible.class.getName());
         String group = annotationAttributes.getString("group");
 
         return null;
