@@ -11,12 +11,12 @@ public class BeanToBeanTest {
 
     @Test
     public void a() {
-        BeanToBeanConverterHandler beanToBeanConverterHandler =
-                BeanToBeanConverterHandler.transferCustom(new CommonSkipConverterFilter());
-
-        HumanA humanA = init();
-        HumanB humanB = (HumanB) beanToBeanConverterHandler.convert(humanA, "net.noboard.bean.HumanB");
-        System.out.println(humanB);
+//        BeanToBeanConverterHandler beanToBeanConverterHandler =
+//                BeanToBeanConverterHandler.transferCustom(new CommonSkipConverterFilter());
+//
+//        HumanA humanA = init();
+//        HumanB humanB = (HumanB) beanToBeanConverterHandler.convert(humanA, "net.noboard.bean.HumanB");
+//        System.out.println(humanB);
     }
 
     public static HumanA init() {

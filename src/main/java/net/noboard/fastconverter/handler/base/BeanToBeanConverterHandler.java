@@ -34,38 +34,6 @@ import java.util.LinkedHashSet;
  */
 public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
 
-    private static FieldConverterHandler fieldConverterHandler = new FieldConverterHandler();
-
-    private static BeanToBeanConverterHandler beanTransfer = null;
-
-    /**
-     * 一个专门用于递归复制Bean的BeanToBeanConverterHandler实例，它不会对数据做任何修改，除非
-     * 你通过@FieldConverter指定了转换器。
-     */
-    public static BeanToBeanConverterHandler transfer() {
-        if (beanTransfer == null) {
-            ConverterFilter converterFilter = new CommonSkipConverterFilter();
-            beanTransfer = new BeanToBeanConverterHandler(converterFilter);
-            converterFilter.addLast(beanTransfer);
-        }
-
-        return beanTransfer;
-    }
-
-    /**
-     * transfer的自定义版本，用户可以通过传递不同的ConverterFilter实例，来影响默认转换行为。
-     * 需要注意的是，它会自动在转换链末尾添加BeanToBeanConverterHandler转换器（以实现递归的
-     * Bean To Bean转换能力），所以你不必在ConverterFilter实例中手动添加。
-     *
-     * @param converterFilter
-     * @return
-     */
-    public static BeanToBeanConverterHandler transferCustom(ConverterFilter converterFilter) {
-        BeanToBeanConverterHandler converterHandler = new BeanToBeanConverterHandler(converterFilter);
-        converterFilter.addLast(converterHandler);
-        return converterHandler;
-    }
-
     public BeanToBeanConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter, Convertible.defaultGroup);
     }
@@ -150,7 +118,7 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                     }
 
                     ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, null, group);
-                    do {
+                    while (true) {
                         Converter converter = currentMap.getConverter();
                         if (converter == null) {
                             converter = this.filter(r);
@@ -169,7 +137,7 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
                         } else {
                             break;
                         }
-                    } while (true);
+                    }
 
                     try {
                         tD.getWriteMethod().invoke(to, r);
