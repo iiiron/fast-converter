@@ -1,7 +1,5 @@
 package net.noboard.fastconverter;
 
-import com.sun.org.apache.xerces.internal.xs.datatypes.XSDateTime;
-import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
 import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
 
 import java.lang.reflect.AnnotatedElement;

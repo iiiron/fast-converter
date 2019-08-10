@@ -1,7 +1,7 @@
 package net.noboard.fastconverter.filter;
 
 import net.noboard.fastconverter.Converter;
-import net.noboard.fastconverter.handler.base.SkippingConverterHandler;
+import net.noboard.fastconverter.handler.SkippingConverterHandler;
 
 import java.util.List;
 

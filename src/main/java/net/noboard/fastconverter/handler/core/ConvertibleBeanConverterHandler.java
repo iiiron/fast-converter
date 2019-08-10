@@ -1,9 +1,7 @@
-package net.noboard.fastconverter.handler.base;
+package net.noboard.fastconverter.handler.core;
 
 import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
 import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
-import net.noboard.fastconverter.handler.support.FieldConverterHandler;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.beans.BeanInfo;
@@ -14,31 +12,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 
-/**
- * 将指定Bean对象转换为一个新类型的Bean
- * <p>
- * ConverterFilter不支持的域将照搬原值。如果不指定转换目标类型，则转换目标类型=被转换Bean的类型（转换过程
- * 会按照转换器一一进行）。
- *
- * <p>
- * 下面描述中，将待转换Bean叫做A，转换结果叫做B。
- * <p>
- * 该转换器并不要求A和B是相同的类型，由于转换器基于Bean中域的名字（非大小写敏感）来进行数据的映射，
- * 所以A,B不需要是相同的类型，转换器仅针对A，B中相同域名的域进行A->B的转换，转换过程可通过@FieldConverter
- * 注解干预，也可根据注册到ConverterFilter中的默认转换器来进行默认转换（域名相同，但未通过@FieldConverter
- * 指定转换器的域，会被默认转换器转换）。
- * <p>
- * 如果不指定转换结果类型，则B的类型将等同A的类型。在这种情况下不能将BeanToBeanConverterHandler的行为
- * 理解为浅复制或者深复制。BeanToBeanConverterHandler的行为受到ConverterFilter中注册的各种转换器的
- * 实现的影响。而这些转换器并不一定会在转换后返回新的对象（例如SkippingConverterHandler）。
- */
-public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
+public class ConvertibleBeanConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
 
-    public BeanToBeanConverterHandler(ConverterFilter converterFilter) {
+    public ConvertibleBeanConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter, Convertible.defaultGroup);
     }
 
-    public BeanToBeanConverterHandler(ConverterFilter converterFilter, String group) {
+    public ConvertibleBeanConverterHandler(ConverterFilter converterFilter, String group) {
         super(converterFilter, group);
     }
 
@@ -49,11 +29,6 @@ public class BeanToBeanConverterHandler extends AbstractFilterBaseConverterHandl
     @Override
     protected Object converting(Object value, String group) throws ConvertException {
         ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(value.getClass(), group);
-        if (convertibleBean == null) {
-            throw new ConvertException(String.format("no @ConvertibleBean annotation agree with group '%s', on bean %s",
-                    group,
-                    value.getClass()));
-        }
 
         Object objT;
         String targetName = null;

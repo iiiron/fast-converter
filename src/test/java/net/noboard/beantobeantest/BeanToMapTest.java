@@ -2,8 +2,8 @@ package net.noboard.beantobeantest;
 
 import net.noboard.bean.HumanA;
 import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
-import net.noboard.fastconverter.handler.base.BeanToMapConverterHandler;
-import net.noboard.fastconverter.handler.base.CommonFilterBaseConverterHandler;
+import net.noboard.fastconverter.handler.BeanToMapConverterHandler;
+import net.noboard.fastconverter.handler.core.CommonFilterBaseConverterHandler;
 import org.junit.Test;
 
 import java.util.Map;

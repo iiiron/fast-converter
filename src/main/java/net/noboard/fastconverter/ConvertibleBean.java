@@ -1,6 +1,5 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.handler.base.SkippingConverterHandler;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;

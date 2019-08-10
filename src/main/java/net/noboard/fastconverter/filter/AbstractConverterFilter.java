@@ -2,9 +2,9 @@ package net.noboard.fastconverter.filter;
 
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
-import net.noboard.fastconverter.handler.base.ArrayToArrayConverterHandler;
-import net.noboard.fastconverter.handler.base.CollectionToCollectionConverterHandler;
-import net.noboard.fastconverter.handler.base.MapToMapConverterHandler;
+import net.noboard.fastconverter.handler.core.ArrayToArrayConverterHandler;
+import net.noboard.fastconverter.handler.core.CollectionToCollectionConverterHandler;
+import net.noboard.fastconverter.handler.core.MapToMapConverterHandler;
 
 import java.util.ArrayList;
 import java.util.List;

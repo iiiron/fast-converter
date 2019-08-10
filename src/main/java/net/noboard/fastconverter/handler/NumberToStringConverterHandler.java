@@ -1,6 +1,6 @@
 package net.noboard.fastconverter.handler;
 
-import net.noboard.fastconverter.handler.base.AbstractConverterHandler;
+import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
 
 import java.math.BigDecimal;
 

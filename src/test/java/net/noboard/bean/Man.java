@@ -3,9 +3,7 @@ package net.noboard.bean;
 import lombok.Data;
 import net.noboard.fastconverter.ConvertibleBean;
 import net.noboard.fastconverter.ConvertibleField;
-import net.noboard.fastconverter.FieldConverter;
 import net.noboard.fastconverter.handler.*;
-import net.noboard.fastconverter.handler.base.CollectionToCollectionConverterHandler;
 
 import java.util.*;
 
@@ -21,5 +19,21 @@ public class Man {
 
     @ConvertibleField(group = "b",converter = BooleanToNumberConverterHandler.class)
     @ConvertibleField(group = "b",converter = NumberToBigDecimalConverterHandler.class)
+    @ConvertibleField(converter = BooleanToNumberConverterHandler.class)
+    @ConvertibleField(converter = NumberToBigDecimalConverterHandler.class)
     private boolean sex = true;
+
+    private Date birthday;
+
+    private Integer age;
+
+    private Integer[] bbb;
+
+    private Boolean fff;
+
+    private Set<String> ccc;
+
+    private List<String>[] ddd;
+
+    private Map<String, Date> eee;
 }

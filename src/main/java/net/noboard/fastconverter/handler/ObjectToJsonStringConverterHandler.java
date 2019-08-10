@@ -2,11 +2,9 @@ package net.noboard.fastconverter.handler;
 
 import com.alibaba.fastjson.JSON;
 import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
-import net.noboard.fastconverter.handler.base.AbstractFilterBaseConverterHandler;
-import net.noboard.fastconverter.handler.base.BeanToMapConverterHandler;
-import net.noboard.fastconverter.handler.base.CommonFilterBaseConverterHandler;
+import net.noboard.fastconverter.handler.core.AbstractFilterBaseConverterHandler;
+import net.noboard.fastconverter.handler.core.CommonFilterBaseConverterHandler;
 
 /**
  * @author wanxm

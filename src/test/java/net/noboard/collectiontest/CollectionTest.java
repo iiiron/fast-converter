@@ -4,10 +4,9 @@ import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.filter.AbstractConverterFilter;
 import net.noboard.fastconverter.handler.BooleanToStringConverterHandler;
 import net.noboard.fastconverter.handler.NumberToBigDecimalConverterHandler;
-import net.noboard.fastconverter.handler.base.ArrayToArrayConverterHandler;
-import net.noboard.fastconverter.handler.base.CollectionToCollectionConverterHandler;
-import net.noboard.fastconverter.handler.base.MapToMapConverterHandler;
-import net.noboard.fastconverter.handler.base.SkippingConverterHandler;
+import net.noboard.fastconverter.handler.core.ArrayToArrayConverterHandler;
+import net.noboard.fastconverter.handler.core.CollectionToCollectionConverterHandler;
+import net.noboard.fastconverter.handler.core.MapToMapConverterHandler;
 
 import java.util.*;
 

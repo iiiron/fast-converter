@@ -1,10 +1,11 @@
-package net.noboard.fastconverter.handler.base;
+package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.Field;
 import net.noboard.fastconverter.FieldConverter;
+import net.noboard.fastconverter.handler.core.AbstractFilterBaseConverterHandler;
 import net.noboard.fastconverter.handler.support.FieldConverterHandler;
 
 import java.beans.BeanInfo;

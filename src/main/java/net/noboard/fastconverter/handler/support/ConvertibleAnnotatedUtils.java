@@ -36,7 +36,7 @@ public class ConvertibleAnnotatedUtils {
                     beanClass.toString()));
         }
         if (convertibleBean.targetClass() == Void.class && "".equals(convertibleBean.targetName())) {
-            throw new ConvertException(String.format("you have to declare target of convert on @ConvertibleBean use 'targetName' or 'targetClass' when at BeanToBeanConverterHandler"));
+            throw new ConvertException(String.format("you have to declare target of convert on @ConvertibleBean use 'targetName' or 'targetClass' at %s", beanClass.toString()));
         }
         if (convertibleBean.targetClass() != Void.class
                 && !"".equals(convertibleBean.targetName())

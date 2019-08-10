@@ -15,5 +15,5 @@ public class ChildA {
 
     @ConvertibleField(group = "toChildC")
     @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy-MM-dd HH:mm:ss", nameTo = "birthday")
-    private Date birth;
+    private Date birthday;
 }

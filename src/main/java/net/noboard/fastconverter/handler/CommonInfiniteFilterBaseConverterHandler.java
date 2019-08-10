@@ -1,8 +1,9 @@
-package net.noboard.fastconverter.handler.base;
+package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.handler.core.AbstractFilterBaseConverterHandler;
 
 /**
  * 无限转换转换器

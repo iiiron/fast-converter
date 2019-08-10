@@ -21,7 +21,7 @@ public class SpringTest {
     public void b() {
         Man m = new Man();
         ChildA childA = new ChildA();
-        childA.setBirth(new Date());
+        childA.setBirthday(new Date());
         childA.setName("hello");
         List<ChildA> list = new ArrayList<>();
         list.add(childA);

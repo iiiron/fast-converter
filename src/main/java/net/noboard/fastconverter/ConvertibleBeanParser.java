@@ -1,7 +1,7 @@
 package net.noboard.fastconverter;
 
 import net.noboard.fastconverter.filter.CommonConverterFilter;
-import net.noboard.fastconverter.handler.base.BeanToBeanConverterHandler;
+import net.noboard.fastconverter.handler.core.ConvertibleBeanConverterHandler;
 import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
 
 import java.lang.reflect.AnnotatedElement;
@@ -21,12 +21,12 @@ public class ConvertibleBeanParser implements ConvertibleParser {
                 throw new IllegalArgumentException(String.format("the class %s pointed by attribute 'converter' in @ConvertibleBean can not be implemented", convertibleBean.converter().getName()));
             }
         } else {
-            BeanToBeanConverterHandler beanToBeanConverterHandler =
-                    new BeanToBeanConverterHandler(new CommonConverterFilter(), convertibleBean.group());
+            ConvertibleBeanConverterHandler convertibleBeanConverterHandler =
+                    new ConvertibleBeanConverterHandler(new CommonConverterFilter(), convertibleBean.group());
             if (convertibleBean.nested()) {
-                beanToBeanConverterHandler.getFilter().addLast(beanToBeanConverterHandler);
+                convertibleBeanConverterHandler.getFilter().addLast(convertibleBeanConverterHandler);
             }
-            cMap.setConverter(beanToBeanConverterHandler);
+            cMap.setConverter(convertibleBeanConverterHandler);
         }
         cMap.setTip(convertibleBean.tip());
         return cMap;

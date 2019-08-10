@@ -1,9 +1,8 @@
 package net.noboard.fastconverter;
 
 import net.noboard.fastconverter.filter.CommonConverterFilter;
-import net.noboard.fastconverter.handler.base.BeanToBeanConverterHandler;
-import net.noboard.fastconverter.handler.base.CommonFilterBaseConverterHandler;
-import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.handler.core.ConvertibleBeanConverterHandler;
+import net.noboard.fastconverter.handler.core.CommonFilterBaseConverterHandler;
 
 public class FastConverter {
     public static Object autoConvert(Object bean, String group) {
@@ -19,7 +18,7 @@ public class FastConverter {
 
     public static Converter getConverter() {
         CommonFilterBaseConverterHandler commonFilterBaseConverterHandler = new CommonFilterBaseConverterHandler(new CommonConverterFilter());
-        commonFilterBaseConverterHandler.getFilter().addLast(new BeanToBeanConverterHandler(commonFilterBaseConverterHandler.getFilter()));
+        commonFilterBaseConverterHandler.getFilter().addLast(new ConvertibleBeanConverterHandler(commonFilterBaseConverterHandler.getFilter()));
         return commonFilterBaseConverterHandler;
     }
 }
