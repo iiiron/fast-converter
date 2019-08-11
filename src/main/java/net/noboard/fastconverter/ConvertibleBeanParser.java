@@ -1,7 +1,7 @@
 package net.noboard.fastconverter;
 
 import net.noboard.fastconverter.filter.CommonConverterFilter;
-import net.noboard.fastconverter.handler.core.ConvertibleBeanConverterHandler;
+import net.noboard.fastconverter.handler.core.bean.ConvertibleBeanConverterHandler;
 import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
 
 import java.lang.reflect.AnnotatedElement;

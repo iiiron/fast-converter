@@ -17,7 +17,7 @@ import java.util.function.Function;
  */
 public abstract class AbstractConverterFilter implements ConverterFilter {
 
-    private List<Converter> converters;
+    protected List<Converter> converters;
 
     public AbstractConverterFilter() {
         converters = new ArrayList<>();

@@ -2,6 +2,7 @@ package net.noboard.fastconverter.handler.support;
 
 import net.noboard.fastconverter.*;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedHashSet;
@@ -43,6 +44,7 @@ public class ConvertibleAnnotatedUtils {
                 && !convertibleBean.targetClass().getName().equals(convertibleBean.targetName())) {
             throw new ConvertException("the attributes 'targetName' and 'targetClass' in annotation @ConvertibleBean must point the same class. or just declare one of the two");
         }
+
         return convertibleBean;
     }
 
