@@ -22,6 +22,7 @@ public class FastConverter {
         beanConverters = new AbstractBeanConverterFilter(defaultConverters) {
             @Override
             protected void initConverters(List<BeanConverter> converters) {
+                converters.add(new BeanToMapConverter(defaultConverters));
                 converters.add(new BeanToBeanConverter(defaultConverters));
             }
         };

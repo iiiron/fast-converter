@@ -13,6 +13,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 public class BeanToBeanConverter extends AbstractBeanConverter<Object, Object> {
 
@@ -37,48 +38,23 @@ public class BeanToBeanConverter extends AbstractBeanConverter<Object, Object> {
             throw new ConvertException(String.format("the target class %s of @ConvertibleBean pointed is can not be implemented", targetName), e);
         }
 
-        BeanInfo beanF, beanT;
+        BeanInfo beanT;
         try {
-            beanF = Introspector.getBeanInfo(from.getClass());
             beanT = Introspector.getBeanInfo(to.getClass());
         } catch (IntrospectionException e) {
             throw new ConvertException(e);
         }
 
-        for (PropertyDescriptor fD : beanF.getPropertyDescriptors()) {
-            if ("class".equals(fD.getName())) {
-                continue;
-            }
+        Map<String, Object> map = parse(from, group);
 
-            Field field;
-            try {
-                field = from.getClass().getDeclaredField(fD.getName());
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-                throw new ConvertException(String.format("field named '%s' not exist in %s",
-                        fD.getName(),
-                        from.getClass().getName()));
-            }
-
-            LinkedHashSet<ConvertibleField> convertibleFields = ConvertibleAnnotatedUtils.getMergedConvertField(field, group);
-            ConvertibleField last = lastConvertibleField(convertibleFields);
-            String nameTo = fD.getName();
-            if (last != null) {
-                if (last.abandon()) {
-                    continue;
-                }
-                if (!"".equals(last.nameTo())) {
-                    nameTo = last.nameTo();
-                }
-            }
-
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
             for (PropertyDescriptor tD : beanT.getPropertyDescriptors()) {
-                if (nameTo.toLowerCase().equals(tD.getName().toLowerCase())) {
+                if (entry.getKey().toLowerCase().equals(tD.getName().toLowerCase())) {
                     try {
-                        tD.getWriteMethod().invoke(to, getConvertedValue(fD.getReadMethod().invoke(from), field, group));
+                        tD.getWriteMethod().invoke(to, entry.getValue());
                     } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
                         throw new ConvertException(String.format("after convert, value of field '%s' in class %s is not match the field '%s' of target class %s",
-                                fD.getName(), from.getClass().getName(), tD.getName(), to.getClass().getName()));
+                                entry.getKey(), from.getClass().getName(), tD.getName(), to.getClass().getName()));
                     }
 
                     break;

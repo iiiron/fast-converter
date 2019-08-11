@@ -14,8 +14,10 @@ public class BeanToBeanTest {
 //                BeanToBeanConverterHandler.transferCustom(new CommonSkipConverterFilter());
 //
         HumanA humanA = init();
-        HumanB humanB = (HumanB) FastConverter.autoConvert(humanA);
-        System.out.println(humanB);
+        List<HumanA> list = new LinkedList<>();
+        list.add(humanA);
+        Object o = FastConverter.autoConvert(list);
+        System.out.println(o);
     }
 
     public static HumanA init() {

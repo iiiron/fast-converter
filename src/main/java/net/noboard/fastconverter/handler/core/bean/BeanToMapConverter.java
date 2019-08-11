@@ -15,7 +15,7 @@ public class BeanToMapConverter extends AbstractBeanConverter<Object, Map> {
 
     @Override
     public Map convert(Object value, String group) throws ConvertException {
-        return null;
+        return parse(value, group);
     }
 
     @Override
