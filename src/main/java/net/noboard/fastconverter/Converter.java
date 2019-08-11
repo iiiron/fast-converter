@@ -10,6 +10,8 @@ public interface Converter<T, K> {
 
     void setDefaultTip(String tip);
 
+    String getDefaultTip();
+
     boolean supports(Object value);
 
     static boolean isTipHasMessage(String tip) {

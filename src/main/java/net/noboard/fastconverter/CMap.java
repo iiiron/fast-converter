@@ -4,8 +4,6 @@ public class CMap implements ConvertibleMap {
 
     private String tip;
 
-    private String group;
-
     private Converter converter;
 
     private ConvertibleMap next;
@@ -42,7 +40,6 @@ public class CMap implements ConvertibleMap {
     public String toString() {
         return "CMap{" +
                 "tip='" + tip + '\'' +
-                ", group='" + group + '\'' +
                 ", converter=" + converter +
                 '}';
     }

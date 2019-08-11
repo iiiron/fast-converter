@@ -1,6 +1,7 @@
-package net.noboard.fastconverter;
+package net.noboard.fastconverter.parser;
 
-import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedHashSet;

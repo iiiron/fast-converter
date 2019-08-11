@@ -1,6 +1,7 @@
-package net.noboard.fastconverter;
+package net.noboard.fastconverter.parser;
 
-import net.noboard.fastconverter.handler.support.GroupUtils;
+import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.support.GroupUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 

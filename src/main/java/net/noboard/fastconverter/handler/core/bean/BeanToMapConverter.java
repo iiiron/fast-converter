@@ -3,7 +3,7 @@ package net.noboard.fastconverter.handler.core.bean;
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.ConvertibleBean;
-import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.util.Map;
 

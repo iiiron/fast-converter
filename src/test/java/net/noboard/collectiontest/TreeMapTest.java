@@ -1,8 +1,6 @@
 package net.noboard.collectiontest;
 
 import net.noboard.bean.Man;
-import net.noboard.fastconverter.filter.CommonSkipConverterFilter;
-import net.noboard.fastconverter.handler.ObjectToJsonStringConverterHandler;
 
 import java.util.TreeSet;
 

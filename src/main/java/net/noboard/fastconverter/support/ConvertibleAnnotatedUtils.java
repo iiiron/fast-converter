@@ -1,8 +1,9 @@
-package net.noboard.fastconverter.handler.support;
+package net.noboard.fastconverter.support;
 
 import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.parser.ConvertibleParser;
+import net.noboard.fastconverter.parser.ImportParser;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationAttributes;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedHashSet;

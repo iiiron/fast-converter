@@ -1,7 +1,7 @@
 package net.noboard.fastconverter.handler.core.bean;
 
 import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

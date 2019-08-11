@@ -1,4 +1,4 @@
-package net.noboard.fastconverter.handler.support;
+package net.noboard.fastconverter.support;
 
 public class GroupUtils {
     public static boolean checkGroup(String groupExpress, String group) {

@@ -3,16 +3,13 @@ package net.noboard.fastconverter.handler.core.bean;
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.ConvertibleBean;
-import net.noboard.fastconverter.ConvertibleField;
-import net.noboard.fastconverter.handler.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashSet;
 import java.util.Map;
 
 public class BeanToBeanConverter extends AbstractBeanConverter<Object, Object> {

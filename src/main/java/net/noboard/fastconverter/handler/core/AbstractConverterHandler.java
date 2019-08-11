@@ -22,7 +22,7 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
 
     protected abstract K converting(T value, String tip) throws ConvertException;
 
-    protected String getDefaultTip() {
+    public String getDefaultTip() {
         return this.defaultTip;
     }
 

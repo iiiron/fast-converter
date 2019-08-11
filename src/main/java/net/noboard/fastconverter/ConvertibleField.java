@@ -1,5 +1,7 @@
 package net.noboard.fastconverter;
 
+import net.noboard.fastconverter.parser.ConvertibleFieldParser;
+import net.noboard.fastconverter.parser.ImportParser;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
