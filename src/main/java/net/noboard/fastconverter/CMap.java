@@ -8,11 +8,35 @@ public class CMap implements ConvertibleMap {
 
     private ConvertibleMap next;
 
+    private boolean abandon;
+
+    private boolean skipNull;
+
     private boolean hasNext = false;
 
     @Override
     public String getTip() {
         return tip;
+    }
+
+    @Override
+    public void setAbandon(boolean abandon) {
+        this.abandon = abandon;
+    }
+
+    @Override
+    public boolean isAbandon() {
+        return this.abandon;
+    }
+
+    @Override
+    public void setRetainNull(boolean isSkipNull) {
+        this.skipNull = isSkipNull;
+    }
+
+    @Override
+    public boolean isRetainNull() {
+        return this.skipNull;
     }
 
     @Override
@@ -26,22 +50,15 @@ public class CMap implements ConvertibleMap {
     }
 
     @Override
-    public void join(ConvertibleMap convertibleMap) {
-        this.next = convertibleMap;
-        this.hasNext = true;
-    }
-
-    @Override
     public void setConverter(Converter converter) {
         this.converter = converter;
     }
 
+
     @Override
-    public String toString() {
-        return "CMap{" +
-                "tip='" + tip + '\'' +
-                ", converter=" + converter +
-                '}';
+    public void join(ConvertibleMap convertibleMap) {
+        this.next = convertibleMap;
+        this.hasNext = true;
     }
 
     @Override
@@ -52,5 +69,13 @@ public class CMap implements ConvertibleMap {
     @Override
     public ConvertibleMap next() {
         return this.next;
+    }
+
+    @Override
+    public String toString() {
+        return "CMap{" +
+                "tip='" + tip + '\'' +
+                ", converter=" + converter +
+                '}';
     }
 }

@@ -21,7 +21,7 @@ public class Man {
     @ConvertibleField(group = "b",converter = NumberToBigDecimalConverterHandler.class)
     @ConvertibleField(converter = BooleanToNumberConverterHandler.class)
     @ConvertibleField(converter = NumberToBigDecimalConverterHandler.class)
-    private boolean sex = true;
+    private boolean sex;
 
     private Date birthday;
 

@@ -29,6 +29,8 @@ public class ConvertibleFieldsParser implements ConvertibleParser {
                 } else {
                     last.setTip(tip);
                 }
+                last.setAbandon(convertibleField.abandon());
+                last.setRetainNull(convertibleField.retainNull());
             }
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();

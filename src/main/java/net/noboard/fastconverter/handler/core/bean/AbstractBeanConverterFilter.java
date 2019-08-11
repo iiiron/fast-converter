@@ -1,8 +1,6 @@
 package net.noboard.fastconverter.handler.core.bean;
 
-import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
-import net.noboard.fastconverter.filter.AbstractConverterFilter;
 
 import java.util.ArrayList;
 import java.util.List;

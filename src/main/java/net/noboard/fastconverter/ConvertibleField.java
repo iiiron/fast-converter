@@ -24,4 +24,6 @@ public @interface ConvertibleField {
     boolean abandon() default false;
 
     String nameTo() default "";
+
+    boolean retainNull() default true;
 }

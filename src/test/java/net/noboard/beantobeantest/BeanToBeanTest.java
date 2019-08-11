@@ -27,7 +27,7 @@ public class BeanToBeanTest {
         man.setName("wanxm");
         man.setBirthday(new Date());
         man.setAge(25);
-        man.setSex(true);
+//        man.setSex(true);
 //        man.setAaa(new int[]{1, 2, 3});
         man.setBbb(new Integer[]{1, 2, 3});
         man.setFff(true);

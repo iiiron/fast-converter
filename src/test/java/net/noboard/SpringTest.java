@@ -18,6 +18,14 @@ public class SpringTest {
     }
 
     @Test
+    public void c() {
+        ChildA childA = new ChildA();
+        childA.setName("wanxm");
+        Object o = FastConverter.autoConvert(childA);
+        System.out.println(o);
+    }
+
+    @Test
     public void b() {
         Man m = new Man();
         ChildA childA = new ChildA();

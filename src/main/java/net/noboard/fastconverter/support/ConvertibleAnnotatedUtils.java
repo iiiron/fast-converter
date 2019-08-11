@@ -106,6 +106,26 @@ public class ConvertibleAnnotatedUtils {
     private static ConvertibleMap factory(String tip, String group, Converter converter) {
         return new ConvertibleMap() {
             @Override
+            public void setAbandon(boolean abandon) {
+
+            }
+
+            @Override
+            public boolean isAbandon() {
+                return false;
+            }
+
+            @Override
+            public void setRetainNull(boolean isSkipNull) {
+
+            }
+
+            @Override
+            public boolean isRetainNull() {
+                return true;
+            }
+
+            @Override
             public void setTip(String tip) {
 
             }

@@ -9,7 +9,6 @@ import java.lang.reflect.AnnotatedElement;
 
 public class ConvertibleBeanParser implements ConvertibleParser {
 
-    // TODO BeanToMap的支持
     @Override
     public ConvertibleMap parse(AnnotatedElement annotatedElement, String tip, String group) {
         ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(annotatedElement, group);

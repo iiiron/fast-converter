@@ -92,16 +92,18 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
     protected Object getConvertedValue(Object value, Field field, String group) {
         ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, null, group);
         while (true) {
-            Converter converter = currentMap.getConverter();
-            if (converter == null) {
-                converter = this.converterFilter.filter(value);
-            }
+            if (value != null || !currentMap.isRetainNull()) {
+                Converter converter = currentMap.getConverter();
+                if (converter == null) {
+                    converter = this.converterFilter.filter(value);
+                }
 
-            if (converter != null) {
-                if (currentMap.getTip() != null) {
-                    value = converter.convert(value, currentMap.getTip());
-                } else {
-                    value = converter.convert(value);
+                if (converter != null) {
+                    if (currentMap.getTip() != null) {
+                        value = converter.convert(value, currentMap.getTip());
+                    } else {
+                        value = converter.convert(value);
+                    }
                 }
             }
 
