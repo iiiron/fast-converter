@@ -1,6 +1,7 @@
 package net.noboard.fastconverter.handler.core.bean;
 
 import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.beans.BeanInfo;
@@ -90,7 +91,7 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
     }
 
     protected Object getConvertedValue(Object value, Field field, String group) {
-        ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, null, group);
+        ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group, group);
         while (true) {
             if (value != null || !currentMap.isRetainNull()) {
                 Converter converter = currentMap.getConverter();
@@ -99,7 +100,7 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
                 }
 
                 if (converter != null) {
-                    if (currentMap.getTip() != null) {
+                    if (Converter.isTipHasMessage(currentMap.getTip())) {
                         value = converter.convert(value, currentMap.getTip());
                     } else {
                         value = converter.convert(value);

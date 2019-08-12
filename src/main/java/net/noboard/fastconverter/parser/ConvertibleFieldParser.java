@@ -24,9 +24,6 @@ public class ConvertibleFieldParser implements ConvertibleParser {
             cMap.setTip(annotationAttributes.getString("tip"));
             cMap.setAbandon(annotationAttributes.getBoolean("abandon"));
             cMap.setRetainNull(annotationAttributes.getBoolean("retainNull"));
-        } else {
-            // TODO 为什么
-            cMap.setTip(tip);
         }
 
         return cMap;

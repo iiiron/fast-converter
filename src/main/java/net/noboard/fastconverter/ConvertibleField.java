@@ -16,7 +16,7 @@ public @interface ConvertibleField {
     String group() default Convertible.defaultGroup;
 
     @AliasFor(annotation = Convertible.class)
-    String tip() default Convertible.defaultGroup;
+    String tip() default Convertible.defaultTip;
 
     @AliasFor(annotation = Convertible.class)
     Class<? extends Converter> converter() default Converter.class;
