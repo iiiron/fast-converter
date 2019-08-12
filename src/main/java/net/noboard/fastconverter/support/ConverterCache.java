@@ -5,7 +5,7 @@ import net.noboard.fastconverter.Converter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ConverterFactory {
+public class ConverterCache {
 
     private static Map<Class, Converter> converterMap = new HashMap<>();
 

@@ -12,6 +12,7 @@ import java.util.Date;
 @Data
 @ConvertibleBean(targetClass = Duct.class)
 public class Son {
+    @ConvertibleField(converter = AddNumberConverterHandler.class)
     private String name;
 
     @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy.MM")

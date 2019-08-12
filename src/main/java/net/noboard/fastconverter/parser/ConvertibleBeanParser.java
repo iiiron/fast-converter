@@ -3,7 +3,7 @@ package net.noboard.fastconverter.parser;
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.filter.CommonConverterFilter;
 import net.noboard.fastconverter.handler.core.bean.ConvertibleBeanConverterHandler;
-import net.noboard.fastconverter.support.ConverterFactory;
+import net.noboard.fastconverter.support.ConverterCache;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.lang.reflect.AnnotatedElement;
@@ -16,7 +16,7 @@ public class ConvertibleBeanParser implements ConvertibleParser {
 
         CMap cMap = new CMap();
         if (convertibleBean.converter() != Converter.class) {
-            cMap.setConverter(ConverterFactory.get(convertibleBean.converter()));
+            cMap.setConverter(ConverterCache.get(convertibleBean.converter()));
         } else {
             ConvertibleBeanConverterHandler convertibleBeanConverterHandler =
                     new ConvertibleBeanConverterHandler(new CommonConverterFilter(), convertibleBean.group());

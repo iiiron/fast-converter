@@ -1,7 +1,7 @@
 package net.noboard.fastconverter.parser;
 
 import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.support.ConverterFactory;
+import net.noboard.fastconverter.support.ConverterCache;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.lang.reflect.AnnotatedElement;
@@ -22,7 +22,7 @@ public class ConvertibleFieldsParser implements ConvertibleParser {
             }
 
             if (convertibleField.converter() != Converter.class) {
-                last.setConverter(ConverterFactory.get(convertibleField.converter()));
+                last.setConverter(ConverterCache.get(convertibleField.converter()));
             }
             last.setTip(convertibleField.tip());
             last.setAbandon(convertibleField.abandon());

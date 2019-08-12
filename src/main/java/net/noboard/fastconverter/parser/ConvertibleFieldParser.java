@@ -1,7 +1,7 @@
 package net.noboard.fastconverter.parser;
 
 import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.support.ConverterFactory;
+import net.noboard.fastconverter.support.ConverterCache;
 import net.noboard.fastconverter.support.GroupUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -17,7 +17,7 @@ public class ConvertibleFieldParser implements ConvertibleParser {
         Class converterClass = (Class) annotationAttributes.get("converter");
         if (GroupUtils.checkGroup(annotationAttributes.getString("group"), group)) {
             if (converterClass != Converter.class) {
-                cMap.setConverter(ConverterFactory.get(converterClass));
+                cMap.setConverter(ConverterCache.get(converterClass));
             }
             cMap.setTip(annotationAttributes.getString("tip"));
             cMap.setAbandon(annotationAttributes.getBoolean("abandon"));

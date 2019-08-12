@@ -23,7 +23,8 @@ public class ConvertibleAnnotatedUtils {
     public static ConvertibleBean getMergedConvertBean(AnnotatedElement beanClass, String group) {
 //        GroupUtils.requireGroup(group);
 
-        Set<ConvertibleBean> set = AnnotatedElementUtils.findMergedRepeatableAnnotations(beanClass, ConvertibleBean.class);
+//        Set<ConvertibleBean> set = AnnotatedElementUtils.getMergedRepeatableAnnotations(beanClass, ConvertibleBean.class);
+        Set<ConvertibleBean> set = ConvertibleBeanCache.get(beanClass);
         ConvertibleBean convertibleBean = null;
         for (ConvertibleBean bean : set) {
             GroupUtils.requireGroup(bean.group(), bean.getClass());
@@ -59,7 +60,8 @@ public class ConvertibleAnnotatedUtils {
     public static LinkedHashSet<ConvertibleField> getMergedConvertField(AnnotatedElement field, String group) {
 //        GroupUtils.requireGroup(group);
 
-        Set<ConvertibleField> set = AnnotatedElementUtils.findMergedRepeatableAnnotations(field, ConvertibleField.class);
+//        Set<ConvertibleField> set = AnnotatedElementUtils.getMergedRepeatableAnnotations(field, ConvertibleField.class);
+        Set<ConvertibleField> set = ConvertibleFieldCache.get(field);
         if (set == null || set.size() < 1) {
             return null;
         }
