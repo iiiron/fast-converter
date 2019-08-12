@@ -13,10 +13,10 @@ import java.lang.annotation.*;
 @Convertible
 public @interface ConvertibleField {
     @AliasFor(annotation = Convertible.class)
-    String group() default Convertible.defaultGroup;
+    String group() default Converter.DEFAULT_GROUP;
 
     @AliasFor(annotation = Convertible.class)
-    String tip() default Convertible.defaultTip;
+    String tip() default Converter.DEFAULT_TIP;
 
     @AliasFor(annotation = Convertible.class)
     Class<? extends Converter> converter() default Converter.class;

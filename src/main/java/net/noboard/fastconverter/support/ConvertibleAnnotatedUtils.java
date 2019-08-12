@@ -76,11 +76,11 @@ public class ConvertibleAnnotatedUtils {
     }
 
     public static ConvertibleMap parse(AnnotatedElement annotatedElement) {
-        return parse(annotatedElement, Convertible.defaultTip, Convertible.defaultGroup);
+        return parse(annotatedElement, Converter.DEFAULT_TIP, Converter.DEFAULT_GROUP);
     }
 
     public static ConvertibleMap parse(AnnotatedElement annotatedElement, String tip) {
-        return parse(annotatedElement, tip, Convertible.defaultGroup);
+        return parse(annotatedElement, tip, Converter.DEFAULT_GROUP);
     }
 
     /**

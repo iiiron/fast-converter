@@ -14,10 +14,10 @@ import java.lang.annotation.*;
 public @interface ConvertibleBean {
 
     @AliasFor(annotation = Convertible.class)
-    String group() default Convertible.defaultGroup;
+    String group() default Converter.DEFAULT_GROUP;
 
     @AliasFor(annotation = Convertible.class)
-    String tip() default Convertible.defaultGroup;
+    String tip() default Converter.DEFAULT_GROUP;
 
     @AliasFor(annotation = Convertible.class)
     Class<? extends Converter> converter() default Converter.class;

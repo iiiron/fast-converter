@@ -6,14 +6,10 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 public @interface Convertible {
 
-    String defaultGroup = "default";
+    String group() default Converter.DEFAULT_GROUP;
 
-    String defaultTip = "";
-
-    String group() default defaultGroup;
+    String tip() default Converter.DEFAULT_TIP;
 
     Class<? extends Converter> converter() default Converter.class;
-
-    String tip() default defaultTip;
 
 }

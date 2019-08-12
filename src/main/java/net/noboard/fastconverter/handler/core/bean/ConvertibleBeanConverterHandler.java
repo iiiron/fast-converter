@@ -9,7 +9,7 @@ public class ConvertibleBeanConverterHandler extends AbstractFilterBaseConverter
     private BeanConverterFilter beanConverterFilter;
 
     public ConvertibleBeanConverterHandler(ConverterFilter converterFilter) {
-        this(converterFilter, Convertible.defaultGroup);
+        this(converterFilter, Converter.DEFAULT_GROUP);
     }
 
     public ConvertibleBeanConverterHandler(ConverterFilter converterFilter, String group) {

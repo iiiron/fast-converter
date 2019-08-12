@@ -40,14 +40,14 @@ public class FastConverter {
     }
 
     public static Object autoConvert(Object bean) {
-        return autoConvert(bean, Convertible.defaultGroup);
+        return autoConvert(bean, Converter.DEFAULT_GROUP);
     }
 
-    public BeanConverterFilter customBeanConverters() {
+    public static BeanConverterFilter customBeanConverters() {
         return beanConverters;
     }
 
-    public ConverterFilter customDefaultConverters() {
+    public static ConverterFilter customDefaultConverters() {
         return defaultConverters;
     }
 }
