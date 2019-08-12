@@ -32,11 +32,6 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return this.converterFilter;
     }
 
-    @Override
-    public K convert(T value, String group) throws ConvertException {
-        return null;
-    }
-
     protected Map<String, Object> parse(Object from, String group) {
         BeanInfo beanF;
         try {
@@ -83,14 +78,14 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return result;
     }
 
-    protected ConvertibleField lastConvertibleField(LinkedHashSet<ConvertibleField> convertibleFields) {
+    private ConvertibleField lastConvertibleField(LinkedHashSet<ConvertibleField> convertibleFields) {
         if (convertibleFields == null || convertibleFields.size() < 1) {
             return null;
         }
         return (ConvertibleField) convertibleFields.toArray()[convertibleFields.size() - 1];
     }
 
-    protected Object getConvertedValue(Object value, Field field, String group) {
+    private Object getConvertedValue(Object value, Field field, String group) {
         ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group, group);
         while (true) {
             if (value != null || !currentMap.isRetainNull()) {

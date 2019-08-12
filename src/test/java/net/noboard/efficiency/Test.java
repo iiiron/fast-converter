@@ -15,15 +15,15 @@ public class Test {
 //                .addFirst(new DateToTimeStampStringConverterHandler());
         Object o = SpeedCheck.check(a -> FastConverter.autoConvert(list));
         System.out.println("a");
-//        SpeedCheck.check(a -> FastConverter.autoConvert(list));
-//        SpeedCheck.check(a -> FastConverter.autoConvert(list));
-//        SpeedCheck.check(a -> FastConverter.autoConvert(list));
-//        SpeedCheck.check(a -> FastConverter.autoConvert(list));
+        SpeedCheck.check(a -> FastConverter.autoConvert(list));
+        SpeedCheck.check(a -> FastConverter.autoConvert(list));
+        SpeedCheck.check(a -> FastConverter.autoConvert(list));
+        SpeedCheck.check(a -> FastConverter.autoConvert(list));
     }
 
     private static List<BeanA> init() {
         List<BeanA> list = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10000; i++) {
             BeanA beanA = new BeanA();
             beanA.setAge(i);
             beanA.setBirthday(new Date());

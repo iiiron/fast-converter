@@ -5,7 +5,9 @@ import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Collection转换器
@@ -25,8 +27,9 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
         try {
             collection = value.getClass().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new ConvertException("实例化" + value.getClass() + "失败", e);
-
+            collection = new ArrayList<>();
+            System.err.println(String.format("class %s can't be implemented, the degradation measures implement the container with %s ",
+                    value.getClass().getName(), collection.getClass()));
         }
 
         Converter converter = null;

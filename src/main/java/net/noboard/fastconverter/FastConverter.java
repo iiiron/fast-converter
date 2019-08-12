@@ -19,6 +19,7 @@ public class FastConverter {
 
         enterConverter = new CommonFilterBaseConverterHandler(defaultConverters);
 
+        // 设置标准Bean处理器
         beanConverters = new AbstractBeanConverterFilter(defaultConverters) {
             @Override
             protected void initConverters(List<BeanConverter> converters) {

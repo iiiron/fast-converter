@@ -5,6 +5,7 @@ import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -32,7 +33,9 @@ public class MapToMapConverterHandler<T, K> extends AbstractFilterBaseConverterH
         try {
             newMap = value.getClass().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new ConvertException("实例化" + value.getClass() + "失败", e);
+            newMap = new HashMap<>();
+            System.err.println(String.format("class %s can't be implemented, the degradation measures implement the container with %s ",
+                    value.getClass(), newMap.getClass()));
         }
 
         Converter converter = null;
