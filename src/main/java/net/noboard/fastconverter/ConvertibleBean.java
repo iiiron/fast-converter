@@ -13,12 +13,16 @@ import java.lang.annotation.*;
 @Convertible
 public @interface ConvertibleBean {
 
-    @AliasFor(annotation = Convertible.class)
+    @AliasFor("tip")
     String group() default Converter.DEFAULT_GROUP;
+
+    @AliasFor("group")
+    String tip() default Converter.DEFAULT_GROUP;
 
     String targetName() default "";
 
     Class targetClass() default Void.class;
 
+    // TODO
     boolean nested() default true;
 }
