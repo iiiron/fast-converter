@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
-public class Duct {
+public class Daughter {
     private String name;
 
     private String birthday;

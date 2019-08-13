@@ -8,9 +8,11 @@ import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
 import net.noboard.fastconverter.handler.NumberToBigDecimalConverterHandler;
 
 import java.util.Date;
+import java.util.Map;
 
 @Data
-@ConvertibleBean(targetClass = Duct.class)
+@ConvertibleBean(targetClass = Daughter.class)
+@ConvertibleBean(targetClass = Map.class, group = "toMap")
 public class Son {
     @ConvertibleField(converter = AddNumberConverterHandler.class)
     private String name;

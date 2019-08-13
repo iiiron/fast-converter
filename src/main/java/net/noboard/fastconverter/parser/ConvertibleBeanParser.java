@@ -15,17 +15,7 @@ public class ConvertibleBeanParser implements ConvertibleParser {
         ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(annotatedElement, group);
 
         CMap cMap = new CMap();
-        if (convertibleBean.converter() != Converter.class) {
-            cMap.setConverter(ConverterCache.get(convertibleBean.converter()));
-        } else {
-            ConvertibleBeanConverterHandler convertibleBeanConverterHandler =
-                    new ConvertibleBeanConverterHandler(new CommonConverterFilter(), convertibleBean.group());
-            if (convertibleBean.nested()) {
-                convertibleBeanConverterHandler.getFilter().addLast(convertibleBeanConverterHandler);
-            }
-            cMap.setConverter(convertibleBeanConverterHandler);
-        }
-        cMap.setTip(convertibleBean.tip());
+        cMap.setTip(convertibleBean.group());
         return cMap;
     }
 }

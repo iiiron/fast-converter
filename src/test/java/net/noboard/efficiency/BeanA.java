@@ -16,8 +16,8 @@ public class BeanA {
     @ConvertibleField(converter = DateToFormatStringConverterHandler.class)
     private Date birthday;
 
-    @ConvertibleField(nameTo = "ducts")
-    @ConvertibleField(nameTo = "ducts", group = "b")
+    @ConvertibleField(nameTo = "daughters")
+    @ConvertibleField(nameTo = "daughters", group = "b")
     private List<Son> sons;
 
     private Integer age;
