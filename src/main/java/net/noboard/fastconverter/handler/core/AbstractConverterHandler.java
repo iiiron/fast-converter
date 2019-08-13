@@ -34,7 +34,7 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
     @Override
     public K convert(T value, String tip) throws ConvertException {
         if (!this.supports(value)) {
-            throw new ConvertException(this.getClass().getName() + " 无法转换数据 " + value);
+            throw new ConvertException(this.getClass().getName() + " can't convert value: " + value);
         }
 
         return this.converting(value, tip);

@@ -23,6 +23,4 @@ public @interface ConvertibleBean {
 
     Class targetClass() default Void.class;
 
-    // TODO
-    boolean nested() default true;
 }
