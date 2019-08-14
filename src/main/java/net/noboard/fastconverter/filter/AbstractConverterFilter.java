@@ -51,7 +51,7 @@ public abstract class AbstractConverterFilter implements ConverterFilter {
 
     @Override
     public ConverterFilter addFirst(Function<ConverterFilter, Converter> add) {
-        converters.add(add.apply(this));
+        converters.add(0, add.apply(this));
         return this;
     }
 
