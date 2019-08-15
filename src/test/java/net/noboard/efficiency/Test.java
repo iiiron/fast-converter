@@ -11,8 +11,8 @@ public class Test {
     @org.junit.Test
     public void a() {
         List<BeanA> list = init();
-//        FastConverter.customDefaultConverters()
-//                .addFirst(new DateToTimeStampStringConverterHandler());
+        FastConverter.customDefaultConverters()
+                .addFirst(new DateToTimeStampStringConverterHandler());
         Object o = SpeedCheck.check(a -> FastConverter.autoConvert(list));
         System.out.println("a");
 //        SpeedCheck.check(a -> FastConverter.autoConvert(list));

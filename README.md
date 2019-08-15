@@ -127,7 +127,7 @@ Daughter daughter = (Daughter) FastConverter.autoConvert(son);
 这个过程有以下逻辑构成：
 
 - 如果ConverterFilter中没有支持当前元素的转换器，则将元素直接推入新容器；
-- 否则，如果CollectionToCollectionConverterHandler的转换过程被指定了一个不为空字符串，也不为null的tip，则使用该tip指导ConverterFilter中筛选出的Converter的转换工作（也就是调用 Converter#convert(T,String) 方法）；
+- 否则，如果CollectionToCollectionConverterHandler的转换过程被指定了一个不为空字符串，也不为null的tip，**则使用该tip指导ConverterFilter中筛选出的Converter的转换工作**（也就是调用 Converter#convert(T,String) 方法）；
 - 否则，调用Converter的另一个重载方法Converter#convert(T)，即让转换器使用它自己的默认tip对数据进行转换。
 
 应该注意到，CollectionToCollectionConverterHandler本身不对Collection的元素进行具体的转换，而是交给了ConverterFilter中所注册的一众转换器去完成。因此对数据的转换规则完全依赖于你注册到ConverterFilter中的转换器。而FastConverter入口类的静态初始化块将四个核心转换器全部添加到了该ConverterFilter中，也就是说无论是多少层的容器嵌套，它都可以处理。
@@ -213,8 +213,101 @@ public class Son {
     @ConvertibleField(group="default, toMap", converter = BooleanToNumberConverterHandler.class)
     @ConvertibleField(converter = NumberToBigDecimalConverterHandler.class, nameTo = "sexy")
     private Boolean sex;
+    
+    ... 省略getter/setter
 }
 ```
 
 其中，name字段标注了AddNumberConverterHandler转换器，无论group是“default”还是“toMap”它都支持。sex字段的BooleanToNumberConverterHandler转换器同上，但是sex字段的NumberToBigDecimalConverterHandler转换器只支持“default”分组。所以当Son被转换为Daughter时，sex会变成Bigdecimal类型的sexy字段，而当Son被转换为Map时，sex字段将会变成Map的值为Integer类型的1，key为字符串“sex”。
+
+# 如何自定制FastConverter的默认转换行为
+
+前面介绍了，FastConverter的4个核心转换器都依赖其持有的ConverterFilter实例，而FastConverter的入口类在静态初始化块中已经向该实例添加了4个核心转换器，所以初始情况下，FastConverter能够处理Collection，Map的子类，以及数组和被@ConvertibleBean标注的POJO。而又因为ArrayToArrayConverterHandler，CollectionToCollectionConverterHandler，MapToMapConverterHandler这三个转换器只是将对应容器拆开（实际上ConvertibleBeanConverterHandler也只是将POJO拆开，具体字段的转换也要交给ConverterFilter去选择转换器），选取ConverterFilter中的转换器对元素进行处理，此时ConverterFilter中只有四个核心转换器，故，它实际上不会对任何其他类型（其他类型指的是除Collection，Map的子类，以及数组和被@ConvertibleBean标注的POJO以外的类型）的数据进行转换，仅保留原值。
+
+FastConverter入口类提供了customDefaultConverters方法对ConverterFilter实例进行自定制。
+
+具体来看，该方法返回是一个ConverterFilter的实例，这个实例就是四个核心转换器所持有的实例，还记得ConverterFilter接口那四个addXXX方法吗，是的，你可以通过向ConverterFilter实例添加Converter的实例来定制整个FastConverter的默认转换行为。
+
+举个例子：
+
+```java
+FastConverter.customDefaultConverters()
+    .addFirst(new DateToTimeStampStringConverterHandler());
+```
+
+通过上例，我们向FastConverter添加了一个默认行为，该行为就是“将java.util.Date对象转换为时间戳字符串”。你可以预想一下会发生什么。
+
+在没有添加这个默认转换器之前，当FastConverter遇到一个Date对象，它不是Collection，Map的子类，也不是数组，也没有被@ConvertibleBean标注，所以它会在转换过程中被原封不动的保留到转换结果中去。而现在，当FastConverter遇到Date对象时，它将会被转换为一个时间戳字符串。当然，如果它是某个POJO的字段，那么默认转换行为会被@ConvertibleField中指定的转换器替代。
+
+```java
+List<Date> dates = new ArrayList<>();
+Date date = new Date;
+dates.add(date);
+
+FastConverter.autoConvert(dates);// 结果是 ArrayList<String>，包含一个元素，即当前时间戳字符串
+FastConverter.autoConvert(date);// 结果是 String 对象，即当前时间戳字符串
+```
+
+回忆一下Son POJO
+
+```java
+@ConvertibleBean(targetClass = Daughter.class)
+@ConvertibleBean(targetClass = Map.class, group = "toMap")
+public class Son {
+    ... 省略
+
+    @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy.MM")
+    private Date birthday;
+    
+    ... 省略
+```
+
+该POJO中有一个Date类型的字段birthday。其上的注解显示，当分组为“default”时，birthday字段将被转换为格式化（“yyyy.MM”）的时间字符串。但如果分组为“toMap”，birthday字段并没有设定相应的@ConvertibleField，则birthday将会被交给默认的转换器去转换，此时默认转换器能对Date进行处理，它是DateToTimeStampStringConverterHandler，birthday将被转换为时间戳字符串。
+
+```java
+Son son = new Son();
+son.setBirthday(new Date());
+
+FastConverter.autoConvert(son,"toMap");// 结果是HashMap，其中有key为birthday，value为格式化时间字符串的entry。
+```
+
+还有，DateToTimeStampStringConverterHandler有两种模式，默认是毫秒，还可以是秒，通过tip为“ms”和“s”来控制。则：
+
+```java
+@ConvertibleBean(targetClass = Daughter.class)
+@ConvertibleBean(targetClass = Map.class, group = "toMap")
+public class Son {
+    ... 省略
+
+    @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy.MM")
+    @ConvertibleField(group = "toMap", tip = "s")
+    private Date birthday;
+    
+    ... 省略
+```
+
+是的，@ConvertibleField并不是只为了指定转换器而存在的，它没有任何一个属性是必须的，含义就是，所有属性都可以单独使用。
+
+还有，对容器（Collection，Map的子类，及数组）转换器指定的tip会穿透容器，作用在对元素的转换过程中（请注意前文对CollectionToCollectionConverterHandler的阐述内容）。
+
+```java
+@ConvertibleBean(targetClass = BeanB.class)
+public class BeanA {
+    
+    @ConvertibleField(nameTo = "daughters", tip = "toMap")
+    private List<Son> sons;
+    
+    ... 省略
+}
+```
+
+这里指定的 tip = "toMap"，将会作用到对Son的转换上去，由于Son是一个@ConvertibleBean标注的POJO，所以会由ConvertibleBeanConverterHandler对它进行转换，而该转换器将tip用作对group的选择，所以，sons将会被转换为 BeanB 中的 List\<Map\>  类型的 daughters 字段。
+
+也许看这里的用例比较难懂，如果无法理解，那就去项目的test目录下转一转吧！
+
+# Bean 转换器的自定制
+
+**一般来说，理解前文的阐述，就可以在几乎所有场景下使用FastConverter了，如果你的需求已经满足，无需更深层次的自定制，则此后的内容，无须理会。**
+
+当然，如果你的项目对Bean的转换存在更多，更灵活，更奇特的要求，FastConverter提供了足够灵活的接口，抽象，以及入口让你来自定制自己的转换器。
 
