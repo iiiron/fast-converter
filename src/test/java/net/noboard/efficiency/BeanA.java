@@ -13,6 +13,7 @@ import java.util.List;
 public class BeanA {
     private String name;
 
+    @ConvertibleField(tip = "s")
     private Date birthday;
 
     @ConvertibleField(nameTo = "daughters")

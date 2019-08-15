@@ -1,6 +1,8 @@
 package net.noboard.fastconverter.handler;
 
+import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 
@@ -8,9 +10,23 @@ import java.util.Date;
  * @author wanxm
  */
 public class DateToTimeStampStringConverterHandler extends AbstractConverterHandler<Date, String> {
+
+    public DateToTimeStampStringConverterHandler() {
+        super("ms");
+    }
+
     @Override
     protected String converting(Date value, String tip) {
-        return String.valueOf((value).getTime());
+        switch (tip.toLowerCase()) {
+            case "ms":
+                return String.valueOf((value).getTime());
+
+            case "s":
+                return String.valueOf(value.getTime() / 1000);
+
+            default:
+                throw new ConvertException(String.format("DateToTimeStampStringConverterHandler do not support tip '%s'", tip));
+        }
     }
 
     @Override

@@ -24,7 +24,7 @@ public class Test {
 
     private static List<BeanA> init() {
         List<BeanA> list = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10000; i++) {
             BeanA beanA = new BeanA();
             beanA.setAge(i);
             beanA.setBirthday(new Date());
