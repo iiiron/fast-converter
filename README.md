@@ -186,11 +186,11 @@ public class Son {
 
 - boolean abandon()
 
-  标识是否抛弃该字段，默认为false，如果设置为true，则转换过程将不会对该字段进行转换处理，也不会照搬原值，对于转换结果来说，这个字段消失了。
+  标识是否抛弃该字段，默认为false，如果设置为true，则转换过程将不会对该字段进行转换处理，也不会照搬原值，对于转换结果来说，这个字段消失了。**要注意**，如果存在对同一字段的多次转换，则只有最后一次转换的abandon属性生效。
 
 - String nameTo()
 
-  标识转换后该字段的名字，默认是空字符串，表示不进行特殊的名字映射。例如Son的sex和Daughter的sexy字段并不对应，但通过将Son的sex字段nameTo sexy，则sex字段可被正确的映射到sexy字段上。
+  标识转换后该字段的名字，默认是空字符串，表示不进行特殊的名字映射。例如Son的sex和Daughter的sexy字段并不对应，但通过将Son的sex字段nameTo sexy，则sex字段可被正确的映射到sexy字段上。**要注意**，如果存在对同一字段的多次转换，则只有最后一次转换的nameTo属性生效。
 
 - boolean retainNull()
 
@@ -219,6 +219,8 @@ public class Son {
 ```
 
 其中，name字段标注了AddNumberConverterHandler转换器，无论group是“default”还是“toMap”它都支持。sex字段的BooleanToNumberConverterHandler转换器同上，但是sex字段的NumberToBigDecimalConverterHandler转换器只支持“default”分组。所以当Son被转换为Daughter时，sex会变成Bigdecimal类型的sexy字段，而当Son被转换为Map时，sex字段将会变成Map的值为Integer类型的1，key为字符串“sex”。
+
+@ConvertibleField也是一个可重复注解，它不仅能用来标注不同分组，同一个分组也可以重复标注，由于java的重复注解是符合顺序结构的，在这里，你可以对同一个分组标注多次，转换过程将按照你的标注顺序进行，这样你就可以复用某些转换器，而不必为了完成某些组合的转换行为而去创建新的转换器了。**如何使用 FastConverter**一节对Son对象的sex字段的标注就是这种用法。
 
 # 如何自定制FastConverter的默认转换行为
 
@@ -310,4 +312,3 @@ public class BeanA {
 **一般来说，理解前文的阐述，就可以在几乎所有场景下使用FastConverter了，如果你的需求已经满足，无需更深层次的自定制，则此后的内容，无须理会。**
 
 当然，如果你的项目对Bean的转换存在更多，更灵活，更奇特的要求，FastConverter提供了足够灵活的接口，抽象，以及入口让你来自定制自己的转换器。
-
