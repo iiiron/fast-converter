@@ -1,4 +1,6 @@
-package net.noboard.fastconverter;
+package net.noboard.fastconverter.parser;
+
+import net.noboard.fastconverter.Converter;
 
 /**
  * tip：用于转换的tip
@@ -16,6 +18,10 @@ public interface ConvertibleMap {
     void setTip(String tip);
 
     String getTip();
+
+    void setNameTo(String nameTo);
+
+    String getNameTo();
 
     void setConverter(Converter converter);
 

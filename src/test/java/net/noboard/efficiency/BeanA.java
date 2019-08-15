@@ -13,7 +13,6 @@ import java.util.List;
 public class BeanA {
     private String name;
 
-    @ConvertibleField(converter = DateToFormatStringConverterHandler.class)
     private Date birthday;
 
     @ConvertibleField(nameTo = "daughters")

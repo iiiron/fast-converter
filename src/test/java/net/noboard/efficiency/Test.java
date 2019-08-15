@@ -21,9 +21,6 @@ public class Test {
 //        SpeedCheck.check(a -> FastConverter.autoConvert(list));
     }
 
-    public static void main(String[] args) {
-
-    }
 
     private static List<BeanA> init() {
         List<BeanA> list = new ArrayList<>();

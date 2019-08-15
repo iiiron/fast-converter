@@ -1,6 +1,7 @@
 package net.noboard.fastconverter.support;
 
 import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.parser.ConvertibleParser;
 import net.noboard.fastconverter.parser.ImportParser;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -21,9 +22,6 @@ public class ConvertibleAnnotatedUtils {
      * @return
      */
     public static ConvertibleBean getMergedConvertBean(AnnotatedElement beanClass, String group) {
-//        GroupUtils.requireGroup(group);
-
-//        Set<ConvertibleBean> set = AnnotatedElementUtils.getMergedRepeatableAnnotations(beanClass, ConvertibleBean.class);
         Set<ConvertibleBean> set = ConvertibleBeanCache.get(beanClass);
         ConvertibleBean convertibleBean = null;
         for (ConvertibleBean bean : set) {
@@ -58,9 +56,6 @@ public class ConvertibleAnnotatedUtils {
      * @return
      */
     public static LinkedHashSet<ConvertibleField> getMergedConvertField(AnnotatedElement field, String group) {
-//        GroupUtils.requireGroup(group);
-
-//        Set<ConvertibleField> set = AnnotatedElementUtils.getMergedRepeatableAnnotations(field, ConvertibleField.class);
         Set<ConvertibleField> set = ConvertibleFieldCache.get(field);
         if (set == null || set.size() < 1) {
             return null;
@@ -92,75 +87,14 @@ public class ConvertibleAnnotatedUtils {
      * @return
      */
     public static ConvertibleMap parse(AnnotatedElement annotatedElement, String tip, String group) {
-        try {
-            ImportParser importParser = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, ImportParser.class);
-            if (importParser == null) {
-                return factory(tip, group, null);
-            }
-            ConvertibleParser parser = importParser.clazz().newInstance();
-            return parser.parse(annotatedElement, tip, group);
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+        ImportParser importParser = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, ImportParser.class);
+        if (importParser == null) {
+            CMap cMap = new CMap();
+            cMap.setAbandon(false);
+            cMap.setRetainNull(true);
+            return cMap;
         }
-        return null;
-    }
-
-    private static ConvertibleMap factory(String tip, String group, Converter converter) {
-        return new ConvertibleMap() {
-            @Override
-            public void setAbandon(boolean abandon) {
-
-            }
-
-            @Override
-            public boolean isAbandon() {
-                return false;
-            }
-
-            @Override
-            public void setRetainNull(boolean isSkipNull) {
-
-            }
-
-            @Override
-            public boolean isRetainNull() {
-                return true;
-            }
-
-            @Override
-            public void setTip(String tip) {
-
-            }
-
-            @Override
-            public String getTip() {
-                return tip;
-            }
-
-            @Override
-            public void setConverter(Converter converter) {
-
-            }
-
-            @Override
-            public Converter getConverter() {
-                return converter;
-            }
-
-            @Override
-            public void join(ConvertibleMap convertibleMap) {
-
-            }
-
-            @Override
-            public boolean hasNext() {
-                return false;
-            }
-
-            @Override
-            public ConvertibleMap next() {
-                return null;
-            }
-        };
+        ConvertibleParser parser = ConvertibleParserCache.get(importParser.clazz());
+        return parser.parse(annotatedElement, tip, group);
     }
 }

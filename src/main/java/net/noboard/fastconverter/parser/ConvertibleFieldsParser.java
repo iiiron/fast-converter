@@ -1,6 +1,8 @@
 package net.noboard.fastconverter.parser;
 
-import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.CMap;
+import net.noboard.fastconverter.Converter;
+import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.support.ConverterCache;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
@@ -27,6 +29,7 @@ public class ConvertibleFieldsParser implements ConvertibleParser {
             last.setTip(convertibleField.tip());
             last.setAbandon(convertibleField.abandon());
             last.setRetainNull(convertibleField.retainNull());
+            last.setNameTo(convertibleField.nameTo());
         }
 
         if (first == null) {

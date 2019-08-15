@@ -1,7 +1,5 @@
 package net.noboard.fastconverter.parser;
 
-import net.noboard.fastconverter.ConvertibleMap;
-
 import java.lang.reflect.AnnotatedElement;
 
 public interface ConvertibleParser {

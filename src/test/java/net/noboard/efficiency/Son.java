@@ -14,13 +14,13 @@ import java.util.Map;
 @ConvertibleBean(targetClass = Daughter.class)
 @ConvertibleBean(targetClass = Map.class, group = "toMap")
 public class Son {
-    @ConvertibleField(group="default, toMap", converter = AddNumberConverterHandler.class)
+    @ConvertibleField(converter = AddNumberConverterHandler.class)
     private String name;
 
     @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy.MM")
     private Date birthday;
 
-    @ConvertibleField(group="default, toMap", converter = BooleanToNumberConverterHandler.class)
+    @ConvertibleField(converter = BooleanToNumberConverterHandler.class)
     @ConvertibleField(converter = NumberToBigDecimalConverterHandler.class, nameTo = "sexy")
     private Boolean sex;
 }

@@ -1,5 +1,7 @@
 package net.noboard.fastconverter;
 
+import net.noboard.fastconverter.parser.ConvertibleMap;
+
 public class CMap implements ConvertibleMap {
 
     private String tip;
@@ -13,6 +15,18 @@ public class CMap implements ConvertibleMap {
     private boolean skipNull;
 
     private boolean hasNext = false;
+
+    private String nameTo;
+
+    @Override
+    public String getNameTo() {
+        return nameTo;
+    }
+
+    @Override
+    public void setNameTo(String nameTo) {
+        this.nameTo = nameTo;
+    }
 
     @Override
     public String getTip() {
@@ -76,6 +90,11 @@ public class CMap implements ConvertibleMap {
         return "CMap{" +
                 "tip='" + tip + '\'' +
                 ", converter=" + converter +
+                ", next=" + next +
+                ", abandon=" + abandon +
+                ", skipNull=" + skipNull +
+                ", hasNext=" + hasNext +
+                ", nameTo='" + nameTo + '\'' +
                 '}';
     }
 }

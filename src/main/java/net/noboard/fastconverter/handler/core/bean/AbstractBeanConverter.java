@@ -1,7 +1,9 @@
 package net.noboard.fastconverter.handler.core.bean;
 
-import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
+import net.noboard.fastconverter.ConvertException;
+import net.noboard.fastconverter.Converter;
+import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.beans.BeanInfo;
@@ -11,7 +13,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 
 public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K> {
@@ -56,20 +57,21 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
                         from.getClass().getName()));
             }
 
-            LinkedHashSet<ConvertibleField> convertibleFields = ConvertibleAnnotatedUtils.getMergedConvertField(field, group);
-            ConvertibleField last = lastConvertibleField(convertibleFields);
+
+            ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group, group);
+            ConvertibleMap last = lastConvertibleField(currentMap);
             String nameTo = fD.getName();
             if (last != null) {
-                if (last.abandon()) {
+                if (last.isAbandon()) {
                     continue;
                 }
-                if (!"".equals(last.nameTo())) {
-                    nameTo = last.nameTo();
+                if (last.getNameTo() != null && !"".equals(last.getNameTo())) {
+                    nameTo = last.getNameTo();
                 }
             }
 
             try {
-                result.put(nameTo, getConvertedValue(fD.getReadMethod().invoke(from), field, group));
+                result.put(nameTo, getConvertedValue(fD.getReadMethod().invoke(from), currentMap));
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new ConvertException(e);
             }
@@ -78,15 +80,18 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return result;
     }
 
-    private ConvertibleField lastConvertibleField(LinkedHashSet<ConvertibleField> convertibleFields) {
-        if (convertibleFields == null || convertibleFields.size() < 1) {
+    private ConvertibleMap lastConvertibleField(ConvertibleMap convertibleMap) {
+        if (convertibleMap == null) {
             return null;
         }
-        return (ConvertibleField) convertibleFields.toArray()[convertibleFields.size() - 1];
+        ConvertibleMap currentMap = convertibleMap;
+        while (currentMap.hasNext()) {
+            currentMap = currentMap.next();
+        }
+        return currentMap;
     }
 
-    private Object getConvertedValue(Object value, Field field, String group) {
-        ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group, group);
+    private Object getConvertedValue(Object value, ConvertibleMap currentMap) {
         while (true) {
             if (value != null || !currentMap.isRetainNull()) {
                 Converter converter = currentMap.getConverter();
