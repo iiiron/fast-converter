@@ -73,20 +73,15 @@ public class ConvertibleAnnotatedUtils {
     }
 
     public static ConvertibleMap parse(AnnotatedElement annotatedElement) {
-        return parse(annotatedElement, Converter.DEFAULT_TIP, Converter.DEFAULT_GROUP);
-    }
-
-    public static ConvertibleMap parse(AnnotatedElement annotatedElement, String tip) {
-        return parse(annotatedElement, tip, Converter.DEFAULT_GROUP);
+        return parse(annotatedElement, Converter.DEFAULT_GROUP);
     }
 
     /**
      * @param annotatedElement 待解析AnnotatedElement
-     * @param tip              解析时使用的默认tip
      * @param group            解析时使用的group
      * @return
      */
-    public static ConvertibleMap parse(AnnotatedElement annotatedElement, String tip, String group) {
+    public static ConvertibleMap parse(AnnotatedElement annotatedElement, String group) {
         ImportParser importParser = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, ImportParser.class);
         if (importParser == null) {
             CMap cMap = new CMap();
@@ -95,6 +90,6 @@ public class ConvertibleAnnotatedUtils {
             return cMap;
         }
         ConvertibleParser parser = ConvertibleParserCache.get(importParser.clazz());
-        return parser.parse(annotatedElement, tip, group);
+        return parser.parse(annotatedElement, group);
     }
 }

@@ -11,7 +11,7 @@ import java.util.LinkedHashSet;
 
 public class ConvertibleFieldsParser implements ConvertibleParser {
     @Override
-    public ConvertibleMap parse(AnnotatedElement annotatedElement, String tip, String group) {
+    public ConvertibleMap parse(AnnotatedElement annotatedElement, String group) {
         LinkedHashSet<ConvertibleField> linkedHashSet = ConvertibleAnnotatedUtils.getMergedConvertField(annotatedElement, group);
         CMap first = null, last = null;
         for (ConvertibleField convertibleField : linkedHashSet) {

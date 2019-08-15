@@ -13,7 +13,7 @@ import java.lang.reflect.AnnotatedElement;
 public class ConvertibleFieldParser implements ConvertibleParser {
 
     @Override
-    public ConvertibleMap parse(AnnotatedElement annotatedElement, String tip, String group) {
+    public ConvertibleMap parse(AnnotatedElement annotatedElement, String group) {
         CMap cMap = new CMap();
         AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, ConvertibleField.class);
         Class converterClass = (Class) annotationAttributes.get("converter");

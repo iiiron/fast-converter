@@ -311,4 +311,157 @@ public class BeanA {
 
 **一般来说，理解前文的阐述，就可以在几乎所有场景下使用FastConverter了，如果你的需求已经满足，无需更深层次的自定制，则此后的内容，无须理会。**
 
-当然，如果你的项目对Bean的转换存在更多，更灵活，更奇特的要求，FastConverter提供了足够灵活的接口，抽象，以及入口让你来自定制自己的转换器。
+当然，如果你的项目对POJO的转换存在更多，更灵活，更奇特的要求，FastConverter提供了足够灵活的接口，抽象，以及入口让你来自定制自己的转换器。
+
+### ConvertibleBeanConverterHandler
+
+在对POJO的处理层面上，我使用了两个新的接口：BeanConverter，BeanConverterFilter。它们不仅名字和前文阐述的两个核心接口相似，连内容也特别相似。
+
+```java
+public interface BeanConverter<T, K> {
+
+    K convert(T value, String group) throws ConvertException;
+
+    void setFilter(ConverterFilter converterFilter);
+
+    ConverterFilter getFilter();
+
+    boolean supports(Object value, String group);
+}
+
+public interface BeanConverterFilter {
+    BeanConverter filter(Object value, String group);
+
+    void setConverterFilter(ConverterFilter converterFilter);
+
+    ConverterFilter getConverterFilter();
+
+    BeanConverterFilter addFirst(BeanConverter converter);
+
+    BeanConverterFilter addFirst(Function<ConverterFilter, BeanConverter> add);
+
+    BeanConverterFilter addLast(BeanConverter converter);
+
+    BeanConverterFilter addLast(Function<ConverterFilter, BeanConverter> add);
+}
+```
+
+唯一的区别是，多了group。由于普通的转换器没有分组的概念，而在对POJO进行处理的过程中，需要有分组的支撑，尽管区别不大，但在抽象上还是有别的。它们和前文的Converter及ConverterFilter功能一样，一个是转换器，一个是过滤器（即工厂）。
+
+还记得前文提到的4个核心转换器中的ConvertibleBeanConverterHandler吗？我介绍了它的使用，和它支撑的两个注解@ConvertibleBean和@ConvertibleFiled，但这两个注解都不是它直接提供支撑的，提供支撑的是BeanToBeanConverter和BeanToMapConverter（目前来说是这两个）。
+
+再具体来说，也不是BeanToBeanConverter和BeanToMapConverter提供支撑，而是它们的父类AbstractBeanConverter提供的，所以接下来我就来说一说，AbstractBeanConverter是如何支撑两个注解的运作的，以及你可以如何扩展，如何自定制自己的AbstractBeanConverter子类。
+
+### AbstractBeanConverter
+
+```java
+public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K> {
+
+    protected Map<String, Object> parse(Object from, String group) {
+        ... 省略方法体
+    }
+
+    ... 省略其他方法和域
+}
+
+```
+
+AbstractBeanConverter提供了一个parse方法，该方法可以根据POJO中的注解，将POJO解析成一个Map，BeanToBeanConverter的实现就是简单的将这个Map重新组装为POJO，而BeanToMapConverter的实现就更简单，它直接返回了这个Map。
+
+如果你想构建自己的AbstractBeanConverter子类，而且根据AbstractBeanConverter#parse方法为你解析的Map就可以实现你的需求，那么了解到这里就足够了。
+
+如果你连这个Map都无法使用，换句话说你必须重载这个方法，那么我需要向你介绍另一个东西：
+
+```java
+public interface ConvertibleParser {
+    /**
+     * @param annotatedElement 该次解析的 AnnotatedElement
+     * @param group            该次解析的指定分组(即有效分组)
+     * @return
+     */
+    ConvertibleMap parse(AnnotatedElement annotatedElement, String group);
+}
+```
+
+以及，必须要贴出@ConvertibleField的完整代码
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+@ImportParser(clazz = ConvertibleFieldParser.class) // 注意这行代码
+@Repeatable(ConvertibleFields.class)
+@Convertible
+public @interface ConvertibleField {
+    @AliasFor(annotation = Convertible.class)
+    String group() default Converter.DEFAULT_GROUP;
+
+    @AliasFor(annotation = Convertible.class)
+    String tip() default Converter.DEFAULT_TIP;
+
+    @AliasFor(annotation = Convertible.class)
+    Class<? extends Converter> converter() default Converter.class;
+
+    boolean abandon() default false;
+
+    String nameTo() default "";
+
+    boolean retainNull() default true;
+}
+```
+
+ConvertibleField使用了元注解@ImportParser，@ImportParser也是fast-converter内部提供的，它用来将一个解析器绑定到注解上，这样在使用注解的时候，就可以直接使用解析器来将注解解析为ConvertibleMap对象，ConvertibleMap是一个存储了转换过程中需要的各类信息的一个“转换地图”。
+
+```java
+public interface ConvertibleMap {
+    void setAbandon(boolean abandon);
+
+    boolean isAbandon();
+
+    void setRetainNull(boolean isRetainNull);
+
+    boolean isRetainNull();
+
+    void setTip(String tip);
+
+    String getTip();
+
+    void setNameTo(String nameTo);
+
+    String getNameTo();
+
+    void setConverter(Converter converter);
+
+    Converter getConverter();
+
+    void join(ConvertibleMap convertibleMap);
+
+    boolean hasNext();
+
+    ConvertibleMap next();
+}
+```
+
+如你所见，它提供了一系列信息来指导转换过程，而且，它是一个链表，这意味着不同的转换过程可以串联起来。我已经提供了工具类ConvertibleAnnotatedUtils来完成这个解析的任务，在AbstractBeanConverter#parse中有如下这段代码：
+
+```java
+public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K> {
+
+    protected Map<String, Object> parse(Object from, String group) {
+        ... 省略
+            
+        ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group);
+        
+        ... 省略
+    }
+
+    ... 省略其他方法和域
+}
+```
+
+这样，我们就根据ConvertibleFieldParser的逻辑将字段上@ConvertibleField注解的信息解析成了一个用于指导转换过程的ConvertibleMap。（这意味着，你可以编写自己的注解，自己的注解解析器，而它们可以和现有的系统契合，而不需要做更多额外的工作）
+
+介绍这些是因为，如果你重写AbstractBeanConverter#parse方法，你需要知道这些内部的知识。当你重写时，自然你可以不遵循ConvertibleMap这种方式，但如果你不遵循，则你实现的AbstractBeanConverter子类将可能和其他任何该类的子类无法兼容，则你的Bean转换器将和你的一整套逻辑紧紧的绑定在一起。故推荐使用这种方式。
+
+### 如何将自定制的Bean转换器添加到FastConverter中去
+
+待续

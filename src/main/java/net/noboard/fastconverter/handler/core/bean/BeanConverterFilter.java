@@ -1,6 +1,5 @@
 package net.noboard.fastconverter.handler.core.bean;
 
-import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 
 import java.util.function.Function;
@@ -14,9 +13,9 @@ public interface BeanConverterFilter {
 
     BeanConverterFilter addFirst(BeanConverter converter);
 
-    BeanConverterFilter addFirst(Function<ConverterFilter,BeanConverter> add);
+    BeanConverterFilter addFirst(Function<ConverterFilter, BeanConverter> add);
 
     BeanConverterFilter addLast(BeanConverter converter);
 
-    BeanConverterFilter addLast(Function<ConverterFilter,BeanConverter> add);
+    BeanConverterFilter addLast(Function<ConverterFilter, BeanConverter> add);
 }

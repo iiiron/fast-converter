@@ -58,7 +58,7 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
             }
 
 
-            ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group, group);
+            ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group);
             ConvertibleMap last = lastConvertibleField(currentMap);
             String nameTo = fD.getName();
             if (last != null) {
