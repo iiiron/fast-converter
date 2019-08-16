@@ -20,7 +20,7 @@ public class Son {
     @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy.MM")
     private Date birthday;
 
-//    @ConvertibleField(converter = BooleanToNumberConverterHandler.class)
+    @ConvertibleField(converter = BooleanToNumberConverterHandler.class)
     @ConvertibleField(converter = NumberToBigDecimalConverterHandler.class, nameTo = "sexy")
     private Boolean sex;
 }
