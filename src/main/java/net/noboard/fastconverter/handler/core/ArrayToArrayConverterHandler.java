@@ -5,7 +5,6 @@ import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 
 import java.lang.reflect.Array;
-import java.text.MessageFormat;
 
 /**
  * 数组到数组转换器
@@ -24,35 +23,22 @@ public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHan
 
     @Override
     protected Object converting(Object value, String tip) throws ConvertException {
-        Converter converter = null;
-        Object newArray = null, newV = null, oldV = null;
-        try {
-            for (int index = 0; index < Array.getLength(value); index++) {
-                oldV = Array.get(value, index);
-                newV = oldV;
-                converter = this.filter(newV);
-                if (converter != null) {
-                    newV = Converter.isTipHasMessage(tip) ? converter.convert(newV, tip) : converter.convert(newV);
-                }
-                if (newArray == null && newV != null) {
-                    newArray = Array.newInstance(newV.getClass(), Array.getLength(value));
-                }
-                if (newArray != null) {
-                    Array.set(newArray, index, newV);
-                }
-            }
-        } catch (Exception e) {
-            throw new ConvertException(
-                    MessageFormat.format(
-                            "旧容器类型：{0}，旧元素类型：{1}，新容器类型：{2}，新元素类型：{3}，转换器类型：{4}，",
-                            value.getClass().getName(),
-                            oldV == null ? "null" : oldV.getClass().getName(),
-                            newArray == null ? "null" : newArray.getClass().getName(),
-                            newV == null ? "null" : newV.getClass().getName(),
-                            converter == null ? "null" : converter.getClass().getName()),
-                    e);
-        }
+        Converter converter;
+        Object newArray = null, newV;
 
+        for (int index = 0; index < Array.getLength(value); index++) {
+            newV = Array.get(value, index);
+            converter = this.filter(newV);
+            if (converter != null) {
+                newV = Converter.isTipHasMessage(tip) ? converter.convert(newV, tip) : converter.convert(newV);
+            }
+            if (newArray == null && newV != null) {
+                newArray = Array.newInstance(newV.getClass(), Array.getLength(value));
+            }
+            if (newArray != null) {
+                Array.set(newArray, index, newV);
+            }
+        }
 
         return newArray;
     }

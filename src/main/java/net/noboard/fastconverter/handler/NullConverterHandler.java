@@ -1,5 +1,6 @@
 package net.noboard.fastconverter.handler;
 
+import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
 
 /**
@@ -34,7 +35,7 @@ public class NullConverterHandler extends AbstractConverterHandler<Object, Strin
         } else if ("2".equals(tip)) {
             return null;
         } else {
-            return null;
+            throw new ConvertException(String.format("not support value of tip '%s' of NullConverterHandler", tip));
         }
     }
 

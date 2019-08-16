@@ -4,16 +4,16 @@ import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 
 /**
  * Collection转换器
  * <p>
  * 该转换器将根据原Collection的实际类型生成一个新的相同类型的实例。并使用ConverterFilter中注册的转换器对
  * 原容器中的元素一一进行转换，转换结果推入新容器中。如果ConverterFilter没有筛选出转换器，则推入原数据。
+ *
+ * 新容器生成失败时，将把新容器降级为ArrayList，并输出警告信息
  */
 public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<Collection<T>, Collection<K>> {
 
@@ -32,31 +32,18 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
                     value.getClass().getName(), collection.getClass()));
         }
 
-        Converter converter = null;
-        Object newV = null,oldV = null;
-        try {
-            for (T obj : value) {
-                converter = this.filter(obj);
-                oldV = obj;
-                if (converter == null) {
-                    newV = oldV;
-                } else if (Converter.isTipHasMessage(tip)) {
-                    newV = converter.convert(oldV, tip);
-                } else {
-                    newV = converter.convert(oldV);
-                }
-                collection.add((K) newV);
+        Converter converter;
+        Object newV;
+        for (T obj : value) {
+            converter = this.filter(obj);
+            if (converter == null) {
+                newV = obj;
+            } else if (Converter.isTipHasMessage(tip)) {
+                newV = converter.convert(obj, tip);
+            } else {
+                newV = converter.convert(obj);
             }
-        } catch (ConvertException e) {
-            throw new ConvertException(
-                    MessageFormat.format(
-                            "旧容器类型：{0}，旧元素类型：{1}，新容器类型：{2}，新元素类型：{3}，转换器类型：{4}，",
-                            value.getClass().getName(),
-                            oldV == null ? "null" : oldV.getClass().getName(),
-                            collection == null ? "null" : collection.getClass().getName(),
-                            newV == null ? "null" : newV.getClass().getName(),
-                            converter == null ? "null" : converter.getClass().getName()),
-                    e);
+            collection.add((K) newV);
         }
 
 

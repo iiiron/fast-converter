@@ -3,7 +3,10 @@ package net.noboard.fastconverter.handler;
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class InputStreamToStringConverterHandler extends AbstractConverterHandler<InputStream, String> {
 
