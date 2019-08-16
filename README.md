@@ -182,7 +182,7 @@ public class Son {
 
 - Class<? extends Converter> converter()
 
-  标识此处使用某个特定的转换器进行数据转换，如果没有设置此属性，则使用持有的ConverterFilter实例中注册的转换器对字段进行转换。
+  标识此处使用某个特定的转换器进行数据转换，如果没有设置此属性，则使用持有的ConverterFilter实例中注册的转换器对字段进行转换。任何实现了net.noboard.fastconverter.Converter接口的类都可成为该属性的值（注意要提供无参构造函数），为了方便实现该接口，FastConverter提供了AbstractConverterHandler抽象类，推荐大家通过继承该抽象类来实现自己的转换器。
 
 - boolean abandon()
 
@@ -239,7 +239,7 @@ FastConverter.customDefaultConverters()
 
 通过上例，我们向FastConverter添加了一个默认行为，该行为就是“将java.util.Date对象转换为时间戳字符串”。你可以预想一下会发生什么。
 
-在没有添加这个默认转换器之前，当FastConverter遇到一个Date对象，它不是Collection，Map的子类，也不是数组，也没有被@ConvertibleBean标注，所以它会在转换过程中被原封不动的保留到转换结果中去。而现在，当FastConverter遇到Date对象时，它将会被转换为一个时间戳字符串。当然，如果它是某个POJO的字段，那么默认转换行为会被@ConvertibleField中指定的转换器替代。
+在没有添加这个默认转换器之前，当FastConverter遇到一个Date对象，它不是Collection，Map的子类，也不是数组，也没有被@ConvertibleBean标注，所以它会在转换过程中被原封不动的保留到转换结果中去。而现在，当FastConverter遇到Date对象时，它将会被转换为一个时间戳字符串。当然，如果它是某个POJO的字段，那么默认转换行为会被@ConvertibleField中指定的转换器替代（如果指定了的话）。
 
 ```java
 List<Date> dates = new ArrayList<>();
@@ -307,6 +307,8 @@ public class BeanA {
 
 也许看这里的用例比较难懂，如果无法理解，那就去项目的test目录下转一转吧！
 
+最后！很重要的，FastConverter入口类使用静态类变量来存储各种ConverterFilter，它应该在程序启动的时候进行自定制化，而在程序的运行过程中不应该再对其进行定制（或许在未来我会加入临时定制的机制，但在4.0.0版本，它还不具备这样的能力）。
+
 # Bean 转换器的自定制
 
 **一般来说，理解前文的阐述，就可以在几乎所有场景下使用FastConverter了，如果你的需求已经满足，无需更深层次的自定制，则此后的内容，无须理会。**
@@ -350,7 +352,7 @@ public interface BeanConverterFilter {
 
 还记得前文提到的4个核心转换器中的ConvertibleBeanConverterHandler吗？我介绍了它的使用，和它支撑的两个注解@ConvertibleBean和@ConvertibleFiled，但这两个注解都不是它直接提供支撑的，提供支撑的是BeanToBeanConverter和BeanToMapConverter（目前来说是这两个）。
 
-再具体来说，也不是BeanToBeanConverter和BeanToMapConverter提供支撑，而是它们的父类AbstractBeanConverter提供的，所以接下来我就来说一说，AbstractBeanConverter是如何支撑两个注解的运作的，以及你可以如何扩展，如何自定制自己的AbstractBeanConverter子类。
+再具体来说，也不是BeanToBeanConverter和BeanToMapConverter提供支撑，而是它们的父类AbstractBeanConverter提供的，所以接下来我说一说，AbstractBeanConverter是如何支撑两个注解的运作的，以及你可以如何扩展，如何自定制自己的AbstractBeanConverter子类。
 
 ### AbstractBeanConverter
 
@@ -441,7 +443,7 @@ public interface ConvertibleMap {
 }
 ```
 
-如你所见，它提供了一系列信息来指导转换过程，而且，它是一个链表，这意味着不同的转换过程可以串联起来。我已经提供了工具类ConvertibleAnnotatedUtils来完成这个解析的任务，在AbstractBeanConverter#parse中有如下这段代码：
+如你所见，它提供了一系列信息来指导转换过程，而且，它是一个链表，这意味着转换过程可以串联起来。我已经提供了工具类ConvertibleAnnotatedUtils来完成这个解析的任务，在AbstractBeanConverter#parse中有如下这段代码：
 
 ```java
 public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K> {
@@ -458,10 +460,15 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
 }
 ```
 
-这样，我们就根据ConvertibleFieldParser的逻辑将字段上@ConvertibleField注解的信息解析成了一个用于指导转换过程的ConvertibleMap。（这意味着，你可以编写自己的注解，自己的注解解析器，而它们可以和现有的系统契合，而不需要做更多额外的工作）
+这样，我们就根据ConvertibleFieldParser的逻辑将字段上@ConvertibleField注解的信息解析成一个用于指导转换过程的ConvertibleMap。（这意味着，你可以编写自己的注解，自己的注解解析器，而它们可以和现有的系统契合，而不需要做更多额外的工作）
 
-介绍这些是因为，如果你重写AbstractBeanConverter#parse方法，你需要知道这些内部的知识。当你重写时，自然你可以不遵循ConvertibleMap这种方式，但如果你不遵循，则你实现的AbstractBeanConverter子类将可能和其他任何该类的子类无法兼容，则你的Bean转换器将和你的一整套逻辑紧紧的绑定在一起。故推荐使用这种方式。
+介绍这些是因为，如果你重写AbstractBeanConverter#parse方法，你需要知道这些内部的知识。当你重写时，自然你可以不遵循ConvertibleMap这种模式，但如果你不遵循，则你实现的AbstractBeanConverter子类将可能和其他任何该类的子类无法兼容，则你的Bean转换器将和你的一整套逻辑紧紧的绑定在一起。故推荐使用这种方式。
 
 ### 如何将自定制的Bean转换器添加到FastConverter中去
 
-待续
+FastConverter入口类提供了FastConverter#customBeanConverters方法将你自己的Bean转换器添加到ConvertibleBeanConverterHandler中去，则一切被@ConvertibleBean标注的POJO，在被转换的时候就会考虑到你的自定义实现，如果你的supports成立，POJO就会被交给你的转换器去完成转换工作。
+
+
+
+欢迎PR，以及我的邮箱[1062495630@qq.com]，欢迎交流。
+
