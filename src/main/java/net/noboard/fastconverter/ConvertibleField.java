@@ -7,7 +7,7 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.TYPE})
 @ImportParser(clazz = ConvertibleFieldParser.class)
 @Repeatable(ConvertibleFields.class)
 @Convertible
