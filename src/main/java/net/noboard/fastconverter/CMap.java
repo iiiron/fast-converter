@@ -2,6 +2,8 @@ package net.noboard.fastconverter;
 
 import net.noboard.fastconverter.parser.ConvertibleMap;
 
+import javax.validation.constraints.NotNull;
+
 public class CMap implements ConvertibleMap {
 
     private String tip;
@@ -81,7 +83,7 @@ public class CMap implements ConvertibleMap {
     }
 
     @Override
-    public ConvertibleMap next() {
+    public @NotNull ConvertibleMap next() {
         return this.next;
     }
 

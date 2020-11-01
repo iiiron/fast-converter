@@ -32,9 +32,10 @@ public class ConvertibleAnnotatedUtils {
         }
 
         if (convertibleBean == null) {
-            throw new ConvertException(String.format("no @ConvertibleBean annotation agree with group '%s', on bean %s",
-                    group,
-                    beanClass.toString()));
+//            throw new ConvertException(String.format("no @ConvertibleBean annotation agree with group '%s', on bean %s",
+//                    group,
+//                    beanClass.toString()));
+            return null;
         }
         if (convertibleBean.targetClass() == Void.class && "".equals(convertibleBean.targetName())) {
             throw new ConvertException(String.format("you have to declare target of convert on @ConvertibleBean use 'targetName' or 'targetClass' at %s", beanClass.toString()));
@@ -47,6 +48,19 @@ public class ConvertibleAnnotatedUtils {
 
         return convertibleBean;
     }
+
+    public static Class<?> getTargetClass(ConvertibleBean convertibleBean) {
+        try {
+            if (convertibleBean.targetClass() != Void.class) {
+                return convertibleBean.targetClass();
+            } else {
+                return Class.forName(convertibleBean.targetName());
+            }
+        } catch (ClassNotFoundException e) {
+            throw new ConvertException(String.format("", ""), e);
+        }
+    }
+
 
     /**
      * 根据分组过滤出Field上的@ConvertibleField注解数据，以注解申明顺序排序

@@ -2,6 +2,8 @@ package net.noboard.fastconverter.parser;
 
 import net.noboard.fastconverter.Converter;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * tip：用于转换的tip
  * converter：转换器
@@ -31,5 +33,6 @@ public interface ConvertibleMap {
 
     boolean hasNext();
 
+    @NotNull
     ConvertibleMap next();
 }

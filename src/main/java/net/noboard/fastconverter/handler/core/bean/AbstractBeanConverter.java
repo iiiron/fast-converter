@@ -1,11 +1,10 @@
 package net.noboard.fastconverter.handler.core.bean;
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
+import javax.validation.constraints.NotNull;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -33,57 +32,43 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return this.converterFilter;
     }
 
-    protected Map<String, Object> parse(Object from, String group) {
-        BeanInfo beanF;
+
+    @Override
+    public Object convert(Object from, String group) throws ConvertException {
+        Object targetObj;
         try {
-            beanF = Introspector.getBeanInfo(from.getClass());
+            targetObj = BeanMapping.current().getTarget().newInstance();
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new ConvertException(
+                    String.format("the target class %s can not be implemented",
+                            BeanMapping.current().getTarget()), e);
+        }
+
+        Map<String, Object> map = parse(from, group);
+
+        try {
+            for (PropertyDescriptor targetPD : Introspector.getBeanInfo(targetObj.getClass()).getPropertyDescriptors()) {
+                if ("class".equals(targetPD.getName())) {
+                    continue;
+                }
+                try {
+                    targetPD.getWriteMethod().invoke(targetObj, map.get(targetPD.getName()));
+                } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+                    throw new ConvertException(
+                            String.format("Conversion result type mismatch. at field '%s' of target class %s", targetPD.getName(), targetObj.getClass().getName()));
+                }
+            }
         } catch (IntrospectionException e) {
             throw new ConvertException(e);
         }
 
-        Map<String, Object> result = new HashMap<>();
-        for (PropertyDescriptor fD : beanF.getPropertyDescriptors()) {
-            if ("class".equals(fD.getName())) {
-                continue;
-            }
-
-            Field field;
-            try {
-                field = from.getClass().getDeclaredField(fD.getName());
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-                throw new ConvertException(String.format("field named '%s' not exist in %s",
-                        fD.getName(),
-                        from.getClass().getName()));
-            }
-
-
-            ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group);
-            ConvertibleMap last = lastConvertibleField(currentMap);
-            String nameTo = fD.getName();
-            if (last != null) {
-                if (last.isAbandon()) {
-                    continue;
-                }
-                if (last.getNameTo() != null && !"".equals(last.getNameTo())) {
-                    nameTo = last.getNameTo();
-                }
-            }
-
-            try {
-                result.put(nameTo, getConvertedValue(fD.getReadMethod().invoke(from), currentMap));
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new ConvertException(e);
-            }
-        }
-
-        return result;
+        return targetObj;
     }
 
-    private ConvertibleMap lastConvertibleField(ConvertibleMap convertibleMap) {
-        if (convertibleMap == null) {
-            return null;
-        }
+    abstract protected Map<String, Object> parse(Object source, String group);
+
+    @NotNull
+    protected ConvertibleMap lastConvertibleField(@NotNull ConvertibleMap convertibleMap) {
         ConvertibleMap currentMap = convertibleMap;
         while (currentMap.hasNext()) {
             currentMap = currentMap.next();
@@ -91,7 +76,7 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return currentMap;
     }
 
-    private Object getConvertedValue(Object value, ConvertibleMap currentMap) {
+    protected Object getConvertedValue(Object value, ConvertibleMap currentMap) {
         while (true) {
             if (value != null || !currentMap.isRetainNull()) {
                 Converter converter = currentMap.getConverter();

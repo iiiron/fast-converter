@@ -4,17 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import net.noboard.fastconverter.ConvertibleBean;
+import net.noboard.fastconverter.ConvertibleBeanType;
 import net.noboard.fastconverter.ConvertibleField;
-import net.noboard.fastconverter.handler.BooleanToStringConverterHandler;
-import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
 import net.noboard.fastconverter.handler.NumberToBigDecimalConverterHandler;
 
 import java.util.Date;
 
-@ConvertibleBean(targetClass = Woman.class)
 @Getter
 @Setter
 @ToString
+@ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = Woman.class)
 public class Man {
 
     @DateFormat

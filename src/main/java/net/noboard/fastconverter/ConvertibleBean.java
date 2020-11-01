@@ -18,6 +18,7 @@ public @interface ConvertibleBean {
 
     String targetName() default "";
 
-    Class targetClass() default Void.class;
+    Class<?> targetClass() default Void.class;
 
+    ConvertibleBeanType type() default ConvertibleBeanType.TARGET;
 }

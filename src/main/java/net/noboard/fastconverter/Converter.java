@@ -10,10 +10,8 @@ public interface Converter<T, K> {
     String DEFAULT_TIP = "";
 
     static boolean isTipHasMessage(String tip) {
-        return !Converter.DEFAULT_TIP.equals(tip) && tip != null;
+        return tip != null && !Converter.DEFAULT_TIP.equals(tip);
     }
-
-
 
     K convert(T value, String tip) throws ConvertException;
 
