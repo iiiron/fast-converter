@@ -36,11 +36,11 @@ public class FastConverter {
 
     }
 
-    public static Object autoConvert(Object bean) {
+    public static <T> T autoConvert(Object bean) {
         return autoConvert(bean, Converter.DEFAULT_GROUP);
     }
 
-    public static Object autoConvert(Object source, Class<?> target, String group) {
+    public static <T> T autoConvert(Object source, Class<T> target, String group) {
         if (source == null) {
             return null;
         }
@@ -50,6 +50,10 @@ public class FastConverter {
         } finally {
             BeanMapping.clear();
         }
+    }
+
+    public static <T> T autoConvert(Object source, Class<T> target) {
+        return autoConvert(source, target, Converter.DEFAULT_GROUP);
     }
 
     private static <T> T doConvert(Object bean, String group) {
