@@ -26,12 +26,6 @@ public abstract class AbstractConverterFilter implements ConverterFilter {
 
     protected abstract void initConverters(List<Converter> converters);
 
-    protected void addContainerConverter(List<Converter> converters) {
-        converters.add(new CollectionToCollectionConverterHandler<>(this));
-        converters.add(new MapToMapConverterHandler<>(this));
-        converters.add(new ArrayToArrayConverterHandler(this));
-    }
-
     @Override
     public Converter filter(Object value) {
         for (Converter converter : converters) {

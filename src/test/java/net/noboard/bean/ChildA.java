@@ -7,13 +7,29 @@ import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
 
 import java.util.Date;
 
+/**
+ * autoConvert(childB, ChildA.class);
+ * autoConvert(childA)
+ *
+ * 源是A
+ * - sourceConverter=用A的注解转换出B
+ * - targetConverter=用B的注解转换出B
+ *
+ * group = default, base = ChildA , target = ChildB
+ * group = default, base = ChildA , target = ChildC
+ *
+ * group = default, base = ChildB , target = ChildA
+ *
+ * group = default, source = ChildA , target = ChildB
+ *
+ * group = default, source = ChildA , target = ChildC
+ *
+ */
 @Data
 @ConvertibleBean(targetClass = ChildB.class)
-@ConvertibleBean(targetClass = ChildC.class, group = "toChildC")
 public class ChildA {
     private String name;
 
-    @ConvertibleField(group = "toChildC")
     @ConvertibleField(converter = DateToFormatStringConverterHandler.class, tip = "yyyy-MM-dd HH:mm:ss", nameTo = "birthday")
     private Date birthday;
 }

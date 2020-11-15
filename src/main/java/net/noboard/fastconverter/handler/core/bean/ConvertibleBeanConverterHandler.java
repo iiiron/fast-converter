@@ -8,30 +8,17 @@ import java.util.List;
 
 public class ConvertibleBeanConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
 
-    private BeanConverterFilter beanConverterFilter;
+    private final BeanConverterFilter beanConverterFilter;
 
     public ConvertibleBeanConverterHandler(ConverterFilter converterFilter) {
-        this(converterFilter, Converter.DEFAULT_GROUP);
+        super(converterFilter, Converter.DEFAULT_GROUP);
         this.beanConverterFilter = new AbstractBeanConverterFilter(converterFilter) {
             @Override
             protected void initConverters(List<BeanConverter> converters) {
-//                converters.add(new BeanToMapConverter(defaultConverters));
-                converters.add(new SourceBaseBeanConverter(this.converterFilter));
+//                converters.add(new SourceBaseBeanConverter(this.converterFilter));
                 converters.add(new TargetBaseBeanConverter(this.converterFilter));
             }
         };
-    }
-
-    public ConvertibleBeanConverterHandler(ConverterFilter converterFilter, String group) {
-        super(converterFilter, group);
-    }
-
-    public Object convert(Object value, Class clazz) {
-        return this.convert(value, clazz.getName());
-    }
-
-    public BeanConverterFilter getBeanConverterFilter() {
-        return beanConverterFilter;
     }
 
     @Override

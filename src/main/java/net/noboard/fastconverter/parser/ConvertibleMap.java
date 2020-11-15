@@ -35,4 +35,25 @@ public interface ConvertibleMap {
 
     @NotNull
     ConvertibleMap next();
+
+    static boolean hasConverter(ConvertibleMap cMap) {
+        ConvertibleMap current = cMap;
+        while (true) {
+            if (current == null) {
+                return false;
+            }
+            if (current.getConverter() != null) {
+                return true;
+            }
+            current = current.next();
+        }
+    }
+
+    static ConvertibleMap last(@NotNull ConvertibleMap cMap) {
+        ConvertibleMap currentMap = cMap;
+        while (currentMap.hasNext()) {
+            currentMap = currentMap.next();
+        }
+        return currentMap;
+    }
 }

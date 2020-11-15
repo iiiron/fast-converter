@@ -1,12 +1,24 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.filter.CommonConverterFilter;
+import net.noboard.fastconverter.filter.AbstractConverterFilter;
+import net.noboard.fastconverter.handler.core.ArrayToArrayConverterHandler;
+import net.noboard.fastconverter.handler.core.CollectionToCollectionConverterHandler;
+import net.noboard.fastconverter.handler.core.MapToMapConverterHandler;
 import net.noboard.fastconverter.handler.core.bean.*;
 import net.noboard.fastconverter.handler.core.CommonFilterBaseConverterHandler;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.support.ConvertibleBeanCache;
+import net.noboard.fastconverter.support.TypeProbeUtil;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class FastConverter {
 
@@ -14,9 +26,18 @@ public class FastConverter {
 
     private static final Converter enterConverter;
 
+    private static final List<Class<?>> parsedBean = new ArrayList<>();
+
     static {
-        defaultConverters = new CommonConverterFilter();
-        defaultConverters.addLast(new ConvertibleBeanConverterHandler(defaultConverters));
+        defaultConverters = new AbstractConverterFilter() {
+            @Override
+            protected void initConverters(List<Converter> converters) {
+                converters.add(new CollectionToCollectionConverterHandler<>(this));
+                converters.add(new MapToMapConverterHandler<>(this));
+                converters.add(new ArrayToArrayConverterHandler(this));
+                converters.add(new ConvertibleBeanConverterHandler(this));
+            }
+        };
         enterConverter = new CommonFilterBaseConverterHandler<>(defaultConverters);
     }
 
@@ -24,16 +45,8 @@ public class FastConverter {
         if (bean == null) {
             return null;
         }
-        ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(bean.getClass(), group);
-        if (convertibleBean != null && convertibleBean.type() == ConvertibleBeanType.SOURCE) {
-            BeanMapping.push(bean.getClass(), ConvertibleAnnotatedUtils.getTargetClass(convertibleBean));
-        }
-        try {
-            return (T) doConvert(bean, group);
-        } finally {
-            BeanMapping.clear();
-        }
-
+        parseBean(bean.getClass());
+        return (T) doConvert(bean, group);
     }
 
     public static <T> T autoConvert(Object bean) {
@@ -44,12 +57,8 @@ public class FastConverter {
         if (source == null) {
             return null;
         }
-        BeanMapping.push(source.getClass(), target);
-        try {
-            return autoConvert(source, group);
-        } finally {
-            BeanMapping.clear();
-        }
+        parseBean(target);
+        return autoConvert(source, group);
     }
 
     public static <T> T autoConvert(Object source, Class<T> target) {
@@ -64,5 +73,36 @@ public class FastConverter {
     // todo wanxm
     public static ConverterFilter customDefaultConverters() {
         return defaultConverters;
+    }
+
+    private static void parseBean(Class<?> clazz) {
+        if (parsedBean.contains(clazz)) {
+            return;
+        }
+        parsedBean.add(clazz);
+
+        Set<ConvertibleBean> set = ConvertibleBeanCache.get(clazz);
+        for (ConvertibleBean o : set) {
+            try {
+                TargetBeanMapping.push(o.group(), clazz, o.targetClass().equals(Void.class) ? Class.forName(o.targetName()) : o.targetClass());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
+            for (PropertyDescriptor anchorPD : beanInfo.getPropertyDescriptors()) {
+                try {
+                    Field field = clazz.getDeclaredField(anchorPD.getName());
+                    Class<?> fieldType = TypeProbeUtil.find(field);
+                    parseBean(fieldType);
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
+        }
     }
 }
