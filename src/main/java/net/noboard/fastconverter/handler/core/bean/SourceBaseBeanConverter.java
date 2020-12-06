@@ -106,15 +106,7 @@ public class SourceBaseBeanConverter extends AbstractBeanConverter<Object, Objec
             return false;
         }
         Class<?> clazz = value.getClass();
-        BeanMapping beanMapping = BeanMapping.current();
-        if (beanMapping.getSource() != clazz) {
-            return false;
-        }
         ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(clazz, group);
-        if (convertibleBean != null && convertibleBean.type() == ConvertibleBeanType.SOURCE) {
-            return beanMapping.getTarget() == ConvertibleAnnotatedUtils.getTargetClass(convertibleBean);
-        }
-
-        return false;
+        return convertibleBean != null;
     }
 }

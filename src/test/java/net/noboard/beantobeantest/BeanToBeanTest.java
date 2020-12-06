@@ -16,8 +16,8 @@ public class BeanToBeanTest {
         HumanA humanA = init();
         List<HumanA> list = new LinkedList<>();
         list.add(humanA);
-        Object o = FastConverter.autoConvert(list);
-        System.out.println(o);
+//        Object o = FastConverter.autoConvert(list);
+//        System.out.println(o);
     }
 
     public static HumanA init() {

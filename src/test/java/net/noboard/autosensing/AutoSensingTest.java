@@ -1,6 +1,7 @@
 package net.noboard.autosensing;
 
 import lombok.extern.slf4j.Slf4j;
+import net.noboard.fastconverter.FastConverter;
 import net.noboard.fastconverter.handler.AutoSensingConverter;
 import org.junit.Test;
 
@@ -14,6 +15,13 @@ public class AutoSensingTest {
 
         obj = autoSensingConverter.convert(Human.LADY, String.class.getName());
         System.out.println(obj);
+    }
+
+    @Test
+    public void test2() {
+        Object obj = FastConverter.autoConvert(BeanA.builder().human("MAN").name("wanxm").build(), BeanB.class);
+        System.out.println(obj);
+
     }
 
 }

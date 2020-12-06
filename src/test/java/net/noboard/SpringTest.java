@@ -21,8 +21,8 @@ public class SpringTest {
     public void c() {
         ChildA childA = new ChildA();
         childA.setName("wanxm");
-        Object o = FastConverter.autoConvert(childA);
-        System.out.println(o);
+//        Object o = FastConverter.autoConvert(childA);
+//        System.out.println(o);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class SpringTest {
         List<List<ChildA>> lists = new ArrayList<>();
         lists.add(list);
         m.setChild(lists);
-        Object o = FastConverter.autoConvert(m,"b");
-        System.out.println(o);
+//        Object o = FastConverter.autoConvert(m,"b");
+//        System.out.println(o);
     }
 }

@@ -41,24 +41,29 @@ public class FastConverter {
         enterConverter = new CommonFilterBaseConverterHandler<>(defaultConverters);
     }
 
-    public static <T> T autoConvert(Object bean, String group) {
-        if (bean == null) {
-            return null;
-        }
-        parseBean(bean.getClass());
-        return (T) doConvert(bean, group);
-    }
+//    public static <T> T autoConvert(Object bean, String group) {
+//        if (bean == null) {
+//            return null;
+//        }
+//        parseBean(bean.getClass());
+//        return (T) doConvert(bean, group);
+//    }
 
-    public static <T> T autoConvert(Object bean) {
-        return autoConvert(bean, Converter.DEFAULT_GROUP);
-    }
+//    public static <T> T autoConvert(Object bean) {
+//        return autoConvert(bean, Converter.DEFAULT_GROUP);
+//    }
 
     public static <T> T autoConvert(Object source, Class<T> target, String group) {
         if (source == null) {
             return null;
         }
-        parseBean(target);
-        return autoConvert(source, group);
+
+        try {
+            BeanMapping.push(source.getClass(), target);
+            return doConvert(source, group);
+        } finally {
+            BeanMapping.clear();
+        }
     }
 
     public static <T> T autoConvert(Object source, Class<T> target) {

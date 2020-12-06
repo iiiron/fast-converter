@@ -13,8 +13,8 @@ public class Test {
         List<BeanA> list = init();
         FastConverter.customDefaultConverters()
                 .addFirst(new DateToTimeStampStringConverterHandler());
-        Object o = SpeedCheck.check(a -> FastConverter.autoConvert(list));
-        System.out.println("a");
+//        Object o = SpeedCheck.check(a -> FastConverter.autoConvert(list));
+//        System.out.println("a");
 //        SpeedCheck.check(a -> FastConverter.autoConvert(list));
 //        SpeedCheck.check(a -> FastConverter.autoConvert(list));
 //        SpeedCheck.check(a -> FastConverter.autoConvert(list));

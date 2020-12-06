@@ -33,6 +33,10 @@ public interface ConvertibleMap {
 
     boolean hasNext();
 
+    void setCollectionElementClass(Class<?> clazz);
+
+    Class<?> getCollectionElementClass();
+
     @NotNull
     ConvertibleMap next();
 

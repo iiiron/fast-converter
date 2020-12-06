@@ -30,7 +30,7 @@ public class TargetBaseBeanConverter extends AbstractBeanConverter<Object, Objec
     }
 
     protected Map<String, Object> parse(Object source, String group) {
-        Class<?> target = BeanMapping.pop().getTarget();
+        Class<?> target = BeanMapping.current().getTarget();
 
         BeanInfo anchorBeanInfo;
         BeanInfo sourceBeanInfo;
@@ -78,35 +78,15 @@ public class TargetBaseBeanConverter extends AbstractBeanConverter<Object, Objec
 
             // 如果字段上没有指定转换器
             if (!ConvertibleMap.hasConverter(currentMap)) {
-
-                // 检查当前字段类型是否标注了目标，有的话给上下文推一组映射
-                Class<?> fieldType = TypeProbeUtil.find(field);
-                ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(fieldType,
-                        Converter.isTipHasMessage(last.getTip()) ? last.getTip() : Converter.DEFAULT_GROUP);
-                if (convertibleBean != null && convertibleBean.type() == ConvertibleBeanType.TARGET) {
-                    try {
-                        // 问题出在，这里push进去了，你怎么知道在pop的时候，程序就是在处理当前这个字段？
-                        BeanMapping.push(
-                                convertibleBean.targetClass() == Void.class
-                                        ? Class.forName(convertibleBean.targetName())
-                                        : convertibleBean.targetClass(), fieldType);
-                        try {
-                            result.put(anchorPD.getName(), getConvertedValue(sourceValue, currentMap));
-                        } finally {
-                            BeanMapping.pop();
-                        }
-                    } catch (ClassNotFoundException e) {
-                        throw new ConvertException(String.format("", ""), e);
-                    }
-                } else if (autoSensingConverter.supports(sourceValue)) {
+                if (autoSensingConverter.supports(sourceValue)) {
                     // 当前目标没有标注ConvertibleBean，尝试进行转换
-                    Object targetValue = autoSensingConverter.convert(sourceValue, field.getDeclaringClass().getName());
+                    Object targetValue = autoSensingConverter.convert(sourceValue, field.getType().getName());
                     if (targetValue != null) {
                         result.put(anchorPD.getName(), targetValue);
+                        continue;
                     }
-                } else {
-                    result.put(anchorPD.getName(), getConvertedValue(sourceValue, currentMap));
                 }
+                result.put(anchorPD.getName(), getConvertedValue(sourceValue, currentMap));
             } else {
                 // 字段上指定了转换器，则用指定的转换器来处理数据
                 result.put(anchorPD.getName(), getConvertedValue(sourceValue, currentMap));
@@ -122,21 +102,11 @@ public class TargetBaseBeanConverter extends AbstractBeanConverter<Object, Objec
             return false;
         }
 
-        Class clazz = TargetBeanMapping.getTarget(group, value.getClass());
-        if (clazz != null) {
-            return true;
-        }
-
         BeanMapping beanMapping = BeanMapping.current();
-        Class<?> clazz = beanMapping.getTarget();
-        if (beanMapping.getSource() != value.getClass()) {
+        if (beanMapping == null || beanMapping.getSource() == null) {
             return false;
         }
-        ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(clazz, group);
-        if (convertibleBean != null && convertibleBean.type() == ConvertibleBeanType.TARGET) {
-            return beanMapping.getSource() == ConvertibleAnnotatedUtils.getTargetClass(convertibleBean);
-        }
 
-        return false;
+        return beanMapping.getSource() == value.getClass();
     }
 }

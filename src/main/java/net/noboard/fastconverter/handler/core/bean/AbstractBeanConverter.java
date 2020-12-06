@@ -79,6 +79,10 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
     protected Object getConvertedValue(Object value, ConvertibleMap currentMap) {
         while (true) {
             if (value != null || !currentMap.isRetainNull()) {
+                if (value != null && currentMap.getCollectionElementClass() != Void.class) {
+                    BeanMapping.push(value.getClass(), currentMap.getCollectionElementClass());
+                }
+
                 Converter converter = currentMap.getConverter();
                 if (converter == null) {
                     converter = this.converterFilter.filter(value);
@@ -91,6 +95,8 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
                         value = converter.convert(value);
                     }
                 }
+
+                BeanMapping.pop();
             }
 
             if (currentMap.hasNext()) {

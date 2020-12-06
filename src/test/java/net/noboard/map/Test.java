@@ -11,7 +11,7 @@ public class Test {
         Map<Class, Object> map = new HashMap<>();
         map.put(Integer.class, Integer.valueOf(1));
         map.put(String.class, "2");
-        Object o = FastConverter.autoConvert(map);
-        System.out.println(o);
+//        Object o = FastConverter.autoConvert(map);
+//        System.out.println(o);
     }
 }
