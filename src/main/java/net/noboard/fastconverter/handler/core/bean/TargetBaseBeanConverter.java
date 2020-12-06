@@ -4,7 +4,6 @@ import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.handler.AutoSensingConverter;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
-import net.noboard.fastconverter.support.TypeProbeUtil;
 import org.springframework.util.StringUtils;
 
 import java.beans.*;
@@ -29,9 +28,7 @@ public class TargetBaseBeanConverter extends AbstractBeanConverter<Object, Objec
         super(converterFilter);
     }
 
-    protected Map<String, Object> parse(Object source, String group) {
-        Class<?> target = BeanMapping.current().getTarget();
-
+    protected Map<String, Object> parse(Object source, String group, Class<?> target) {
         BeanInfo anchorBeanInfo;
         BeanInfo sourceBeanInfo;
         try {
@@ -86,10 +83,10 @@ public class TargetBaseBeanConverter extends AbstractBeanConverter<Object, Objec
                         continue;
                     }
                 }
-                result.put(anchorPD.getName(), getConvertedValue(sourceValue, currentMap));
+                result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
             } else {
                 // 字段上指定了转换器，则用指定的转换器来处理数据
-                result.put(anchorPD.getName(), getConvertedValue(sourceValue, currentMap));
+                result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
             }
         }
 

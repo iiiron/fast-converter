@@ -14,7 +14,7 @@ public class Test {
         man.setSex(true);
         man.setName("万相明");
 
-//        Woman woman = (Woman) FastConverter.autoConvert(man);
-//        System.out.println(woman);
+        Woman woman = (Woman) FastConverter.autoConvert(man);
+        System.out.println(woman);
     }
 }

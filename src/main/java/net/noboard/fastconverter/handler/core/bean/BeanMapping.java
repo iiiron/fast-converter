@@ -2,6 +2,7 @@ package net.noboard.fastconverter.handler.core.bean;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
 import java.util.LinkedList;
 
@@ -22,11 +23,19 @@ public class BeanMapping {
     }
 
     public static BeanMapping current(){
-        return sourceClass.get().getLast();
+        if (hasMapping()) {
+            return sourceClass.get().getLast();
+        } else {
+            return null;
+        }
     }
 
     public static BeanMapping pop(){
         return sourceClass.get().removeLast();
+    }
+
+    public static boolean hasMapping() {
+        return !CollectionUtils.isEmpty(sourceClass.get());
     }
 
     public static void clear(){

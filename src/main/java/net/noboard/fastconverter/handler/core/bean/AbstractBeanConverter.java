@@ -37,14 +37,19 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
     public Object convert(Object from, String group) throws ConvertException {
         Object targetObj;
         try {
-            targetObj = BeanMapping.current().getTarget().newInstance();
+            if (BeanMapping.hasMapping()) {
+                targetObj = BeanMapping.current().getTarget().newInstance();
+            } else {
+                ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(from.getClass(), group);
+                targetObj = ConvertibleAnnotatedUtils.getTargetClass(convertibleBean).newInstance();
+            }
         } catch (IllegalAccessException | InstantiationException e) {
             throw new ConvertException(
                     String.format("the target class %s can not be implemented",
                             BeanMapping.current().getTarget()), e);
         }
 
-        Map<String, Object> map = parse(from, group);
+        Map<String, Object> map = parse(from, group, targetObj.getClass());
 
         try {
             for (PropertyDescriptor targetPD : Introspector.getBeanInfo(targetObj.getClass()).getPropertyDescriptors()) {
@@ -65,7 +70,7 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return targetObj;
     }
 
-    abstract protected Map<String, Object> parse(Object source, String group);
+    abstract protected Map<String, Object> parse(Object source, String group, Class<?> target);
 
     @NotNull
     protected ConvertibleMap lastConvertibleField(@NotNull ConvertibleMap convertibleMap) {
@@ -76,27 +81,36 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return currentMap;
     }
 
-    protected Object getConvertedValue(Object value, ConvertibleMap currentMap) {
+    protected Object convertValue(Object value, ConvertibleMap currentMap) {
         while (true) {
             if (value != null || !currentMap.isRetainNull()) {
-                if (value != null && currentMap.getCollectionElementClass() != Void.class) {
+                boolean isPush = false;
+                if (value != null
+                        && currentMap.getCollectionElementClass() != null
+                        && currentMap.getCollectionElementClass() != Void.class
+                        && BeanMapping.hasMapping()) {
                     BeanMapping.push(value.getClass(), currentMap.getCollectionElementClass());
+                    isPush = true;
                 }
 
-                Converter converter = currentMap.getConverter();
-                if (converter == null) {
-                    converter = this.converterFilter.filter(value);
-                }
+                try {
+                    Converter converter = currentMap.getConverter();
+                    if (converter == null) {
+                        converter = this.converterFilter.filter(value);
+                    }
 
-                if (converter != null) {
-                    if (Converter.isTipHasMessage(currentMap.getTip())) {
-                        value = converter.convert(value, currentMap.getTip());
-                    } else {
-                        value = converter.convert(value);
+                    if (converter != null) {
+                        if (Converter.isTipHasMessage(currentMap.getTip())) {
+                            value = converter.convert(value, currentMap.getTip());
+                        } else {
+                            value = converter.convert(value);
+                        }
+                    }
+                } finally {
+                    if (isPush) {
+                        BeanMapping.pop();
                     }
                 }
-
-                BeanMapping.pop();
             }
 
             if (currentMap.hasNext()) {

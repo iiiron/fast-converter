@@ -20,6 +20,18 @@ public class CMap implements ConvertibleMap {
 
     private String nameTo;
 
+    private Class<?> collectionElementClass;
+
+    @Override
+    public Class<?> getCollectionElementClass() {
+        return collectionElementClass;
+    }
+
+    @Override
+    public void setCollectionElementClass(Class<?> collectionElementClass) {
+        this.collectionElementClass = collectionElementClass;
+    }
+
     @Override
     public String getNameTo() {
         return nameTo;

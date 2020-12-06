@@ -15,8 +15,8 @@ public class ConvertibleBeanConverterHandler extends AbstractFilterBaseConverter
         this.beanConverterFilter = new AbstractBeanConverterFilter(converterFilter) {
             @Override
             protected void initConverters(List<BeanConverter> converters) {
-//                converters.add(new SourceBaseBeanConverter(this.converterFilter));
                 converters.add(new TargetBaseBeanConverter(this.converterFilter));
+                converters.add(new SourceBaseBeanConverter(this.converterFilter));
             }
         };
     }
@@ -33,7 +33,7 @@ public class ConvertibleBeanConverterHandler extends AbstractFilterBaseConverter
         } else {
             return AnnotatedElementUtils.getMergedAnnotation(value.getClass(), ConvertibleBean.class) != null
                     || AnnotatedElementUtils.getMergedAnnotationAttributes(value.getClass(), ConvertibleBeans.class) != null
-                    || BeanMapping.current().getSource() == value.getClass();
+                    || (BeanMapping.hasMapping() && BeanMapping.current().getSource() == value.getClass());
         }
     }
 }

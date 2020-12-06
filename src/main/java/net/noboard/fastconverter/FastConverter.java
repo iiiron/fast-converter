@@ -41,17 +41,16 @@ public class FastConverter {
         enterConverter = new CommonFilterBaseConverterHandler<>(defaultConverters);
     }
 
-//    public static <T> T autoConvert(Object bean, String group) {
-//        if (bean == null) {
-//            return null;
-//        }
-//        parseBean(bean.getClass());
-//        return (T) doConvert(bean, group);
-//    }
+    public static <T> T autoConvert(Object bean, String group) {
+        if (bean == null) {
+            return null;
+        }
+        return (T) doConvert(bean, group);
+    }
 
-//    public static <T> T autoConvert(Object bean) {
-//        return autoConvert(bean, Converter.DEFAULT_GROUP);
-//    }
+    public static <T> T autoConvert(Object bean) {
+        return autoConvert(bean, Converter.DEFAULT_GROUP);
+    }
 
     public static <T> T autoConvert(Object source, Class<T> target, String group) {
         if (source == null) {
@@ -78,36 +77,5 @@ public class FastConverter {
     // todo wanxm
     public static ConverterFilter customDefaultConverters() {
         return defaultConverters;
-    }
-
-    private static void parseBean(Class<?> clazz) {
-        if (parsedBean.contains(clazz)) {
-            return;
-        }
-        parsedBean.add(clazz);
-
-        Set<ConvertibleBean> set = ConvertibleBeanCache.get(clazz);
-        for (ConvertibleBean o : set) {
-            try {
-                TargetBeanMapping.push(o.group(), clazz, o.targetClass().equals(Void.class) ? Class.forName(o.targetName()) : o.targetClass());
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
-            for (PropertyDescriptor anchorPD : beanInfo.getPropertyDescriptors()) {
-                try {
-                    Field field = clazz.getDeclaredField(anchorPD.getName());
-                    Class<?> fieldType = TypeProbeUtil.find(field);
-                    parseBean(fieldType);
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (IntrospectionException e) {
-            e.printStackTrace();
-        }
     }
 }
