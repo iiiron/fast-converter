@@ -1,5 +1,6 @@
 package net.noboard.fastconverter.handler.core.bean;
 
+import com.sun.tools.javac.util.Assert;
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
@@ -13,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K> {
 
@@ -35,19 +37,7 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
 
     @Override
     public Object convert(Object from, String group) throws ConvertException {
-        Object targetObj;
-        try {
-            if (BeanMapping.hasMapping()) {
-                targetObj = BeanMapping.current().getTarget().newInstance();
-            } else {
-                ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(from.getClass(), group);
-                targetObj = ConvertibleAnnotatedUtils.getTargetClass(convertibleBean).newInstance();
-            }
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new ConvertException(
-                    String.format("the target class %s can not be implemented",
-                            BeanMapping.current().getTarget()), e);
-        }
+        Object targetObj = instantiateTarget(getTargetClass(from, group));
 
         Map<String, Object> map = parse(from, group, targetObj.getClass());
 
@@ -68,6 +58,30 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         }
 
         return targetObj;
+    }
+
+    protected Object instantiateTarget(Object source, String group) {
+        return instantiateTarget(getTargetClass(source, group));
+    }
+
+    protected Class<?> getTargetClass(Object source, String group) {
+        Objects.requireNonNull(source);
+
+        if (BeanMapping.hasMapping()) {
+            return BeanMapping.current().getTarget();
+        } else {
+            ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(source.getClass(), group);
+            return ConvertibleAnnotatedUtils.getTargetClass(convertibleBean);
+        }
+    }
+
+    protected Object instantiateTarget(Class<?> target) {
+        try {
+            return target.newInstance();
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new ConvertException(
+                    String.format("the target class %s can not be implemented", target), e);
+        }
     }
 
     abstract protected Map<String, Object> parse(Object source, String group, Class<?> target);

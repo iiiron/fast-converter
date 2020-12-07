@@ -15,8 +15,9 @@ public class ConvertibleBeanConverterHandler extends AbstractFilterBaseConverter
         this.beanConverterFilter = new AbstractBeanConverterFilter(converterFilter) {
             @Override
             protected void initConverters(List<BeanConverter> converters) {
-                converters.add(new TargetBaseBeanConverter(this.converterFilter));
-                converters.add(new SourceBaseBeanConverter(this.converterFilter));
+                converters.add(new BeanToMapConverterHandler(this.converterFilter));
+                converters.add(new TargetBaseBeanConverterHandler(this.converterFilter));
+                converters.add(new SourceBaseBeanConverterHandler(this.converterFilter));
             }
         };
     }

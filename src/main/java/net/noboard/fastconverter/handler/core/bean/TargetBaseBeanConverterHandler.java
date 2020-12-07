@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
  * @author by wanxm
  * @date 2020/11/1 12:43 下午
  */
-public class TargetBaseBeanConverter extends AbstractBeanConverter<Object, Object> {
+public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object, Object> {
 
     private static AutoSensingConverter autoSensingConverter = new AutoSensingConverter();
 
-    public TargetBaseBeanConverter(ConverterFilter converterFilter) {
+    public TargetBaseBeanConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
     }
 

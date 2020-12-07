@@ -9,11 +9,13 @@ import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.handler.NumberToBigDecimalConverterHandler;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 @Getter
 @Setter
 @ToString
-@ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = Woman.class)
+@ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = LinkedHashMap.class)
 public class Man {
 
     @DateFormat

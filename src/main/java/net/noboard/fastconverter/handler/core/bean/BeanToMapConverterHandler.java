@@ -1,27 +1,39 @@
 package net.noboard.fastconverter.handler.core.bean;
 
-import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.ConvertException;
+import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.ConvertibleBean;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
-import java.beans.*;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 基于数据源上的注解来指导转换过程的bean转换器
+ * bean转map的转换器
  *
- * @date 2020/11/1 12:42 下午
+ * @date 2020/12/7 11:03 上午
  * @author by wanxm
  */
-public class SourceBaseBeanConverter extends AbstractBeanConverter<Object, Object> {
+public class BeanToMapConverterHandler extends AbstractBeanConverter<Object, Object>{
 
-    public SourceBaseBeanConverter(ConverterFilter converterFilter) {
+    public BeanToMapConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
     }
 
+    @Override
+    public Object convert(Object from, String group) throws ConvertException {
+        return this.parse(from, group, getTargetClass(from, group));
+    }
+
+    @Override
     protected Map<String, Object> parse(Object source, String group, Class<?> target) {
         BeanInfo sourceBeanInfo;
         try {
@@ -30,7 +42,7 @@ public class SourceBaseBeanConverter extends AbstractBeanConverter<Object, Objec
             throw new ConvertException(e);
         }
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = (Map<String, Object>) instantiateTarget(target);
         for (PropertyDescriptor sourcePD : sourceBeanInfo.getPropertyDescriptors()) {
             if ("class".equals(sourcePD.getName())) {
                 continue;
@@ -75,6 +87,6 @@ public class SourceBaseBeanConverter extends AbstractBeanConverter<Object, Objec
         }
         Class<?> clazz = value.getClass();
         ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(clazz, group);
-        return convertibleBean != null;
+        return convertibleBean != null && Map.class.isAssignableFrom(ConvertibleAnnotatedUtils.getTargetClass(convertibleBean));
     }
 }
