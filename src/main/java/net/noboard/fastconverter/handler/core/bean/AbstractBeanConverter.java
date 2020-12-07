@@ -1,18 +1,14 @@
 package net.noboard.fastconverter.handler.core.bean;
 
-import com.sun.tools.javac.util.Assert;
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import javax.validation.constraints.NotNull;
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -60,10 +56,6 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return targetObj;
     }
 
-    protected Object instantiateTarget(Object source, String group) {
-        return instantiateTarget(getTargetClass(source, group));
-    }
-
     protected Class<?> getTargetClass(Object source, String group) {
         Objects.requireNonNull(source);
 
@@ -71,7 +63,12 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
             return BeanMapping.current().getTarget();
         } else {
             ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(source.getClass(), group);
-            return ConvertibleAnnotatedUtils.getTargetClass(convertibleBean);
+            if (ConvertibleBeanType.SOURCE.equals(convertibleBean.type())) {
+                return ConvertibleAnnotatedUtils.getTargetClass(convertibleBean);
+            }
+
+            throw new ConvertException(
+                    String.format("the source bean %s defect @ConvertibleBean with type of ConvertibleBeanType.SOURCE", source.getClass()));
         }
     }
 

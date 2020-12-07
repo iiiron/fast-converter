@@ -5,6 +5,7 @@ import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.ConvertibleBean;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.support.FieldFindUtil;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -12,8 +13,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -48,11 +47,8 @@ public class BeanToMapConverterHandler extends AbstractBeanConverter<Object, Obj
                 continue;
             }
 
-            Field field;
-            try {
-                field = source.getClass().getDeclaredField(sourcePD.getName());
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+            Field field = FieldFindUtil.find(source.getClass(), sourcePD.getName());
+            if (field == null) {
                 throw new ConvertException(String.format("field named '%s' not exist in %s",
                         sourcePD.getName(),
                         source.getClass().getName()));

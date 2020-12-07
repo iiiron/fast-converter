@@ -8,6 +8,7 @@ import net.noboard.fastconverter.handler.core.CommonFilterBaseConverterHandler;
 import net.noboard.fastconverter.handler.core.MapToMapConverterHandler;
 import net.noboard.fastconverter.handler.core.bean.BeanMapping;
 import net.noboard.fastconverter.handler.core.bean.ConvertibleBeanConverterHandler;
+import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,12 @@ public class FastConverter {
         }
 
         try {
-            BeanMapping.push(source.getClass(), target);
+            ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(target, group);
+            if (convertibleBean != null && ConvertibleBeanType.TARGET.equals(convertibleBean.type())) {
+                BeanMapping.push(ConvertibleAnnotatedUtils.getTargetClass(convertibleBean), target);
+            } else {
+                throw new ConvertException(String.format("the target bean %s defect @ConvertibleBean with type of ConvertibleBeanType.TARGET", target));
+            }
             return doConvert(source, group);
         } finally {
             BeanMapping.clear();

@@ -4,6 +4,7 @@ import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.handler.AutoSensingConverter;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.support.TypeProbeUtil;
 import org.springframework.util.StringUtils;
 
 import java.beans.*;
@@ -75,7 +76,26 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
 
             // 如果字段上没有指定转换器
             if (!ConvertibleMap.hasConverter(currentMap)) {
-                if (autoSensingConverter.supports(sourceValue)) {
+                // 检查当前字段类型是否标注了目标，有的话给上下文推一组映射
+                Class<?> fieldType = TypeProbeUtil.find(field);
+                ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(fieldType,
+                        Converter.isTipHasMessage(last.getTip()) ? last.getTip() : Converter.DEFAULT_GROUP);
+                if (convertibleBean != null && convertibleBean.type() == ConvertibleBeanType.TARGET) {
+                    try {
+                        BeanMapping.push(
+                                convertibleBean.targetClass() == Void.class
+                                        ? Class.forName(convertibleBean.targetName())
+                                        : convertibleBean.targetClass(), fieldType);
+                        try {
+                            result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
+                            continue;
+                        } finally {
+                            BeanMapping.pop();
+                        }
+                    } catch (ClassNotFoundException e) {
+                        throw new ConvertException(String.format("", ""), e);
+                    }
+                } else  if (autoSensingConverter.supports(sourceValue)) {
                     // 当前目标没有标注ConvertibleBean，尝试进行转换
                     Object targetValue = autoSensingConverter.convert(sourceValue, field.getType().getName());
                     if (targetValue != null) {
@@ -83,6 +103,7 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
                         continue;
                     }
                 }
+
                 result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
             } else {
                 // 字段上指定了转换器，则用指定的转换器来处理数据

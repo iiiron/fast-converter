@@ -3,6 +3,7 @@ package net.noboard.fastconverter.handler.core.bean;
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
+import net.noboard.fastconverter.support.FieldFindUtil;
 
 import java.beans.*;
 import java.lang.reflect.Field;
@@ -36,11 +37,9 @@ public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object
                 continue;
             }
 
-            Field field;
-            try {
-                field = source.getClass().getDeclaredField(sourcePD.getName());
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+            // 查找那个字段
+            Field field = FieldFindUtil.find(source.getClass(), sourcePD.getName());
+            if (field == null) {
                 throw new ConvertException(String.format("field named '%s' not exist in %s",
                         sourcePD.getName(),
                         source.getClass().getName()));
@@ -75,6 +74,6 @@ public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object
         }
         Class<?> clazz = value.getClass();
         ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(clazz, group);
-        return convertibleBean != null;
+        return convertibleBean != null && ConvertibleBeanType.SOURCE.equals(convertibleBean.type());
     }
 }
