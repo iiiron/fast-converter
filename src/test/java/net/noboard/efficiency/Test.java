@@ -1,9 +1,7 @@
 package net.noboard.efficiency;
 
-import com.sun.jmx.remote.internal.ArrayQueue;
-import net.noboard.SpeedCheck;
 import net.noboard.fastconverter.FastConverter;
-import net.noboard.fastconverter.handler.DateToTimeStampStringConverterHandler;
+import net.noboard.fastconverter.handler.DateToTimeStampConverterHandler;
 
 import java.util.*;
 
@@ -12,7 +10,7 @@ public class Test {
     public void a() {
         List<BeanA> list = init();
         FastConverter.customDefaultConverters()
-                .addFirst(new DateToTimeStampStringConverterHandler());
+                .addFirst(new DateToTimeStampConverterHandler());
 //        Object o = SpeedCheck.check(a -> FastConverter.autoConvert(list));
 //        System.out.println("a");
 //        SpeedCheck.check(a -> FastConverter.autoConvert(list));
