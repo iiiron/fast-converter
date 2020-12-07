@@ -11,6 +11,6 @@ public class EnumToNameConverterHandler extends AbstractConverterHandler<Enum<?>
 
     @Override
     public boolean supports(Object value) {
-        return true;
+        return value != null && Enum.class.isAssignableFrom(value.getClass());
     }
 }

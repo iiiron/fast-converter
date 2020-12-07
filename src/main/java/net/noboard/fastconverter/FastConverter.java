@@ -1,24 +1,17 @@
 package net.noboard.fastconverter;
 
 import net.noboard.fastconverter.filter.AbstractConverterFilter;
+import net.noboard.fastconverter.handler.EnumToNameConverterHandler;
 import net.noboard.fastconverter.handler.core.ArrayToArrayConverterHandler;
 import net.noboard.fastconverter.handler.core.CollectionToCollectionConverterHandler;
-import net.noboard.fastconverter.handler.core.MapToMapConverterHandler;
-import net.noboard.fastconverter.handler.core.bean.*;
 import net.noboard.fastconverter.handler.core.CommonFilterBaseConverterHandler;
-import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
-import net.noboard.fastconverter.support.ConvertibleBeanCache;
-import net.noboard.fastconverter.support.TypeProbeUtil;
+import net.noboard.fastconverter.handler.core.MapToMapConverterHandler;
+import net.noboard.fastconverter.handler.core.bean.BeanMapping;
+import net.noboard.fastconverter.handler.core.bean.ConvertibleBeanConverterHandler;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class FastConverter {
 
@@ -32,6 +25,7 @@ public class FastConverter {
         defaultConverters = new AbstractConverterFilter() {
             @Override
             protected void initConverters(List<Converter> converters) {
+                converters.add(new EnumToNameConverterHandler());
                 converters.add(new CollectionToCollectionConverterHandler<>(this));
                 converters.add(new MapToMapConverterHandler<>(this));
                 converters.add(new ArrayToArrayConverterHandler(this));
