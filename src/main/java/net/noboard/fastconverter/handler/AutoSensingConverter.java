@@ -21,8 +21,7 @@ public class AutoSensingConverter extends AbstractConverterHandler<Object, Objec
         try {
             target = Class.forName(tip);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new ConvertException("");
+            return null;
         }
 
         if (value instanceof String) {

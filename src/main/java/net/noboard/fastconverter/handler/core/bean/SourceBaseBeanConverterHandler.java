@@ -1,9 +1,11 @@
 package net.noboard.fastconverter.handler.core.bean;
 
 import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.handler.AutoSensingConverter;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 import net.noboard.fastconverter.support.FieldFindUtil;
+import org.springframework.util.StringUtils;
 
 import java.beans.*;
 import java.lang.reflect.Field;
@@ -14,10 +16,12 @@ import java.util.Map;
 /**
  * 基于数据源上的注解来指导转换过程的bean转换器
  *
- * @date 2020/11/1 12:42 下午
  * @author by wanxm
+ * @date 2020/11/1 12:42 下午
  */
 public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object, Object> {
+
+    private static AutoSensingConverter autoSensingConverter = new AutoSensingConverter();
 
     public SourceBaseBeanConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);
@@ -45,6 +49,7 @@ public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object
                         source.getClass().getName()));
             }
 
+            // 解析转换链
             ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group);
             ConvertibleMap last = lastConvertibleField(currentMap);
             String nameTo = sourcePD.getName();
@@ -57,11 +62,28 @@ public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object
                 }
             }
 
+            // 读取源值
+            Object sourceValue;
             try {
-                result.put(nameTo, convertValue(sourcePD.getReadMethod().invoke(source), currentMap));
+                sourceValue = sourcePD.getReadMethod().invoke(source);
             } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
                 throw new ConvertException(e);
             }
+
+            // 尝试进行自动识别转换
+            Field targetField = FieldFindUtil.find(target, nameTo);
+            if (!ConvertibleMap.hasConverter(currentMap)
+                    && targetField != null
+                    && autoSensingConverter.supports(sourceValue)) {
+                Object targetValue = autoSensingConverter.convert(sourceValue, targetField.getGenericType().getTypeName());
+                if (targetValue != null) {
+                    result.put(nameTo, targetValue);
+                    continue;
+                }
+            }
+
+            result.put(nameTo, convertValue(sourceValue, currentMap));
         }
 
         return result;
