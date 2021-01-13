@@ -29,7 +29,7 @@ public class DateToTimeStampConverterHandler extends AbstractConverterHandler<Da
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return value != null && Date.class.isAssignableFrom(value.getClass());
     }
 }

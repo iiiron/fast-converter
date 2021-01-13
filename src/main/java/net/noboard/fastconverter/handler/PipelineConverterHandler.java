@@ -30,7 +30,7 @@ public class PipelineConverterHandler extends AbstractConverterHandler<Object, O
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         if (converters == null || converters.size() < 1) {
             return false;
         }

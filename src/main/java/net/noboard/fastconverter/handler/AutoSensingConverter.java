@@ -2,6 +2,7 @@ package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.ConvertException;
 import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
+import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 
@@ -27,6 +28,9 @@ public class AutoSensingConverter extends AbstractConverterHandler<Object, Objec
         if (value instanceof String) {
             // 源是字符串，目标是枚举，直接value of
             if (target.isEnum()) {
+                if (StringUtils.isEmpty(value)) {
+                    return null;
+                }
                 return Enum.valueOf(target, (String) value);
             }
         } else if (value instanceof Enum) {
@@ -40,7 +44,20 @@ public class AutoSensingConverter extends AbstractConverterHandler<Object, Objec
     }
 
     @Override
-    public boolean supports(Object value) {
-        return Objects.nonNull(value);
+    public boolean supports(Object value, String tip) {
+        Class target;
+        try {
+            target = Class.forName(tip);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+
+        if (value instanceof String && target.isEnum()) {
+            return true;
+        } else if (value instanceof Enum && target.equals(String.class)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

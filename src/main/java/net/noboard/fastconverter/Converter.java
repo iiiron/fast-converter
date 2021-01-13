@@ -22,4 +22,6 @@ public interface Converter<T, K> {
     String getDefaultTip();
 
     boolean supports(Object value);
+
+    boolean supports(Object value, String tip);
 }

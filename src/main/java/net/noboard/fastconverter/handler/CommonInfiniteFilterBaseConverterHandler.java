@@ -34,7 +34,7 @@ public class CommonInfiniteFilterBaseConverterHandler<T, K> extends AbstractFilt
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return this.filter(value) != null;
     }
 }

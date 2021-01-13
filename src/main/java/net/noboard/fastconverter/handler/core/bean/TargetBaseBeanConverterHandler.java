@@ -67,8 +67,16 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
 
             // 读取源值
             Object sourceValue;
+
+            PropertyDescriptor propertyDescriptor = sourcePDMap.get(StringUtils.isEmpty(last.getNameTo()) ? anchorPD.getName() : last.getNameTo());
+            if (propertyDescriptor == null) {
+                throw new ConvertException(String.format("field named '%s' not exist in %s",
+                        StringUtils.isEmpty(last.getNameTo()) ? anchorPD.getName() : last.getNameTo(),
+                        source.getClass().getName()));
+            }
+
             try {
-                sourceValue = sourcePDMap.get(StringUtils.isEmpty(last.getNameTo()) ? anchorPD.getName() : last.getNameTo()).getReadMethod().invoke(source);
+                sourceValue = propertyDescriptor.getReadMethod().invoke(source);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 throw new ConvertException(e);
@@ -95,13 +103,11 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
                     } catch (ClassNotFoundException e) {
                         throw new ConvertException(String.format("", ""), e);
                     }
-                } else  if (autoSensingConverter.supports(sourceValue)) {
+                } else if (autoSensingConverter.supports(sourceValue, field.getType().getName())) {
                     // 当前目标没有标注ConvertibleBean，尝试进行转换
                     Object targetValue = autoSensingConverter.convert(sourceValue, field.getType().getName());
-                    if (targetValue != null) {
-                        result.put(anchorPD.getName(), targetValue);
-                        continue;
-                    }
+                    result.put(anchorPD.getName(), targetValue);
+                    continue;
                 }
 
                 result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));

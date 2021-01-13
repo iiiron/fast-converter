@@ -11,18 +11,15 @@ import java.util.LinkedList;
 public class BeanMapping {
     private static final ThreadLocal<LinkedList<BeanMapping>> sourceClass = new ThreadLocal<>();
 
-    static {
-        sourceClass.set(new LinkedList<>());
-    }
-
     private Class<?> source;
     private Class<?> target;
 
-    public static void push(Class<?> source, Class<?> target){
+    public static void push(Class<?> source, Class<?> target) {
+        init();
         sourceClass.get().addLast(BeanMapping.builder().source(source).target(target).build());
     }
 
-    public static BeanMapping current(){
+    public static BeanMapping current() {
         if (hasMapping()) {
             return sourceClass.get().getLast();
         } else {
@@ -30,7 +27,8 @@ public class BeanMapping {
         }
     }
 
-    public static BeanMapping pop(){
+    public static BeanMapping pop() {
+        init();
         return sourceClass.get().removeLast();
     }
 
@@ -38,7 +36,13 @@ public class BeanMapping {
         return !CollectionUtils.isEmpty(sourceClass.get());
     }
 
-    public static void clear(){
+    public static void clear() {
         sourceClass.get().clear();
+    }
+
+    private static void init() {
+        if (sourceClass.get() == null) {
+            sourceClass.set(new LinkedList<>());
+        }
     }
 }

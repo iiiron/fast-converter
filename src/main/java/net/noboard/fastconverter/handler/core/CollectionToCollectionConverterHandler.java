@@ -51,7 +51,7 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return value != null && Collection.class.isAssignableFrom(value.getClass());
     }
 }

@@ -10,7 +10,7 @@ public class EnumToNameConverterHandler extends AbstractConverterHandler<Enum<?>
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return value != null && Enum.class.isAssignableFrom(value.getClass());
     }
 }

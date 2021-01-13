@@ -17,7 +17,7 @@ public class NameToEnumConverterHandler<T extends Enum<T>> extends AbstractConve
     }
 
     @Override
-    public boolean supports(Object o) {
+    public boolean supports(Object o, String tip) {
         return true;
     }
 }

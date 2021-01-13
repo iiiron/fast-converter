@@ -10,7 +10,7 @@ public class StringAddPrefixConverter extends AbstractConverterHandler<String, S
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return true;
     }
 }

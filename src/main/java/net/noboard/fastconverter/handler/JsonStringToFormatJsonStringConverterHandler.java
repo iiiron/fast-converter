@@ -61,7 +61,7 @@ public class JsonStringToFormatJsonStringConverterHandler extends AbstractConver
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return value != null && String.class.isAssignableFrom(value.getClass());
     }
 }

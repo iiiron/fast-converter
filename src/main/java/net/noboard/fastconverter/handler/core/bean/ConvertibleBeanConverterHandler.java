@@ -28,7 +28,7 @@ public class ConvertibleBeanConverterHandler extends AbstractFilterBaseConverter
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         if (value == null) {
             return false;
         } else {

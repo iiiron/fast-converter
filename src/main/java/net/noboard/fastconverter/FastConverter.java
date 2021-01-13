@@ -20,13 +20,10 @@ public class FastConverter {
 
     private static final Converter enterConverter;
 
-    private static final List<Class<?>> parsedBean = new ArrayList<>();
-
     static {
         defaultConverters = new AbstractConverterFilter() {
             @Override
             protected void initConverters(List<Converter> converters) {
-                converters.add(new EnumToNameConverterHandler());
                 converters.add(new CollectionToCollectionConverterHandler<>(this));
                 converters.add(new MapToMapConverterHandler<>(this));
                 converters.add(new ArrayToArrayConverterHandler(this));

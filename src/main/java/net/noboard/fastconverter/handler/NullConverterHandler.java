@@ -40,7 +40,7 @@ public class NullConverterHandler extends AbstractConverterHandler<Object, Strin
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return value == null;
     }
 }

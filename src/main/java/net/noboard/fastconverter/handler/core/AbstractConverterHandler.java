@@ -33,7 +33,7 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
 
     @Override
     public K convert(T value, String tip) throws ConvertException {
-        if (!this.supports(value)) {
+        if (!this.supports(value, tip)) {
             throw new ConvertException(this.getClass().getName() + " can't convert value: " + value);
         }
 
@@ -43,5 +43,10 @@ public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> 
     @Override
     public void setDefaultTip(String tip) {
         this.defaultTip = tip;
+    }
+
+    @Override
+    public boolean supports(Object value) {
+        return supports(value, defaultTip);
     }
 }

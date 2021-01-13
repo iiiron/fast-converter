@@ -15,7 +15,7 @@ public class NumberToBigDecimalConverterHandler extends AbstractConverterHandler
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return numberToStringConverterHandler.supports(value);
     }
 }

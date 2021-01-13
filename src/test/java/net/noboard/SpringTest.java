@@ -19,10 +19,13 @@ public class SpringTest {
 
     @Test
     public void c() {
-        ChildA childA = new ChildA();
-        childA.setName("wanxm");
+//        ChildA childA = new ChildA();
+//        childA.setName("wanxm");
 //        Object o = FastConverter.autoConvert(childA);
 //        System.out.println(o);
+
+        Object obj = 1234L / 10;
+        System.out.println(obj);
     }
 
     @Test

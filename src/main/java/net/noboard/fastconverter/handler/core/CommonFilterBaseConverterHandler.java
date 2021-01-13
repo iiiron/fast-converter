@@ -16,7 +16,7 @@ public class CommonFilterBaseConverterHandler<T, K> extends AbstractFilterBaseCo
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         return this.filter(value) != null;
     }
 

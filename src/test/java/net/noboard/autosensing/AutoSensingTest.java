@@ -1,6 +1,5 @@
 package net.noboard.autosensing;
 
-import lombok.extern.slf4j.Slf4j;
 import net.noboard.fastconverter.FastConverter;
 import net.noboard.fastconverter.handler.AutoSensingConverter;
 import org.junit.Test;

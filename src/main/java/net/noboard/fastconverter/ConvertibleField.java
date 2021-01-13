@@ -21,8 +21,6 @@ public @interface ConvertibleField {
     @AliasFor(annotation = Convertible.class)
     Class<? extends Converter> converter() default Converter.class;
 
-    Class<?> collectionElementClass() default Void.class;
-
     boolean abandon() default false;
 
     String nameTo() default "";

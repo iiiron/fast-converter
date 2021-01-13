@@ -41,7 +41,7 @@ public class SkippingConverterHandler extends AbstractConverterHandler<Object, O
     }
 
     @Override
-    public boolean supports(Object value) {
+    public boolean supports(Object value, String tip) {
         if (classes == null || Array.getLength(classes) == 0) {
             return true;
         } else {

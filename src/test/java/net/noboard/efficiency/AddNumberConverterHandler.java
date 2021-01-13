@@ -10,7 +10,7 @@ public class AddNumberConverterHandler extends AbstractConverterHandler<String, 
     }
 
     @Override
-    public boolean supports(Object o) {
+    public boolean supports(Object o, String tip) {
         return true;
     }
 }
