@@ -61,8 +61,8 @@ public class BeanToMapConverterHandler extends AbstractBeanConverter<Object, Obj
                 if (last.isAbandon()) {
                     continue;
                 }
-                if (last.getNameTo() != null && !"".equals(last.getNameTo())) {
-                    nameTo = last.getNameTo();
+                if (last.getAliasName() != null && !"".equals(last.getAliasName())) {
+                    nameTo = last.getAliasName();
                 }
             }
 

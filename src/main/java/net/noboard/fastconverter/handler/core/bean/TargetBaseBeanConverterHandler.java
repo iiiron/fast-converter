@@ -59,61 +59,55 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
             }
 
             ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group);
-            ConvertibleMap last = ConvertibleMap.last(currentMap);
+            while (true) {
+                if (!currentMap.isAbandon()) {
+                    // 读取源值
+                    Object sourceValue;
 
-            if (last.isAbandon()) {
-                continue;
-            }
-
-            // 读取源值
-            Object sourceValue;
-
-            PropertyDescriptor propertyDescriptor = sourcePDMap.get(StringUtils.isEmpty(last.getNameTo()) ? anchorPD.getName() : last.getNameTo());
-            if (propertyDescriptor == null) {
-                throw new ConvertException(String.format("field named '%s' not exist in %s",
-                        StringUtils.isEmpty(last.getNameTo()) ? anchorPD.getName() : last.getNameTo(),
-                        source.getClass().getName()));
-            }
-
-            try {
-                sourceValue = propertyDescriptor.getReadMethod().invoke(source);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                throw new ConvertException(e);
-            }
-
-            // 如果字段上没有指定转换器
-            if (!ConvertibleMap.hasConverter(currentMap)) {
-                // 检查当前字段类型是否标注了目标，有的话给上下文推一组映射
-                Class<?> fieldType = TypeProbeUtil.find(field);
-                ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(fieldType,
-                        Converter.isTipHasMessage(last.getTip()) ? last.getTip() : Converter.DEFAULT_GROUP);
-                if (convertibleBean != null && convertibleBean.type() == ConvertibleBeanType.TARGET) {
-                    try {
-                        BeanMapping.push(
-                                convertibleBean.targetClass() == Void.class
-                                        ? Class.forName(convertibleBean.targetName())
-                                        : convertibleBean.targetClass(), fieldType);
-                        try {
-                            result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
-                            continue;
-                        } finally {
-                            BeanMapping.pop();
-                        }
-                    } catch (ClassNotFoundException e) {
-                        throw new ConvertException(String.format("", ""), e);
+                    PropertyDescriptor propertyDescriptor = sourcePDMap.get(StringUtils.isEmpty(currentMap.getAliasName()) ? anchorPD.getName() : currentMap.getAliasName());
+                    if (propertyDescriptor == null) {
+                        throw new ConvertException(String.format("field named '%s' not exist in %s",
+                                StringUtils.isEmpty(currentMap.getAliasName()) ? anchorPD.getName() : currentMap.getAliasName(),
+                                source.getClass().getName()));
                     }
-                } else if (autoSensingConverter.supports(sourceValue, field.getType().getName())) {
-                    // 当前目标没有标注ConvertibleBean，尝试进行转换
-                    Object targetValue = autoSensingConverter.convert(sourceValue, field.getType().getName());
-                    result.put(anchorPD.getName(), targetValue);
-                    continue;
+
+                    try {
+                        sourceValue = propertyDescriptor.getReadMethod().invoke(source);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                        throw new ConvertException(e);
+                    }
+
+                    // 如果字段上没有指定转换器
+                    if (!ConvertibleMap.hasConverter(currentMap)) {
+                        // 检查当前字段类型是否标注了目标，有的话给上下文推一组映射
+                        Class<?> fieldType = TypeProbeUtil.find(field);
+                        ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(fieldType,
+                                Converter.isTipHasMessage(currentMap.getTip()) ? currentMap.getTip() : Converter.DEFAULT_GROUP);
+
+                        if (convertibleBean != null && convertibleBean.type() == ConvertibleBeanType.TARGET) {
+                            Class<?> fieldTarget = ConvertibleAnnotatedUtils.getTargetClass(convertibleBean);
+                            BeanMapping.push(fieldTarget, fieldType);
+                            result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
+                            BeanMapping.pop();
+                        } else if (autoSensingConverter.supports(sourceValue, field.getType().getName())) {
+                            // 当前目标没有标注ConvertibleBean，尝试进行转换
+                            Object targetValue = autoSensingConverter.convert(sourceValue, field.getType().getName());
+                            result.put(anchorPD.getName(), targetValue);
+                        } else {
+                            result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
+                        }
+                    } else {
+                        // 字段上指定了转换器，则用指定的转换器来处理数据
+                        result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
+                    }
                 }
 
-                result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
-            } else {
-                // 字段上指定了转换器，则用指定的转换器来处理数据
-                result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
+                if (currentMap.hasNext()) {
+                    currentMap = currentMap.next();
+                } else {
+                    break;
+                }
             }
         }
 

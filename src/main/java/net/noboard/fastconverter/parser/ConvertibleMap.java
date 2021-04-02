@@ -21,9 +21,9 @@ public interface ConvertibleMap {
 
     String getTip();
 
-    void setNameTo(String nameTo);
+    void setAliasName(String aliasName);
 
-    String getNameTo();
+    String getAliasName();
 
     void setConverter(Converter converter);
 

@@ -93,41 +93,33 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
     }
 
     protected Object convertValue(Object value, ConvertibleMap currentMap) {
-        while (true) {
-            if (value != null || !currentMap.isRetainNull()) {
-                boolean isPush = false;
-                if (value != null
-                        && currentMap.getCollectionElementClass() != null
-                        && currentMap.getCollectionElementClass() != Void.class
-                        && BeanMapping.hasMapping()) {
-                    BeanMapping.push(value.getClass(), currentMap.getCollectionElementClass());
-                    isPush = true;
-                }
-
-                try {
-                    Converter converter = currentMap.getConverter();
-                    if (converter == null) {
-                        converter = this.converterFilter.filter(value);
-                    }
-
-                    if (converter != null) {
-                        if (Converter.isTipHasMessage(currentMap.getTip())) {
-                            value = converter.convert(value, currentMap.getTip());
-                        } else {
-                            value = converter.convert(value);
-                        }
-                    }
-                } finally {
-                    if (isPush) {
-                        BeanMapping.pop();
-                    }
-                }
+        if (value != null || !currentMap.isRetainNull()) {
+            boolean isPush = false;
+            if (value != null
+                    && currentMap.getCollectionElementClass() != null
+                    && currentMap.getCollectionElementClass() != Void.class
+                    && BeanMapping.hasMapping()) {
+                BeanMapping.push(value.getClass(), currentMap.getCollectionElementClass());
+                isPush = true;
             }
 
-            if (currentMap.hasNext()) {
-                currentMap = currentMap.next();
-            } else {
-                break;
+            try {
+                Converter converter = currentMap.getConverter();
+                if (converter == null) {
+                    converter = this.converterFilter.filter(value);
+                }
+
+                if (converter != null) {
+                    if (Converter.isTipHasMessage(currentMap.getTip())) {
+                        value = converter.convert(value, currentMap.getTip());
+                    } else {
+                        value = converter.convert(value);
+                    }
+                }
+            } finally {
+                if (isPush) {
+                    BeanMapping.pop();
+                }
             }
         }
 

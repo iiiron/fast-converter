@@ -37,7 +37,9 @@ public class BeanMapping {
     }
 
     public static void clear() {
-        sourceClass.get().clear();
+        if (sourceClass.get() != null) {
+            sourceClass.get().clear();
+        }
     }
 
     private static void init() {

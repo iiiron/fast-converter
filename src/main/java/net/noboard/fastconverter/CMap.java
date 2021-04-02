@@ -18,7 +18,7 @@ public class CMap implements ConvertibleMap {
 
     private boolean hasNext = false;
 
-    private String nameTo;
+    private String aliasName;
 
     private Class<?> collectionElementClass;
 
@@ -33,13 +33,13 @@ public class CMap implements ConvertibleMap {
     }
 
     @Override
-    public String getNameTo() {
-        return nameTo;
+    public String getAliasName() {
+        return aliasName;
     }
 
     @Override
-    public void setNameTo(String nameTo) {
-        this.nameTo = nameTo;
+    public void setAliasName(String aliasName) {
+        this.aliasName = aliasName;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class CMap implements ConvertibleMap {
                 ", abandon=" + abandon +
                 ", skipNull=" + skipNull +
                 ", hasNext=" + hasNext +
-                ", nameTo='" + nameTo + '\'' +
+                ", aliasName='" + aliasName + '\'' +
                 '}';
     }
 }

@@ -23,7 +23,7 @@ public @interface ConvertibleField {
 
     boolean abandon() default false;
 
-    String nameTo() default "";
+    String aliasName() default "";
 
     boolean retainNull() default true;
 }

@@ -57,7 +57,7 @@ public class ConvertibleAnnotatedUtils {
                 return Class.forName(convertibleBean.targetName());
             }
         } catch (ClassNotFoundException e) {
-            throw new ConvertException(String.format("", ""), e);
+            throw new ConvertException(String.format("the target class %s in @ConvertibleBean cannot be find", convertibleBean.targetName()), e);
         }
     }
 

@@ -29,7 +29,7 @@ public class ConvertibleFieldsParser implements ConvertibleParser {
             last.setTip(convertibleField.tip());
             last.setAbandon(convertibleField.abandon());
             last.setRetainNull(convertibleField.retainNull());
-            last.setNameTo(convertibleField.nameTo());
+            last.setAliasName(convertibleField.aliasName());
         }
 
         if (first == null) {

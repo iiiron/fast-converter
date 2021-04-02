@@ -5,7 +5,6 @@ import net.noboard.fastconverter.handler.AutoSensingConverter;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 import net.noboard.fastconverter.support.FieldFindUtil;
-import org.springframework.util.StringUtils;
 
 import java.beans.*;
 import java.lang.reflect.Field;
@@ -51,39 +50,41 @@ public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object
 
             // 解析转换链
             ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group);
-            ConvertibleMap last = lastConvertibleField(currentMap);
-            String nameTo = sourcePD.getName();
-            if (last != null) {
-                if (last.isAbandon()) {
-                    continue;
+            while (true) {
+                if (!currentMap.isAbandon()) {
+                    String nameTo = sourcePD.getName();
+
+                    if (currentMap.getAliasName() != null && !"".equals(currentMap.getAliasName())) {
+                        nameTo = currentMap.getAliasName();
+                    }
+
+                    // 读取源值
+                    Object sourceValue;
+                    try {
+                        sourceValue = sourcePD.getReadMethod().invoke(source);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                        throw new ConvertException(e);
+                    }
+
+                    // 尝试进行自动识别转换
+                    Field targetField = FieldFindUtil.find(target, nameTo);
+                    if (!ConvertibleMap.hasConverter(currentMap)
+                            && targetField != null
+                            && autoSensingConverter.supports(sourceValue, targetField.getGenericType().getTypeName())) {
+                        Object targetValue = autoSensingConverter.convert(sourceValue, targetField.getGenericType().getTypeName());
+                        result.put(nameTo, targetValue);
+                    } else {
+                        result.put(nameTo, convertValue(sourceValue, currentMap));
+                    }
                 }
-                if (last.getNameTo() != null && !"".equals(last.getNameTo())) {
-                    nameTo = last.getNameTo();
+
+                if (currentMap.hasNext()) {
+                    currentMap = currentMap.next();
+                } else {
+                    break;
                 }
             }
-
-            // 读取源值
-            Object sourceValue;
-            try {
-                sourceValue = sourcePD.getReadMethod().invoke(source);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                throw new ConvertException(e);
-            }
-
-            // 尝试进行自动识别转换
-            Field targetField = FieldFindUtil.find(target, nameTo);
-            if (!ConvertibleMap.hasConverter(currentMap)
-                    && targetField != null
-                    && autoSensingConverter.supports(sourceValue)) {
-                Object targetValue = autoSensingConverter.convert(sourceValue, targetField.getGenericType().getTypeName());
-                if (targetValue != null) {
-                    result.put(nameTo, targetValue);
-                    continue;
-                }
-            }
-
-            result.put(nameTo, convertValue(sourceValue, currentMap));
         }
 
         return result;
