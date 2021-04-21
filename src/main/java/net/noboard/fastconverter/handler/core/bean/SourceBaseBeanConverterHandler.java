@@ -40,22 +40,16 @@ public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object
                 continue;
             }
 
-            // 查找那个字段
             Field field = FieldFindUtil.find(source.getClass(), sourcePD.getName());
-            if (field == null) {
-                throw new ConvertException(String.format("field named '%s' not exist in %s",
-                        sourcePD.getName(),
-                        source.getClass().getName()));
-            }
 
             // 解析转换链
             ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group);
             while (true) {
                 if (!currentMap.isAbandon()) {
-                    String nameTo = sourcePD.getName();
+                    String aliasName = sourcePD.getName();
 
                     if (currentMap.getAliasName() != null && !"".equals(currentMap.getAliasName())) {
-                        nameTo = currentMap.getAliasName();
+                        aliasName = currentMap.getAliasName();
                     }
 
                     // 读取源值
@@ -67,15 +61,15 @@ public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object
                         throw new ConvertException(e);
                     }
 
-                    // 尝试进行自动识别转换
-                    Field targetField = FieldFindUtil.find(target, nameTo);
-                    if (!ConvertibleMap.hasConverter(currentMap)
-                            && targetField != null
+                    Field targetField = FieldFindUtil.find(target, aliasName);
+                    if (targetField == null) {
+                        // 如果目标bean中没有找到指定的字段, 则跳过该字段
+                    } else if (!ConvertibleMap.hasConverter(currentMap)
                             && autoSensingConverter.supports(sourceValue, targetField.getGenericType().getTypeName())) {
                         Object targetValue = autoSensingConverter.convert(sourceValue, targetField.getGenericType().getTypeName());
-                        result.put(nameTo, targetValue);
+                        result.put(aliasName, targetValue);
                     } else {
-                        result.put(nameTo, convertValue(sourceValue, currentMap));
+                        result.put(aliasName, convertValue(sourceValue, currentMap));
                     }
                 }
 

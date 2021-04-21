@@ -60,17 +60,12 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
 
             ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(field, group);
             while (true) {
-                if (!currentMap.isAbandon()) {
+
+                PropertyDescriptor propertyDescriptor = sourcePDMap.get(StringUtils.isEmpty(currentMap.getAliasName()) ? anchorPD.getName() : currentMap.getAliasName());
+
+                if (!currentMap.isAbandon() && propertyDescriptor != null) {
                     // 读取源值
                     Object sourceValue;
-
-                    PropertyDescriptor propertyDescriptor = sourcePDMap.get(StringUtils.isEmpty(currentMap.getAliasName()) ? anchorPD.getName() : currentMap.getAliasName());
-                    if (propertyDescriptor == null) {
-                        throw new ConvertException(String.format("field named '%s' not exist in %s",
-                                StringUtils.isEmpty(currentMap.getAliasName()) ? anchorPD.getName() : currentMap.getAliasName(),
-                                source.getClass().getName()));
-                    }
-
                     try {
                         sourceValue = propertyDescriptor.getReadMethod().invoke(source);
                     } catch (IllegalAccessException | InvocationTargetException e) {
@@ -90,9 +85,9 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
                             BeanMapping.push(fieldTarget, fieldType);
                             result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
                             BeanMapping.pop();
-                        } else if (autoSensingConverter.supports(sourceValue, field.getType().getName())) {
+                        } else if (autoSensingConverter.supports(sourceValue, field.getGenericType().getTypeName())) {
                             // 当前目标没有标注ConvertibleBean，尝试进行转换
-                            Object targetValue = autoSensingConverter.convert(sourceValue, field.getType().getName());
+                            Object targetValue = autoSensingConverter.convert(sourceValue, field.getGenericType().getTypeName());
                             result.put(anchorPD.getName(), targetValue);
                         } else {
                             result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));

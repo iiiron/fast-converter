@@ -45,14 +45,20 @@ public class AutoSensingConverter extends AbstractConverterHandler<Object, Objec
 
     @Override
     public boolean supports(Object value, String tip) {
-        Class target;
+        if (value == null) {
+            return false;
+        }
+
+        Class<?> target;
         try {
             target = Class.forName(tip);
         } catch (ClassNotFoundException e) {
             return false;
         }
 
-        if (value instanceof String && target.isEnum()) {
+        if (value.getClass().equals(target)) {
+            return false;
+        } else if (value instanceof String && target.isEnum()) {
             return true;
         } else if (value instanceof Enum && target.equals(String.class)) {
             return true;

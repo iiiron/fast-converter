@@ -9,15 +9,25 @@ import net.noboard.fastconverter.FastConverter;
 import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
 import net.noboard.fastconverter.handler.DateToTimeStampConverterHandler;
 import org.junit.Test;
+import org.springframework.util.Assert;
 
 import java.util.Date;
 
+/**
+ * 预测转换器测试
+ *
+ * @date 2021/4/21 11:20 上午
+ * @author by wanxm
+ */
 public class AutoSensingConvertTest {
 
     @Test
     public void test1() {
-        BeanA beanA = new BeanA(BeanEnum.MAN);
+        BeanA beanA = new BeanA(BeanEnum.MAN, "wanxm", null);
         BeanB beanB = FastConverter.autoConvert(beanA);
+
+        Assert.isTrue(BeanEnum.MAN.name().equals(beanB.getType()));
+        Assert.isTrue("wanxm".equals(beanB.getName()));
     }
 
     @AllArgsConstructor
@@ -25,11 +35,17 @@ public class AutoSensingConvertTest {
     @ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = BeanB.class)
     public static class BeanA {
         private BeanEnum type;
+
+        private String name;
+
+        private String nullData;
     }
 
     @Data
     public static class BeanB {
         private String type;
+
+        private String name;
     }
 
     public static enum BeanEnum {
