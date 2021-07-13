@@ -1,7 +1,7 @@
 package net.noboard.fastconverter.handler.core.bean;
 
 import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.handler.core.AbstractFilterBaseConverterHandler;
+import net.noboard.fastconverter.AbstractFilterBaseConverterHandler;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.List;

@@ -1,16 +1,13 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.filter.AbstractConverterFilter;
-import net.noboard.fastconverter.handler.EnumToNameConverterHandler;
-import net.noboard.fastconverter.handler.core.ArrayToArrayConverterHandler;
-import net.noboard.fastconverter.handler.core.CollectionToCollectionConverterHandler;
-import net.noboard.fastconverter.handler.core.CommonFilterBaseConverterHandler;
-import net.noboard.fastconverter.handler.core.MapToMapConverterHandler;
-import net.noboard.fastconverter.handler.core.bean.BeanMapping;
-import net.noboard.fastconverter.handler.core.bean.ConvertibleBeanConverterHandler;
+import net.noboard.fastconverter.handler.ArrayToArrayConverterHandler;
+import net.noboard.fastconverter.handler.CollectionToCollectionConverterHandler;
+import net.noboard.fastconverter.handler.CommonFilterBaseConverterHandler;
+import net.noboard.fastconverter.handler.MapToMapConverterHandler;
+import net.noboard.fastconverter.handler.bean.BeanMapping;
+import net.noboard.fastconverter.handler.bean.ConvertibleBeanConverterHandler;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

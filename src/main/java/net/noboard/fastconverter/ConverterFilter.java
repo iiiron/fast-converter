@@ -16,6 +16,8 @@ public interface ConverterFilter {
      */
     Converter filter(Object value);
 
+    Converter filter(Object value, String tip);
+
     ConverterFilter addFirst(Converter converter);
 
     ConverterFilter addFirst(Function<ConverterFilter,Converter> add);

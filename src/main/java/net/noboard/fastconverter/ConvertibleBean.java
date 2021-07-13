@@ -16,9 +16,19 @@ public @interface ConvertibleBean {
     @AliasFor("group")
     String tip() default Converter.DEFAULT_GROUP;
 
+    @Deprecated
+    @AliasFor("relevantClassName")
     String targetName() default "";
 
+    @AliasFor("targetName")
+    String relevantClassName() default "";
+
+    @Deprecated
+    @AliasFor("relevantClass")
     Class<?> targetClass() default Void.class;
+
+    @AliasFor("targetClass")
+    Class<?> relevantClass() default Void.class;
 
     ConvertibleBeanType type() default ConvertibleBeanType.TARGET;
 }

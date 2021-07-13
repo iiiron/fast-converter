@@ -1,4 +1,4 @@
-package net.noboard.fastconverter.handler.core;
+package net.noboard.fastconverter;
 
 
 import net.noboard.fastconverter.ConvertException;

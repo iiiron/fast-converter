@@ -1,5 +1,6 @@
-package net.noboard.fastconverter.handler.core;
+package net.noboard.fastconverter;
 
+import net.noboard.fastconverter.AbstractConverterHandler;
 import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConverterFilter;
 import net.noboard.fastconverter.FilterBaseConverter;

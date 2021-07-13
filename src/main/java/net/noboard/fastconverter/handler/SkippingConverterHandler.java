@@ -1,7 +1,7 @@
 package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
+import net.noboard.fastconverter.AbstractConverterHandler;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;

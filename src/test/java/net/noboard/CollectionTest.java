@@ -47,7 +47,7 @@ public class CollectionTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = ItemB.class)
+    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, relevantClass = ItemB.class)
     public static class ItemA {
         @ConvertibleField(converter = DateToFormatStringConverterHandler.class)
         private Date time;

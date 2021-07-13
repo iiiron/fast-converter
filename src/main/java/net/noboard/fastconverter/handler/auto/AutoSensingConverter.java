@@ -1,10 +1,10 @@
 package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.handler.core.AbstractConverterHandler;
+import net.noboard.fastconverter.AbstractConverterHandler;
 import org.springframework.util.StringUtils;
 
-import java.util.Objects;
+import java.util.Date;
 
 /**
  * 自动感知转换器
@@ -26,17 +26,21 @@ public class AutoSensingConverter extends AbstractConverterHandler<Object, Objec
         }
 
         if (value instanceof String) {
-            // 源是字符串，目标是枚举，直接value of
             if (target.isEnum()) {
+                // 源是字符串，目标是枚举，直接value of
                 if (StringUtils.isEmpty(value)) {
                     return null;
                 }
                 return Enum.valueOf(target, (String) value);
             }
         } else if (value instanceof Enum) {
-            // 源是枚举，目标是字符串，直接取name
             if (target.equals(String.class)) {
+                // 源是枚举，目标是字符串，直接取name
                 return ((Enum)value).name();
+            }
+        } else if (value instanceof Long) {
+            if (target.equals(Date.class)) {
+                // 源是Long, 目标是Date
             }
         }
 

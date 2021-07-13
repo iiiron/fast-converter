@@ -18,11 +18,11 @@ public class GenericTest {
         Assert.isTrue(EnumA.MAN.name().equals(b.getFieldA()));
     }
 
-    @Test
+//    @Test
     public void test2(){
         BeanC beanC = new BeanC(EnumA.MAN.name());
 
-        BeanE b = FastConverter.autoConvert(beanC, BeanE.class);
+        BeanD b = FastConverter.autoConvert(beanC, BeanD.class);
 
         Assert.isTrue(EnumA.MAN.equals(b.getFieldA()));
     }
