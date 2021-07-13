@@ -4,15 +4,15 @@ import net.noboard.fastconverter.ConvertException;
 
 import java.util.Date;
 
-public class LongToDateSensingConverter extends AbstractSensingConverter {
+public class DateToLongSensingConverter extends AbstractSensingConverter {
 
     @Override
     protected Object converting(Object value, String tip) throws ConvertException {
-        return new Date((Long) value);
+        return ((Date) value).getTime();
     }
 
     @Override
     protected boolean supports(Class<?> sourceClass, Class<?> targetClass) {
-        return sourceClass.isAssignableFrom(Long.class) && targetClass.isAssignableFrom(Date.class);
+        return Date.class.isAssignableFrom(sourceClass) && Long.class.isAssignableFrom(targetClass);
     }
 }

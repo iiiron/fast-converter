@@ -1,7 +1,7 @@
-package net.noboard.fastconverter.handler.core.bean;
+package net.noboard.fastconverter.handler.bean;
 
 import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.handler.AutoSensingConverter;
+import net.noboard.fastconverter.handler.auto.AutoSensingConverter;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 import net.noboard.fastconverter.support.TypeProbeUtil;
@@ -66,15 +66,20 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
                 if (!currentMap.isAbandon() && propertyDescriptor != null) {
                     // 读取源值
                     Object sourceValue;
-                    try {
-                        sourceValue = propertyDescriptor.getReadMethod().invoke(source);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                        throw new ConvertException(e);
+
+                    if (result.containsKey(anchorPD.getName())) {
+                        sourceValue = result.get(anchorPD.getName());
+                    } else {
+                        try {
+                            sourceValue = propertyDescriptor.getReadMethod().invoke(source);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                            throw new ConvertException(e);
+                        }
                     }
 
-                    // 如果字段上没有指定转换器
                     if (!ConvertibleMap.hasConverter(currentMap)) {
+                        // 如果字段上没有指定转换器
                         // 检查当前字段类型是否标注了目标，有的话给上下文推一组映射
                         Class<?> fieldType = TypeProbeUtil.find(field);
                         ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(fieldType,

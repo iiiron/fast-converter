@@ -1,4 +1,4 @@
-package net.noboard.fastconverter.handler.core.bean;
+package net.noboard.fastconverter.handler.bean;
 
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.parser.ConvertibleMap;
