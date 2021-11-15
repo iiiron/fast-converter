@@ -1,16 +1,10 @@
 package net.noboard.fastconverter.handler.auto;
 
-import net.noboard.fastconverter.ConvertException;
-
-public class StringToEnumSensingConverter extends AbstractSensingConverter {
+public class StringToEnumSensingConverter extends AbstractSensingConverter<String, Enum> {
 
     @Override
-    protected Object converting(Object value, String tip) throws ConvertException {
-        try {
-            return Enum.valueOf((Class<Enum>) Class.forName(tip), (String) value);
-        } catch (ClassNotFoundException e) {
-            throw new ConvertException("can not find enum class " + tip);
-        }
+    protected Enum converting(String value, Class<Enum> targetClass) {
+        return Enum.valueOf(targetClass, value);
     }
 
     @Override

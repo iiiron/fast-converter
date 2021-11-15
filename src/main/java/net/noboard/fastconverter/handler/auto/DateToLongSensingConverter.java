@@ -1,14 +1,12 @@
 package net.noboard.fastconverter.handler.auto;
 
-import net.noboard.fastconverter.ConvertException;
-
 import java.util.Date;
 
-public class DateToLongSensingConverter extends AbstractSensingConverter {
+public class DateToLongSensingConverter extends AbstractSensingConverter<Date, Long> {
 
     @Override
-    protected Object converting(Object value, String tip) throws ConvertException {
-        return ((Date) value).getTime();
+    protected Long converting(Date value, Class<Long> targetClass) {
+        return value.getTime();
     }
 
     @Override

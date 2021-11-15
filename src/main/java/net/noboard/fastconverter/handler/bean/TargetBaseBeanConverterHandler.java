@@ -88,18 +88,18 @@ public class TargetBaseBeanConverterHandler extends AbstractBeanConverter<Object
                         if (convertibleBean != null && convertibleBean.type() == ConvertibleBeanType.TARGET) {
                             Class<?> fieldTarget = ConvertibleAnnotatedUtils.getTargetClass(convertibleBean);
                             BeanMapping.push(fieldTarget, fieldType);
-                            result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
+                            result.put(anchorPD.getName(), convertValue(sourceValue, group, currentMap));
                             BeanMapping.pop();
                         } else if (autoSensingConverter.supports(sourceValue, field.getGenericType().getTypeName())) {
                             // 当前目标没有标注ConvertibleBean，尝试进行转换
                             Object targetValue = autoSensingConverter.convert(sourceValue, field.getGenericType().getTypeName());
                             result.put(anchorPD.getName(), targetValue);
                         } else {
-                            result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
+                            result.put(anchorPD.getName(), convertValue(sourceValue, group, currentMap));
                         }
                     } else {
                         // 字段上指定了转换器，则用指定的转换器来处理数据
-                        result.put(anchorPD.getName(), convertValue(sourceValue, currentMap));
+                        result.put(anchorPD.getName(), convertValue(sourceValue, group, currentMap));
                     }
                 }
 

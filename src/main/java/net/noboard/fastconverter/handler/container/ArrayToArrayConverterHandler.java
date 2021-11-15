@@ -1,9 +1,6 @@
-package net.noboard.fastconverter.handler;
+package net.noboard.fastconverter.handler.container;
 
-import net.noboard.fastconverter.AbstractFilterBaseConverterHandler;
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-import net.noboard.fastconverter.ConverterFilter;
+import net.noboard.fastconverter.*;
 
 import java.lang.reflect.Array;
 
@@ -16,7 +13,7 @@ import java.lang.reflect.Array;
  * <p>
  * 注意，由于java存在自动装箱，int[]经过转换后将变为Integer[]，其他基本数据类型同理。
  */
-public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> {
+public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> implements ContainerConverter {
 
     public ArrayToArrayConverterHandler(ConverterFilter converterFilter) {
         super(converterFilter);

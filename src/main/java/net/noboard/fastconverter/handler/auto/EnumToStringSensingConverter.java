@@ -1,12 +1,9 @@
 package net.noboard.fastconverter.handler.auto;
 
-import net.noboard.fastconverter.ConvertException;
-
-public class EnumToStringSensingConverter extends AbstractSensingConverter {
-
+public class EnumToStringSensingConverter extends AbstractSensingConverter<Enum, String> {
     @Override
-    protected Object converting(Object value, String tip) throws ConvertException {
-        return ((Enum) value).name();
+    protected String converting(Enum value, Class<String> targetClass) {
+        return value.name();
     }
 
     @Override

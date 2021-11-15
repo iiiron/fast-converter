@@ -14,10 +14,11 @@ public class ConvertibleFieldParser implements ConvertibleParser {
 
     @Override
     public ConvertibleMap parse(AnnotatedElement annotatedElement, String group) {
-        CMap cMap = new CMap();
         AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, ConvertibleField.class);
-        Class converterClass = (Class) annotationAttributes.get("converter");
+
+        CMap cMap = new CMap();
         if (GroupUtils.checkGroup(annotationAttributes.getString("group"), group)) {
+            Class converterClass = (Class) annotationAttributes.get("converter");
             if (converterClass != Converter.class) {
                 cMap.setConverter(ConverterCache.get(converterClass));
             }

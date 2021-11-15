@@ -1,9 +1,9 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.handler.ArrayToArrayConverterHandler;
-import net.noboard.fastconverter.handler.CollectionToCollectionConverterHandler;
+import net.noboard.fastconverter.handler.container.ArrayToArrayConverterHandler;
+import net.noboard.fastconverter.handler.container.CollectionToCollectionConverterHandler;
 import net.noboard.fastconverter.handler.CommonFilterBaseConverterHandler;
-import net.noboard.fastconverter.handler.MapToMapConverterHandler;
+import net.noboard.fastconverter.handler.container.MapToMapConverterHandler;
 import net.noboard.fastconverter.handler.bean.BeanMapping;
 import net.noboard.fastconverter.handler.bean.ConvertibleBeanConverterHandler;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;

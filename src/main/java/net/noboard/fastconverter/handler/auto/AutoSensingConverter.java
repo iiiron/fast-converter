@@ -31,12 +31,12 @@ public class AutoSensingConverter extends AbstractConverterHandler<Object, Objec
     }
 
     @Override
-    protected Object converting(Object value, String tip) throws ConvertException {
-       return converterFilter.filter(value, tip).convert(value, tip);
+    protected Object converting(Object value, String className) throws ConvertException {
+       return converterFilter.filter(value, className).convert(value, className);
     }
 
     @Override
-    public boolean supports(Object value, String tip) {
-        return converterFilter.filter(value, tip) != null;
+    public boolean supports(Object value, String className) {
+        return converterFilter.filter(value, className) != null;
     }
 }

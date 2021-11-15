@@ -92,7 +92,7 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
         return currentMap;
     }
 
-    protected Object convertValue(Object value, ConvertibleMap currentMap) {
+    protected Object convertValue(Object value, String group, ConvertibleMap currentMap) {
         if (value != null || !currentMap.isRetainNull()) {
             boolean isPush = false;
             if (value != null
@@ -112,6 +112,9 @@ public abstract class AbstractBeanConverter<T, K> implements BeanConverter<T, K>
                 if (converter != null) {
                     if (Converter.isTipHasMessage(currentMap.getTip())) {
                         value = converter.convert(value, currentMap.getTip());
+                    } else if (BeanConverter.class.isAssignableFrom(converter.getClass())
+                            || ContainerConverter.class.isAssignableFrom(converter.getClass())) {
+                        value = converter.convert(value, group);
                     } else {
                         value = converter.convert(value);
                     }

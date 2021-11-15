@@ -1,13 +1,10 @@
 package net.noboard.fastconverter;
 
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
-
 /**
- * @author wanxm
  * @param <T>
  * @param <K>
+ * @author wanxm
  */
 public abstract class AbstractConverterHandler<T, K> implements Converter<T, K> {
     private String defaultTip;

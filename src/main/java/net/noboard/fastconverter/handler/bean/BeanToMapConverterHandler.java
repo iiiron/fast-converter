@@ -67,7 +67,7 @@ public class BeanToMapConverterHandler extends AbstractBeanConverter<Object, Obj
             }
 
             try {
-                result.put(nameTo, convertValue(sourcePD.getReadMethod().invoke(source), currentMap));
+                result.put(nameTo, convertValue(sourcePD.getReadMethod().invoke(source), group, currentMap));
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new ConvertException(e);
             }

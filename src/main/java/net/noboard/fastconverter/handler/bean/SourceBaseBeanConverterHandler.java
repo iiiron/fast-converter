@@ -71,10 +71,11 @@ public class SourceBaseBeanConverterHandler extends AbstractBeanConverter<Object
                         // 如果目标bean中没有找到指定的字段, 则跳过该字段
                     } else if (!ConvertibleMap.hasConverter(currentMap)
                             && autoSensingConverter.supports(sourceValue, targetField.getGenericType().getTypeName())) {
+                        // 如果字段上没有指定转换器, 并且自动感知转换器适配该字段的转换, 则将该字段的转换交给自动感知转换器
                         Object targetValue = autoSensingConverter.convert(sourceValue, targetField.getGenericType().getTypeName());
                         result.put(aliasName, targetValue);
                     } else {
-                        result.put(aliasName, convertValue(sourceValue, currentMap));
+                        result.put(aliasName, convertValue(sourceValue, group, currentMap));
                     }
                 }
 
