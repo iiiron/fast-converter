@@ -60,18 +60,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-
-  <distributionManagement>
-    <repository>
-      <id>ziroom-central</id>
-      <name>ziroom-release</name>
-      <url>http://mvn.ziroom.com/crm-release</url>
-    </repository>
-    <snapshotRepository>
-      <id>ziroom-central</id>
-      <name>ziroom-snapshot</name>
-      <url>http://mvn.ziroom.com/crm-snapshot</url>
-    </snapshotRepository>
-  </distributionManagement>
 </project>
