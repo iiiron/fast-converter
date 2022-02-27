@@ -1,8 +1,11 @@
 package net.noboard.fastconverter.handler.container;
 
-import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.ContainerConverter;
+import net.noboard.fastconverter.handler.AbstractConverterHandler;
+import net.noboard.fastconverter.handler.bean.ConvertInfo;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.ParameterizedType;
 
 /**
  * 数组到数组转换器
@@ -13,28 +16,27 @@ import java.lang.reflect.Array;
  * <p>
  * 注意，由于java存在自动装箱，int[]经过转换后将变为Integer[]，其他基本数据类型同理。
  */
-public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHandler<Object, Object> implements ContainerConverter {
-
-    public ArrayToArrayConverterHandler(ConverterFilter converterFilter) {
-        super(converterFilter);
-    }
-
+public class ArrayToArrayConverterHandler extends AbstractConverterHandler<Object, Object, ConvertInfo> implements ContainerConverter {
     @Override
-    protected Object converting(Object value, String tip) throws ConvertException {
-        Converter converter;
-        Object newArray = null, newV;
+    protected Object doConvert(Object value, ConvertInfo context) {
+        Object newArray = null;
+
+        ParameterizedType sourceType = (ParameterizedType) context.getSourceType();
+        ParameterizedType targetType = (ParameterizedType) context.getTargetType();
+
+        ConvertInfo convertInfo = new ConvertInfo();
+        convertInfo.setModeType(context.getModeType());
+        convertInfo.setGroup(context.getGroup());
+        convertInfo.setSourceType(sourceType.getActualTypeArguments()[0]);
+        convertInfo.setTargetType(targetType.getActualTypeArguments()[0]);
 
         for (int index = 0; index < Array.getLength(value); index++) {
-            newV = Array.get(value, index);
-            converter = this.filter(newV);
-            if (converter != null) {
-                newV = Converter.isTipHasMessage(tip) ? converter.convert(newV, tip) : converter.convert(newV);
-            }
-            if (newArray == null && newV != null) {
-                newArray = Array.newInstance(newV.getClass(), Array.getLength(value));
+            Object result = context.getConverterFilter().filter(Array.get(value, index), convertInfo).convert();
+            if (newArray == null && result != null) {
+                newArray = Array.newInstance(result.getClass(), Array.getLength(value));
             }
             if (newArray != null) {
-                Array.set(newArray, index, newV);
+                Array.set(newArray, index, result);
             }
         }
 
@@ -42,7 +44,7 @@ public class ArrayToArrayConverterHandler extends AbstractFilterBaseConverterHan
     }
 
     @Override
-    public boolean supports(Object value, String tip) {
-        return value != null && value.getClass().isArray();
+    protected ConvertInfo defaultContext() {
+        return null;
     }
 }

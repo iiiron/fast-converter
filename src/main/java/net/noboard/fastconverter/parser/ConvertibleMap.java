@@ -11,32 +11,68 @@ import javax.validation.constraints.NotNull;
 public interface ConvertibleMap {
     void setAbandon(boolean abandon);
 
+    /**
+     * 是否忽略该字段
+     * @return
+     */
     boolean isAbandon();
 
     void setRetainNull(boolean isRetainNull);
 
+    /**
+     * 是否保留空值
+     * @return
+     */
     boolean isRetainNull();
+
+    void setConvertContext(Object context);
+
+    Object getConvertContext();
 
     void setTip(String tip);
 
+    /**
+     * 获取该字段的tip信息
+     * @return
+     */
     String getTip();
 
     void setAliasName(String aliasName);
 
+    /**
+     * 获取该字段的别名
+     * @return
+     */
     String getAliasName();
 
     void setConverter(Converter converter);
 
+    /**
+     * 获取该字段设置的转换器
+     * @return
+     */
     Converter getConverter();
 
     void join(ConvertibleMap convertibleMap);
 
+    /**
+     * 是否存在下一个ConvertibleMap
+     * @return
+     */
     boolean hasNext();
 
-    void setCollectionElementClass(Class<?> clazz);
+    void setRelevantClass(Class<?> clazz);
 
-    Class<?> getCollectionElementClass();
+    /**
+     * 获取该字段的关联类型
+     * @return
+     */
+    Class<?> getRelevantClass();
 
+    /**
+     * 获取下一个ConvertibleMap
+     * @return
+     */
     @NotNull
     ConvertibleMap next();
 

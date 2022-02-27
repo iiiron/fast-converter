@@ -30,5 +30,5 @@ public @interface ConvertibleBean {
     @AliasFor("targetClass")
     Class<?> relevantClass() default Void.class;
 
-    ConvertibleBeanType type() default ConvertibleBeanType.TARGET;
+    ConverteModeType type() default ConverteModeType.TARGET;
 }

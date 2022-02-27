@@ -14,18 +14,20 @@ public class ConvertibleFieldParser implements ConvertibleParser {
 
     @Override
     public ConvertibleMap parse(AnnotatedElement annotatedElement, String group) {
-        AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(annotatedElement, ConvertibleField.class);
+        ConvertibleField annotationAttributes = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, ConvertibleField.class);
 
         CMap cMap = new CMap();
-        if (GroupUtils.checkGroup(annotationAttributes.getString("group"), group)) {
-            Class converterClass = (Class) annotationAttributes.get("converter");
-            if (converterClass != Converter.class) {
-                cMap.setConverter(ConverterCache.get(converterClass));
+        if (annotationAttributes != null && GroupUtils.checkGroup(annotationAttributes.group(), group)) {
+            if (annotationAttributes.converter() != Converter.class) {
+                cMap.setConverter(ConverterCache.get(annotationAttributes.converter()));
             }
-            cMap.setTip(annotationAttributes.getString("tip"));
-            cMap.setAbandon(annotationAttributes.getBoolean("abandon"));
-            cMap.setRetainNull(annotationAttributes.getBoolean("retainNull"));
-            cMap.setAliasName(annotationAttributes.getString("aliasName"));
+            if (annotationAttributes.relevantClass() != Void.class) {
+                cMap.setRelevantClass(annotationAttributes.relevantClass());
+            }
+            cMap.setTip(annotationAttributes.tip());
+            cMap.setAbandon(annotationAttributes.abandon());
+            cMap.setRetainNull(annotationAttributes.retainNull());
+            cMap.setAliasName(annotationAttributes.aliasName());
         }
 
         return cMap;

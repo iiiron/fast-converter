@@ -26,6 +26,9 @@ public class ConvertibleFieldsParser implements ConvertibleParser {
             if (convertibleField.converter() != Converter.class) {
                 last.setConverter(ConverterCache.get(convertibleField.converter()));
             }
+            if (convertibleField.relevantClass() != Void.class) {
+                last.setRelevantClass(convertibleField.relevantClass());
+            }
             last.setTip(convertibleField.tip());
             last.setAbandon(convertibleField.abandon());
             last.setRetainNull(convertibleField.retainNull());

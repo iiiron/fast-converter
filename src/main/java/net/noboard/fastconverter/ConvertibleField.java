@@ -26,4 +26,6 @@ public @interface ConvertibleField {
     String aliasName() default "";
 
     boolean retainNull() default true;
+
+    Class<?> relevantClass() default Void.class;
 }

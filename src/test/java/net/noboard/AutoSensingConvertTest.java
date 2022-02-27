@@ -3,15 +3,10 @@ package net.noboard;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.noboard.fastconverter.ConvertibleBean;
-import net.noboard.fastconverter.ConvertibleBeanType;
-import net.noboard.fastconverter.ConvertibleField;
+import net.noboard.fastconverter.ConverteModeType;
 import net.noboard.fastconverter.FastConverter;
-import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
-import net.noboard.fastconverter.handler.DateToTimeStampConverterHandler;
 import org.junit.Test;
 import org.springframework.util.Assert;
-
-import java.util.Date;
 
 /**
  * 预测转换器测试
@@ -32,7 +27,7 @@ public class AutoSensingConvertTest {
 
     @AllArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = BeanB.class)
+    @ConvertibleBean(type = ConverteModeType.SOURCE, targetClass = BeanB.class)
     public static class BeanA {
         private BeanEnum type;
 

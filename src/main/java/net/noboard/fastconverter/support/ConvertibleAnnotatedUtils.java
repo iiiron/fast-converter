@@ -7,6 +7,7 @@ import net.noboard.fastconverter.parser.ImportParser;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -37,24 +38,24 @@ public class ConvertibleAnnotatedUtils {
 //                    beanClass.toString()));
             return null;
         }
-        if (convertibleBean.targetClass() == Void.class && "".equals(convertibleBean.targetName())) {
+        if (convertibleBean.relevantClass() == Void.class && "".equals(convertibleBean.targetName())) {
             throw new ConvertException(String.format("you have to declare target of convert on @ConvertibleBean use 'targetName' or 'targetClass' at %s", beanClass.toString()));
         }
-        if (convertibleBean.targetClass() != Void.class
-                && !"".equals(convertibleBean.targetName())
-                && !convertibleBean.targetClass().getName().equals(convertibleBean.targetName())) {
+        if (convertibleBean.relevantClass() != Void.class
+                && !"".equals(convertibleBean.relevantClassName())
+                && !convertibleBean.relevantClass().getName().equals(convertibleBean.relevantClassName())) {
             throw new ConvertException("the attributes 'targetName' and 'targetClass' in annotation @ConvertibleBean must point the same class. or just declare one of the two");
         }
 
         return convertibleBean;
     }
 
-    public static Class<?> getTargetClass(ConvertibleBean convertibleBean) {
+    public static Class<?> getRelevantClass(ConvertibleBean convertibleBean) {
         try {
-            if (convertibleBean.targetClass() != Void.class) {
-                return convertibleBean.targetClass();
+            if (convertibleBean.relevantClass() != Void.class) {
+                return convertibleBean.relevantClass();
             } else {
-                return Class.forName(convertibleBean.targetName());
+                return Class.forName(convertibleBean.relevantClassName());
             }
         } catch (ClassNotFoundException e) {
             throw new ConvertException(String.format("the target class %s in @ConvertibleBean cannot be find", convertibleBean.targetName()), e);
@@ -86,24 +87,40 @@ public class ConvertibleAnnotatedUtils {
         return linkedHashSet;
     }
 
-    public static ConvertibleMap parse(AnnotatedElement annotatedElement) {
-        return parse(annotatedElement, Converter.DEFAULT_GROUP);
-    }
-
     /**
-     * @param annotatedElement 待解析AnnotatedElement
-     * @param group            解析时使用的group
+     * @param field 待解析AnnotatedElement
+     * @param group 解析时使用的group
      * @return
      */
-    public static ConvertibleMap parse(AnnotatedElement annotatedElement, String group) {
-        ImportParser importParser = AnnotatedElementUtils.getMergedAnnotation(annotatedElement, ImportParser.class);
+    public static ConvertibleMap parse(Field field, String group) {
+        ImportParser importParser = AnnotatedElementUtils.getMergedAnnotation(field, ImportParser.class);
         if (importParser == null) {
+            // 如果字段上没有设置解析器, 则走默认解析逻辑
+            // 默认逻辑会将当前字段的类上注释的ConvertibleBean的关联类, 作为当前字段的关联类
+
             CMap cMap = new CMap();
+            cMap.setAliasName(field.getName());
             cMap.setAbandon(false);
             cMap.setRetainNull(true);
+            cMap.setTip(group);
+            cMap.setConverter(null);
+            cMap.setRelevantClass(null);
+
+//            Class<?> fieldType = TypeProbeUtil.find(field);
+//            ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(fieldType, group);
+//            if (convertibleBean != null) {
+//                cMap.setRelevantClass(ConvertibleAnnotatedUtils.getRelevantClass(convertibleBean));
+//            } else {
+//                Field relevantField = FieldFindUtil.find(relevantClass, field.getName());
+//                if (relevantField != null) {
+//                    cMap.setRelevantClass(TypeProbeUtil.find(relevantField));
+//                }
+//            }
+
             return cMap;
         }
-        ConvertibleParser parser = ConvertibleParserCache.get(importParser.clazz());
-        return parser.parse(annotatedElement, group);
+
+        // 有解析器则用解析器的逻辑去构造ConvertibleMap
+        return ConvertibleParserCache.get(importParser.clazz()).parse(field, group);
     }
 }

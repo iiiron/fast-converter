@@ -1,7 +1,11 @@
 package net.noboard.fastconverter.handler.container;
 
-import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.ContainerConverter;
+import net.noboard.fastconverter.handler.AbstractConverterHandler;
+import net.noboard.fastconverter.handler.bean.ConvertInfo;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,43 +19,64 @@ import java.util.Map;
  * <p>
  * 新容器生成失败时，将把新容器降级为HashMap，并输出警告信息
  */
-public class MapToMapConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<Map<Object, T>, Map<Object, K>> implements ContainerConverter {
-
-    public MapToMapConverterHandler(ConverterFilter converterFilter) {
-        super(converterFilter);
-    }
+public class MapToMapConverterHandler<T, K, P, G> extends AbstractConverterHandler<Map<P, T>, Map<G, K>, ConvertInfo> implements ContainerConverter {
+//    @Override
+//    protected Map<Object, K> doConvert(Map<Object, T> value, ContainerConverterContext context) {
+//        Map<Object, K> newMap;
+//        try {
+//            newMap = value.getClass().newInstance();
+//        } catch (InstantiationException | IllegalAccessException e) {
+//            newMap = new HashMap<>();
+//            System.err.println(String.format("class %s can't be implemented, the degradation measures implement the container with %s ",
+//                    value.getClass(), newMap.getClass()));
+//        }
+//
+//        for (Map.Entry entry : value.entrySet()) {
+//            newMap.put(entry.getKey(), (K) context.getConverterFilter().filter(entry.getValue(), context.getConvertInfo()));
+//        }
+//
+//        return newMap;
+//    }
 
     @Override
-    public boolean supports(Object value, String tip) {
-        return value != null && Map.class.isAssignableFrom(value.getClass());
-    }
-
-    @Override
-    protected Map<Object, K> converting(Map<Object, T> value, String tip) throws ConvertException {
-        Map<Object, K> newMap;
+    protected Map<G, K> doConvert(Map<P, T> value, ConvertInfo context) {
+        Map<G, K> newMap;
         try {
-            newMap = value.getClass().newInstance();
+            // todo wanxm 需要做类型识别, 要看这个type是ParameterizedType还是Class, 如果是前者, 要从他
+            Class rawType = (Class) ((ParameterizedType) context.getTargetType()).getRawType();
+            newMap = (Map<G, K>) rawType.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             newMap = new HashMap<>();
             System.err.println(String.format("class %s can't be implemented, the degradation measures implement the container with %s ",
                     value.getClass(), newMap.getClass()));
         }
 
-        Converter converter;
-        Object newV, oldV;
         for (Map.Entry entry : value.entrySet()) {
-            converter = this.filter(entry.getValue());
-            oldV = entry.getValue();
-            if (converter == null) {
-                newV = oldV;
-            } else if (Converter.isTipHasMessage(tip)) {
-                newV = converter.convert(oldV, tip);
-            } else {
-                newV = converter.convert(oldV);
-            }
-            newMap.put(entry.getKey(), (K) newV);
-        }
+            ParameterizedType sourceType = (ParameterizedType) context.getSourceType();
+            ParameterizedType targetType = (ParameterizedType) context.getTargetType();
 
+            ConvertInfo keyConvertInfo = new ConvertInfo();
+            keyConvertInfo.setModeType(context.getModeType());
+            keyConvertInfo.setGroup(context.getGroup());
+            keyConvertInfo.setSourceType(sourceType.getActualTypeArguments()[0]);
+            keyConvertInfo.setTargetType(targetType.getActualTypeArguments()[0]);
+            keyConvertInfo.setConverterFilter(context.getConverterFilter());
+
+            ConvertInfo valueConvertInfo = new ConvertInfo();
+            valueConvertInfo.setModeType(context.getModeType());
+            valueConvertInfo.setGroup(context.getGroup());
+            valueConvertInfo.setSourceType(sourceType.getActualTypeArguments()[1]);
+            valueConvertInfo.setTargetType(targetType.getActualTypeArguments()[1]);
+            valueConvertInfo.setConverterFilter(context.getConverterFilter());
+
+            newMap.put((G) context.getConverterFilter().filter(entry.getKey(), keyConvertInfo).convert(),
+                    (K) context.getConverterFilter().filter(entry.getValue(), valueConvertInfo).convert());
+        }
         return newMap;
+    }
+
+    @Override
+    protected ConvertInfo defaultContext() {
+        return null;
     }
 }

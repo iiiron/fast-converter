@@ -1,16 +1,13 @@
 package net.noboard.fastconverter.handler;
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.AbstractConverterHandler;
-
-public class EnumToNameConverterHandler extends AbstractConverterHandler<Enum<?>, String> {
+public class EnumToNameConverterHandler extends AbstractConverterHandler<Enum<?>, String, Void> {
     @Override
-    protected String converting(Enum<?> value, String tip) throws ConvertException {
+    protected String doConvert(Enum<?> value, Void context) {
         return value.name();
     }
 
     @Override
-    public boolean supports(Object value, String tip) {
-        return value != null && Enum.class.isAssignableFrom(value.getClass());
+    protected Void defaultContext() {
+        return null;
     }
 }

@@ -1,7 +1,10 @@
 package net.noboard.fastconverter.handler.container;
 
 import net.noboard.fastconverter.*;
+import net.noboard.fastconverter.handler.AbstractConverterHandler;
+import net.noboard.fastconverter.handler.bean.ConvertInfo;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -13,14 +16,11 @@ import java.util.Collection;
  * <p>
  * 新容器生成失败时，将把新容器降级为ArrayList，并输出警告信息
  */
-public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilterBaseConverterHandler<Collection<T>, Collection<K>> implements ContainerConverter {
-
-    public CollectionToCollectionConverterHandler(ConverterFilter converterFilter) {
-        super(converterFilter);
-    }
-
+public class CollectionToCollectionConverterHandler<T, K>
+        extends AbstractConverterHandler<Collection<T>, Collection<K>, ConvertInfo>
+        implements ContainerConverter {
     @Override
-    protected Collection<K> converting(Collection<T> value, String tip) throws ConvertException {
+    protected Collection<K> doConvert(Collection<T> value, ConvertInfo context) {
         Collection<K> collection;
         try {
             collection = value.getClass().newInstance();
@@ -30,26 +30,25 @@ public class CollectionToCollectionConverterHandler<T, K> extends AbstractFilter
                     value.getClass().getName(), collection.getClass()));
         }
 
-        Converter converter;
-        Object newV;
-        for (T obj : value) {
-            converter = this.filter(obj);
-            if (converter == null) {
-                newV = obj;
-            } else if (Converter.isTipHasMessage(tip)) {
-                newV = converter.convert(obj, tip);
-            } else {
-                newV = converter.convert(obj);
-            }
-            collection.add((K) newV);
-        }
+        ParameterizedType sourceType = (ParameterizedType) context.getSourceType();
+        ParameterizedType targetType = (ParameterizedType) context.getTargetType();
 
+        ConvertInfo convertInfo = new ConvertInfo();
+        convertInfo.setModeType(context.getModeType());
+        convertInfo.setGroup(context.getGroup());
+        convertInfo.setSourceType(sourceType.getActualTypeArguments()[0]);
+        convertInfo.setTargetType(targetType.getActualTypeArguments()[0]);
+        convertInfo.setConverterFilter(context.getConverterFilter());
+
+        for (T obj : value) {
+            collection.add((K) context.getConverterFilter().filter(obj, convertInfo).convert());
+        }
 
         return collection;
     }
 
     @Override
-    public boolean supports(Object value, String tip) {
-        return value != null && Collection.class.isAssignableFrom(value.getClass());
+    protected ConvertInfo defaultContext() {
+        return null;
     }
 }

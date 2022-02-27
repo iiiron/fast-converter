@@ -1,5 +1,6 @@
 package net.noboard.fastconverter;
 
+import net.noboard.fastconverter.handler.bean.ConvertInfo;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 
 import javax.validation.constraints.NotNull;
@@ -20,16 +21,18 @@ public class CMap implements ConvertibleMap {
 
     private String aliasName;
 
-    private Class<?> collectionElementClass;
+    private Class<?> relevantClass;
+
+    private Object convertInfo;
 
     @Override
-    public Class<?> getCollectionElementClass() {
-        return collectionElementClass;
+    public Class<?> getRelevantClass() {
+        return relevantClass;
     }
 
     @Override
-    public void setCollectionElementClass(Class<?> collectionElementClass) {
-        this.collectionElementClass = collectionElementClass;
+    public void setRelevantClass(Class<?> collectionElementClass) {
+        this.relevantClass = collectionElementClass;
     }
 
     @Override
@@ -65,6 +68,16 @@ public class CMap implements ConvertibleMap {
     @Override
     public boolean isRetainNull() {
         return this.skipNull;
+    }
+
+    @Override
+    public void setConvertContext(Object context) {
+        this.convertInfo = context;
+    }
+
+    @Override
+    public Object getConvertContext() {
+        return this.convertInfo;
     }
 
     @Override
@@ -109,6 +122,7 @@ public class CMap implements ConvertibleMap {
                 ", skipNull=" + skipNull +
                 ", hasNext=" + hasNext +
                 ", aliasName='" + aliasName + '\'' +
+                ", relevantClass=" + relevantClass +
                 '}';
     }
 }

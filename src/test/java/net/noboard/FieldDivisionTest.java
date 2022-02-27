@@ -4,7 +4,7 @@ package net.noboard;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.noboard.fastconverter.ConvertibleBean;
-import net.noboard.fastconverter.ConvertibleBeanType;
+import net.noboard.fastconverter.ConverteModeType;
 import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.FastConverter;
 import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
@@ -45,7 +45,7 @@ public class FieldDivisionTest {
 
     @AllArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = BeanB.class)
+    @ConvertibleBean(type = ConverteModeType.SOURCE, targetClass = BeanB.class)
     public static class BeanA {
         @ConvertibleField(aliasName = "time", converter = DateToTimeStampConverterHandler.class)
         @ConvertibleField(aliasName = "timeString", converter = DateToFormatStringConverterHandler.class, tip = FORMAT)

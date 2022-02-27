@@ -1,16 +1,13 @@
 package net.noboard.fastconverter.handler;
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.AbstractConverterHandler;
-
-public class BooleanToStringConverterHandler extends AbstractConverterHandler<Boolean, String> {
+public class BooleanToStringConverterHandler extends AbstractConverterHandler<Boolean, String, Void> {
     @Override
-    protected String converting(Boolean value, String tip) throws ConvertException {
+    protected String doConvert(Boolean value, Void context) {
         return value.toString();
     }
 
     @Override
-    public boolean supports(Object value, String tip) {
-        return value != null && Boolean.class.isAssignableFrom(value.getClass());
+    protected Void defaultContext() {
+        return null;
     }
 }

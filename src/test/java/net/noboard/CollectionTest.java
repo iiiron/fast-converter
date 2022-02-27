@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.noboard.fastconverter.ConvertibleBean;
-import net.noboard.fastconverter.ConvertibleBeanType;
+import net.noboard.fastconverter.ConverteModeType;
 import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.FastConverter;
 import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
@@ -44,10 +44,22 @@ public class CollectionTest {
         }
     }
 
+    @Test
+    public void test2() {
+        Date now = new Date();
+
+        ListA listA = new ListA(Lists.newArrayList(new ItemA(now)));
+
+        ListB listB = FastConverter.autoConvert(listA, ListB.class, "group2");
+        for (ItemB itemB : listB.getList()) {
+            Assert.isTrue(!itemB.getTime().equals(dateToFormatStringConverterHandler.convert(now)), "itemB 中的字符串与 iteamA 的时间不一致");
+        }
+    }
+
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, relevantClass = ItemB.class)
+    @ConvertibleBean(type = ConverteModeType.SOURCE, relevantClass = ItemB.class)
     public static class ItemA {
         @ConvertibleField(converter = DateToFormatStringConverterHandler.class)
         private Date time;
@@ -56,7 +68,7 @@ public class CollectionTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = ListB.class)
+    @ConvertibleBean(type = ConverteModeType.SOURCE, relevantClass = ListB.class)
     public static class ListA {
         List<ItemA> list;
     }
@@ -64,7 +76,7 @@ public class CollectionTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(targetClass = ItemA.class)
+    @ConvertibleBean(relevantClass = ItemA.class)
     public static class ItemB {
         @ConvertibleField(converter = DateToFormatStringConverterHandler.class)
         private String time;
@@ -72,7 +84,8 @@ public class CollectionTest {
 
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(targetClass = ListA.class)
+    @ConvertibleBean(relevantClass = ListA.class)
+    @ConvertibleBean(relevantClass = ListA.class, group = "group2")
     public static class ListB {
         List<ItemB> list;
     }
