@@ -69,36 +69,39 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
                 // 字段别名
                 String aliasName = StringUtils.isEmpty(currentMap.getAliasName()) ? declaredField.getName() : currentMap.getAliasName();
 
+                String fieldName = convertInfo.getModeType() == ConverteModeType.SOURCE ? aliasName : declaredField.getName();
+
                 // 找到关联类下的关联字段
                 Field field = relevantFieldMap.get(aliasName);
-
-                // 读取数据
-                Object fieldData = null;
-                if (!fieldResult.containsKey(aliasName)) {
-                    declaredField.setAccessible(true);
-                    field.setAccessible(true);
-                    try {
-                        fieldData = convertInfo.getModeType() == ConverteModeType.SOURCE ? declaredField.get(data) : field.get(data);
-                    } catch (IllegalAccessException e) {
-                        throw new ConvertException("获取数据失败");
+                if (field != null) {
+                    // 读取数据
+                    Object fieldData = null;
+                    if (!fieldResult.containsKey(fieldName)) {
+                        declaredField.setAccessible(true);
+                        field.setAccessible(true);
+                        try {
+                            fieldData = convertInfo.getModeType() == ConverteModeType.SOURCE ? declaredField.get(data) : field.get(data);
+                        } catch (IllegalAccessException e) {
+                            throw new ConvertException("获取数据失败");
+                        }
+                    } else {
+                        fieldData = fieldResult.get(fieldName);
                     }
-                } else {
-                    fieldData = fieldResult.get(aliasName);
-                }
 
-                if (currentMap.getConverter() != null) {
-                    fieldData = currentMap.getConverter().convert(fieldData, currentMap.getConvertContext());
-                } else {
-                    ConvertInfo currentConvertInfo = new ConvertInfo();
-                    currentConvertInfo.setModeType(convertInfo.getModeType());
-                    currentConvertInfo.setConverterFilter(convertInfo.getConverterFilter());
-                    currentConvertInfo.setGroup(convertInfo.getGroup());
-                    currentConvertInfo.setSourceType(convertInfo.getModeType() == ConverteModeType.SOURCE ? declaredField.getGenericType() : field.getGenericType());
-                    currentConvertInfo.setTargetType(convertInfo.getModeType() == ConverteModeType.SOURCE ? field.getGenericType() : declaredField.getGenericType());
-                    fieldData = convertInfo.getConverterFilter().filter(fieldData, currentConvertInfo).convert();
-                }
+                    if (currentMap.getConverter() != null) {
+                        fieldData = currentMap.getConverter().convert(fieldData, currentMap.getConvertContext());
+                    } else {
+                        ConvertInfo currentConvertInfo = new ConvertInfo();
+                        currentConvertInfo.setModeType(convertInfo.getModeType());
+                        currentConvertInfo.setConverterFilter(convertInfo.getConverterFilter());
+                        currentConvertInfo.setGroup(convertInfo.getGroup());
+                        currentConvertInfo.setSourceType(convertInfo.getModeType() == ConverteModeType.SOURCE ? declaredField.getGenericType() : field.getGenericType());
+                        currentConvertInfo.setTargetType(convertInfo.getModeType() == ConverteModeType.SOURCE ? field.getGenericType() : declaredField.getGenericType());
+                        fieldData = convertInfo.getConverterFilter().filter(fieldData, currentConvertInfo).convert();
+                    }
 
-                fieldResult.put(aliasName, fieldData);
+                    fieldResult.put(fieldName, fieldData);
+                }
 
                 if (currentMap.hasNext()) {
                     currentMap = currentMap.next();

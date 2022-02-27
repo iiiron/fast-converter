@@ -8,11 +8,16 @@ import net.noboard.fastconverter.FastConverter;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
+import java.lang.reflect.Field;
+
 public class GenericTest {
 
-    @Test
+    private BeanA<EnumA> a = new BeanA<EnumA>(EnumA.MAN);
+
+//    @Test
     public void test() {
-        BeanA<EnumA> a = new BeanA<>(EnumA.MAN);
+        Field[] declaredFields = GenericTest.class.getDeclaredFields();
+
         BeanB b = FastConverter.autoConvert(a);
 
         Assert.isTrue(EnumA.MAN.name().equals(b.getFieldA()));

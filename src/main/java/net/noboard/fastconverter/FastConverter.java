@@ -1,6 +1,5 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.handler.BaseConverterFilterHandler;
 import net.noboard.fastconverter.handler.bean.ConvertInfo;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
@@ -29,19 +28,17 @@ public class FastConverter {
         }
 
         ConvertInfo convertInfo = new ConvertInfo();
-        convertInfo.setModeType(target == null ? ConverteModeType.SOURCE : ConverteModeType.TARGET);
         convertInfo.setConverterFilter(baseConvertFilterHandler);
         convertInfo.setGroup(group);
         convertInfo.setSourceType(source.getClass());
 
         if (target == null) {
             convertInfo.setModeType(ConverteModeType.SOURCE);
-            convertInfo.setTargetType(target);
-            ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(target, group);
-            if (convertibleBean != null && ConverteModeType.TARGET.equals(convertibleBean.type())) {
+            ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(source.getClass(), group);
+            if (convertibleBean != null && ConverteModeType.SOURCE.equals(convertibleBean.type())) {
                 convertInfo.setTargetType(ConvertibleAnnotatedUtils.getRelevantClass(convertibleBean));
             } else {
-                throw new ConvertException(String.format("the target bean %s defect @ConvertibleBean with type of ConvertibleBeanType.TARGET", target));
+                throw new ConvertException(String.format("the source bean %s defect @ConvertibleBean with type of ConvertibleBeanType.SOURCE", source.getClass().getName()));
             }
         } else {
             convertInfo.setModeType(ConverteModeType.TARGET);

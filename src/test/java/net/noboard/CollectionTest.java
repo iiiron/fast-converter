@@ -52,7 +52,7 @@ public class CollectionTest {
 
         ListB listB = FastConverter.autoConvert(listA, ListB.class, "group2");
         for (ItemB itemB : listB.getList()) {
-            Assert.isTrue(!itemB.getTime().equals(dateToFormatStringConverterHandler.convert(now)), "itemB 中的字符串与 iteamA 的时间不一致");
+            Assert.isTrue(itemB.getTime().equals(dateToFormatStringConverterHandler.convert(now)), "itemB 中的字符串与 iteamA 的时间不一致");
         }
     }
 
@@ -77,6 +77,7 @@ public class CollectionTest {
     @NoArgsConstructor
     @Data
     @ConvertibleBean(relevantClass = ItemA.class)
+    @ConvertibleBean(relevantClass = ItemA.class, group = "group2")
     public static class ItemB {
         @ConvertibleField(converter = DateToFormatStringConverterHandler.class)
         private String time;

@@ -14,7 +14,7 @@ public abstract class AbstractConverterHandler<K, T, V> implements Converter<K, 
         if (value == null) {
             return null;
         }
-        return doConvert(value, context);
+        return doConvert(value, context == null ? defaultContext() : context);
     }
 
     @Override
