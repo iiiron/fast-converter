@@ -1,7 +1,5 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.handler.bean.ConvertInfo;
-
 import javax.validation.constraints.NotNull;
 
 /**

@@ -1,6 +1,6 @@
 package net.noboard.fastconverter.handler;
 
-import net.noboard.fastconverter.handler.AbstractConverterHandler;
+import net.noboard.fastconverter.AbstractConverterHandler;
 
 public class EnumToNameConverter extends AbstractConverterHandler<Enum, String, Void> {
     @Override

@@ -5,11 +5,17 @@ import net.noboard.fastconverter.Converter;
 import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.support.ConverterCache;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedHashSet;
 
 public class ConvertibleFieldsParser implements ConvertibleParser {
+
+    private final ExpressionParser parser = new SpelExpressionParser();
+
     @Override
     public ConvertibleMap parse(AnnotatedElement annotatedElement, String group) {
         LinkedHashSet<ConvertibleField> linkedHashSet = ConvertibleAnnotatedUtils.getMergedConvertField(annotatedElement, group);
@@ -29,10 +35,12 @@ public class ConvertibleFieldsParser implements ConvertibleParser {
             if (convertibleField.relevantClass() != Void.class) {
                 last.setRelevantClass(convertibleField.relevantClass());
             }
-            last.setTip(convertibleField.tip());
             last.setAbandon(convertibleField.abandon());
-            last.setRetainNull(convertibleField.retainNull());
+            last.setIgnoreNull(convertibleField.ignoreNull());
             last.setAliasName(convertibleField.aliasName());
+            if (!StringUtils.isEmpty(convertibleField.context())) {
+                last.setConvertContext(parser.parseExpression(convertibleField.context()).getValue());
+            }
         }
 
         if (first == null) {

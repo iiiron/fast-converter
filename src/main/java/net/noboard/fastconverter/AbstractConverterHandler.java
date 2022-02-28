@@ -1,7 +1,4 @@
-package net.noboard.fastconverter.handler;
-
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.Converter;
+package net.noboard.fastconverter;
 
 public abstract class AbstractConverterHandler<K, T, V> implements Converter<K, T, V> {
 
@@ -11,9 +8,6 @@ public abstract class AbstractConverterHandler<K, T, V> implements Converter<K, 
 
     @Override
     public T convert(K value, V context) throws ConvertException {
-        if (value == null) {
-            return null;
-        }
         return doConvert(value, context == null ? defaultContext() : context);
     }
 

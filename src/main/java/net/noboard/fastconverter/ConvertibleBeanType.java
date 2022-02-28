@@ -6,7 +6,7 @@ package net.noboard.fastconverter;
  * @date 2020/10/31 5:41 下午
  * @author by wanxm
  */
-public enum ConverteModeType {
+public enum ConvertibleBeanType {
     TARGET,
 
     SOURCE;

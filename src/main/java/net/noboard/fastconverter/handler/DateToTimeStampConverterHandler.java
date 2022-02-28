@@ -1,5 +1,7 @@
 package net.noboard.fastconverter.handler;
 
+import net.noboard.fastconverter.AbstractConverterHandler;
+
 import java.util.Date;
 
 /**

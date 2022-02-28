@@ -1,6 +1,5 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.handler.bean.ConvertInfo;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 public class FastConverter {
@@ -33,15 +32,15 @@ public class FastConverter {
         convertInfo.setSourceType(source.getClass());
 
         if (target == null) {
-            convertInfo.setModeType(ConverteModeType.SOURCE);
+            convertInfo.setModeType(ConvertibleBeanType.SOURCE);
             ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(source.getClass(), group);
-            if (convertibleBean != null && ConverteModeType.SOURCE.equals(convertibleBean.type())) {
+            if (convertibleBean != null && ConvertibleBeanType.SOURCE.equals(convertibleBean.type())) {
                 convertInfo.setTargetType(ConvertibleAnnotatedUtils.getRelevantClass(convertibleBean));
             } else {
                 throw new ConvertException(String.format("the source bean %s defect @ConvertibleBean with type of ConvertibleBeanType.SOURCE", source.getClass().getName()));
             }
         } else {
-            convertInfo.setModeType(ConverteModeType.TARGET);
+            convertInfo.setModeType(ConvertibleBeanType.TARGET);
             convertInfo.setTargetType(target);
         }
 

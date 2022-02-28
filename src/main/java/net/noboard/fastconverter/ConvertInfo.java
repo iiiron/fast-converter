@@ -1,7 +1,7 @@
-package net.noboard.fastconverter.handler.bean;
+package net.noboard.fastconverter;
 
 import lombok.Data;
-import net.noboard.fastconverter.ConverteModeType;
+import net.noboard.fastconverter.ConvertibleBeanType;
 import net.noboard.fastconverter.ConverterFilter;
 
 import java.lang.reflect.Type;
@@ -12,7 +12,7 @@ public class ConvertInfo {
     /**
      * 转换模式, 1=source模式, 2=target模式
      */
-    private ConverteModeType modeType;
+    private ConvertibleBeanType modeType;
 
     private ConverterFilter converterFilter;
 

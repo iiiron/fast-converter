@@ -1,8 +1,9 @@
 package net.noboard.fastconverter.handler.bean;
 
 import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.ConverteModeType;
-import net.noboard.fastconverter.handler.AbstractConverterHandler;
+import net.noboard.fastconverter.ConvertibleBeanType;
+import net.noboard.fastconverter.AbstractConverterHandler;
+import net.noboard.fastconverter.ConvertInfo;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 import org.springframework.util.StringUtils;
@@ -50,9 +51,9 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
 
     protected Map<String, Object> parse(Object data, ConvertInfo convertInfo) {
         // 标注直接的class
-        Class<?> tagClass = convertInfo.getModeType() == ConverteModeType.SOURCE ? (Class<?>) convertInfo.getSourceType() : (Class<?>) convertInfo.getTargetType();
+        Class<?> tagClass = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? (Class<?>) convertInfo.getSourceType() : (Class<?>) convertInfo.getTargetType();
         // 相对的另一个class
-        Class<?> relevantClass = convertInfo.getModeType() == ConverteModeType.SOURCE ? (Class<?>) convertInfo.getTargetType() : (Class<?>) convertInfo.getSourceType();
+        Class<?> relevantClass = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? (Class<?>) convertInfo.getTargetType() : (Class<?>) convertInfo.getSourceType();
 
         Map<String, Field> relevantFieldMap = Arrays.stream(relevantClass.getDeclaredFields()).collect(Collectors.toMap(Field::getName, o -> o));
 
@@ -69,7 +70,7 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
                 // 字段别名
                 String aliasName = StringUtils.isEmpty(currentMap.getAliasName()) ? declaredField.getName() : currentMap.getAliasName();
 
-                String fieldName = convertInfo.getModeType() == ConverteModeType.SOURCE ? aliasName : declaredField.getName();
+                String fieldName = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? aliasName : declaredField.getName();
 
                 // 找到关联类下的关联字段
                 Field field = relevantFieldMap.get(aliasName);
@@ -80,7 +81,7 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
                         declaredField.setAccessible(true);
                         field.setAccessible(true);
                         try {
-                            fieldData = convertInfo.getModeType() == ConverteModeType.SOURCE ? declaredField.get(data) : field.get(data);
+                            fieldData = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? declaredField.get(data) : field.get(data);
                         } catch (IllegalAccessException e) {
                             throw new ConvertException("获取数据失败");
                         }
@@ -88,16 +89,19 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
                         fieldData = fieldResult.get(fieldName);
                     }
 
-                    if (currentMap.getConverter() != null) {
-                        fieldData = currentMap.getConverter().convert(fieldData, currentMap.getConvertContext());
-                    } else {
-                        ConvertInfo currentConvertInfo = new ConvertInfo();
-                        currentConvertInfo.setModeType(convertInfo.getModeType());
-                        currentConvertInfo.setConverterFilter(convertInfo.getConverterFilter());
-                        currentConvertInfo.setGroup(convertInfo.getGroup());
-                        currentConvertInfo.setSourceType(convertInfo.getModeType() == ConverteModeType.SOURCE ? declaredField.getGenericType() : field.getGenericType());
-                        currentConvertInfo.setTargetType(convertInfo.getModeType() == ConverteModeType.SOURCE ? field.getGenericType() : declaredField.getGenericType());
-                        fieldData = convertInfo.getConverterFilter().filter(fieldData, currentConvertInfo).convert();
+                    // 转换
+                    if (fieldData != null || !currentMap.ignoreNull()) {
+                        if (currentMap.getConverter() != null) {
+                            fieldData = currentMap.getConverter().convert(fieldData, currentMap.getConvertContext());
+                        } else {
+                            ConvertInfo currentConvertInfo = new ConvertInfo();
+                            currentConvertInfo.setModeType(convertInfo.getModeType());
+                            currentConvertInfo.setConverterFilter(convertInfo.getConverterFilter());
+                            currentConvertInfo.setGroup(convertInfo.getGroup());
+                            currentConvertInfo.setSourceType(convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? declaredField.getGenericType() : field.getGenericType());
+                            currentConvertInfo.setTargetType(convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? field.getGenericType() : declaredField.getGenericType());
+                            fieldData = convertInfo.getConverterFilter().filter(fieldData, currentConvertInfo).convert();
+                        }
                     }
 
                     fieldResult.put(fieldName, fieldData);

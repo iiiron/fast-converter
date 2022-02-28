@@ -17,25 +17,17 @@ public interface ConvertibleMap {
      */
     boolean isAbandon();
 
-    void setRetainNull(boolean isRetainNull);
+    void setIgnoreNull(boolean ignoreNull);
 
     /**
      * 是否保留空值
      * @return
      */
-    boolean isRetainNull();
+    boolean ignoreNull();
 
     void setConvertContext(Object context);
 
     Object getConvertContext();
-
-    void setTip(String tip);
-
-    /**
-     * 获取该字段的tip信息
-     * @return
-     */
-    String getTip();
 
     void setAliasName(String aliasName);
 

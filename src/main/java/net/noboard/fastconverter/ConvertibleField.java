@@ -15,8 +15,7 @@ public @interface ConvertibleField {
     @AliasFor(annotation = Convertible.class)
     String group() default Converter.DEFAULT_GROUP;
 
-    @AliasFor(annotation = Convertible.class)
-    String tip() default Converter.DEFAULT_TIP;
+    String context() default Converter.DEFAULT_TIP;
 
     @AliasFor(annotation = Convertible.class)
     Class<? extends Converter> converter() default Converter.class;
@@ -25,7 +24,7 @@ public @interface ConvertibleField {
 
     String aliasName() default "";
 
-    boolean retainNull() default true;
+    boolean ignoreNull() default true;
 
     Class<?> relevantClass() default Void.class;
 }

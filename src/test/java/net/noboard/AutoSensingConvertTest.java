@@ -3,7 +3,7 @@ package net.noboard;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.noboard.fastconverter.ConvertibleBean;
-import net.noboard.fastconverter.ConverteModeType;
+import net.noboard.fastconverter.ConvertibleBeanType;
 import net.noboard.fastconverter.FastConverter;
 import org.junit.Test;
 import org.springframework.util.Assert;
@@ -27,7 +27,7 @@ public class AutoSensingConvertTest {
 
     @AllArgsConstructor
     @Data
-    @ConvertibleBean(type = ConverteModeType.SOURCE, targetClass = BeanB.class)
+    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = BeanB.class)
     public static class BeanA {
         private BeanEnum type;
 

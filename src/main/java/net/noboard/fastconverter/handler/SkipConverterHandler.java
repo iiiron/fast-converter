@@ -1,6 +1,8 @@
 package net.noboard.fastconverter.handler;
 
-public class SkipConverterHandler extends AbstractConverterHandler<Object, Object, Void>{
+import net.noboard.fastconverter.AbstractConverterHandler;
+
+public class SkipConverterHandler extends AbstractConverterHandler<Object, Object, Void> {
     @Override
     protected Object doConvert(Object value, Void context) {
         return value;

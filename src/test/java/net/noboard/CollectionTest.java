@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.noboard.fastconverter.ConvertibleBean;
-import net.noboard.fastconverter.ConverteModeType;
+import net.noboard.fastconverter.ConvertibleBeanType;
 import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.FastConverter;
 import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
@@ -59,7 +59,7 @@ public class CollectionTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(type = ConverteModeType.SOURCE, relevantClass = ItemB.class)
+    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, relevantClass = ItemB.class)
     public static class ItemA {
         @ConvertibleField(converter = DateToFormatStringConverterHandler.class)
         private Date time;
@@ -68,7 +68,7 @@ public class CollectionTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(type = ConverteModeType.SOURCE, relevantClass = ListB.class)
+    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, relevantClass = ListB.class)
     public static class ListA {
         List<ItemA> list;
     }

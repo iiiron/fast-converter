@@ -1,8 +1,8 @@
 package net.noboard.fastconverter.handler.container;
 
 import net.noboard.fastconverter.*;
-import net.noboard.fastconverter.handler.AbstractConverterHandler;
-import net.noboard.fastconverter.handler.bean.ConvertInfo;
+import net.noboard.fastconverter.AbstractConverterHandler;
+import net.noboard.fastconverter.ConvertInfo;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;

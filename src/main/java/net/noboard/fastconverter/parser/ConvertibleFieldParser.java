@@ -6,11 +6,15 @@ import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.support.ConverterCache;
 import net.noboard.fastconverter.support.GroupUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.AnnotatedElement;
 
 public class ConvertibleFieldParser implements ConvertibleParser {
+
+    private final ExpressionParser parser = new SpelExpressionParser();
 
     @Override
     public ConvertibleMap parse(AnnotatedElement annotatedElement, String group) {
@@ -24,10 +28,12 @@ public class ConvertibleFieldParser implements ConvertibleParser {
             if (annotationAttributes.relevantClass() != Void.class) {
                 cMap.setRelevantClass(annotationAttributes.relevantClass());
             }
-            cMap.setTip(annotationAttributes.tip());
             cMap.setAbandon(annotationAttributes.abandon());
-            cMap.setRetainNull(annotationAttributes.retainNull());
+            cMap.setIgnoreNull(annotationAttributes.ignoreNull());
             cMap.setAliasName(annotationAttributes.aliasName());
+            if (!StringUtils.isEmpty(annotationAttributes.context())) {
+                cMap.setConvertContext(parser.parseExpression(annotationAttributes.context()).getValue());
+            }
         }
 
         return cMap;

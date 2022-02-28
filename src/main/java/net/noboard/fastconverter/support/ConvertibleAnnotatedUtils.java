@@ -2,7 +2,6 @@ package net.noboard.fastconverter.support;
 
 import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.parser.ConvertibleMap;
-import net.noboard.fastconverter.parser.ConvertibleParser;
 import net.noboard.fastconverter.parser.ImportParser;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
@@ -95,28 +94,13 @@ public class ConvertibleAnnotatedUtils {
     public static ConvertibleMap parse(Field field, String group) {
         ImportParser importParser = AnnotatedElementUtils.getMergedAnnotation(field, ImportParser.class);
         if (importParser == null) {
-            // 如果字段上没有设置解析器, 则走默认解析逻辑
-            // 默认逻辑会将当前字段的类上注释的ConvertibleBean的关联类, 作为当前字段的关联类
-
             CMap cMap = new CMap();
             cMap.setAliasName(field.getName());
             cMap.setAbandon(false);
-            cMap.setRetainNull(true);
-            cMap.setTip(group);
+            cMap.setIgnoreNull(true);
             cMap.setConverter(null);
             cMap.setRelevantClass(null);
-
-//            Class<?> fieldType = TypeProbeUtil.find(field);
-//            ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(fieldType, group);
-//            if (convertibleBean != null) {
-//                cMap.setRelevantClass(ConvertibleAnnotatedUtils.getRelevantClass(convertibleBean));
-//            } else {
-//                Field relevantField = FieldFindUtil.find(relevantClass, field.getName());
-//                if (relevantField != null) {
-//                    cMap.setRelevantClass(TypeProbeUtil.find(relevantField));
-//                }
-//            }
-
+            cMap.setConvertContext(null);
             return cMap;
         }
 

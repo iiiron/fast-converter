@@ -1,13 +1,10 @@
 package net.noboard.fastconverter;
 
-import net.noboard.fastconverter.handler.bean.ConvertInfo;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 
 import javax.validation.constraints.NotNull;
 
 public class CMap implements ConvertibleMap {
-
-    private String tip;
 
     private Converter converter;
 
@@ -15,7 +12,7 @@ public class CMap implements ConvertibleMap {
 
     private boolean abandon;
 
-    private boolean skipNull;
+    private boolean ignoreNull;
 
     private boolean hasNext = false;
 
@@ -46,11 +43,6 @@ public class CMap implements ConvertibleMap {
     }
 
     @Override
-    public String getTip() {
-        return tip;
-    }
-
-    @Override
     public void setAbandon(boolean abandon) {
         this.abandon = abandon;
     }
@@ -61,13 +53,13 @@ public class CMap implements ConvertibleMap {
     }
 
     @Override
-    public void setRetainNull(boolean isSkipNull) {
-        this.skipNull = isSkipNull;
+    public void setIgnoreNull(boolean ignoreNull) {
+        this.ignoreNull = ignoreNull;
     }
 
     @Override
-    public boolean isRetainNull() {
-        return this.skipNull;
+    public boolean ignoreNull() {
+        return this.ignoreNull;
     }
 
     @Override
@@ -78,11 +70,6 @@ public class CMap implements ConvertibleMap {
     @Override
     public Object getConvertContext() {
         return this.convertInfo;
-    }
-
-    @Override
-    public void setTip(String tip) {
-        this.tip = tip;
     }
 
     @Override
@@ -115,14 +102,14 @@ public class CMap implements ConvertibleMap {
     @Override
     public String toString() {
         return "CMap{" +
-                "tip='" + tip + '\'' +
-                ", converter=" + converter +
+                "converter=" + converter +
                 ", next=" + next +
                 ", abandon=" + abandon +
-                ", skipNull=" + skipNull +
+                ", ignoreNull=" + ignoreNull +
                 ", hasNext=" + hasNext +
                 ", aliasName='" + aliasName + '\'' +
                 ", relevantClass=" + relevantClass +
+                ", convertInfo=" + convertInfo +
                 '}';
     }
 }

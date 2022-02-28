@@ -3,9 +3,8 @@ package net.noboard;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.noboard.fastconverter.ConvertibleBean;
-import net.noboard.fastconverter.ConverteModeType;
+import net.noboard.fastconverter.ConvertibleBeanType;
 import net.noboard.fastconverter.FastConverter;
-import org.junit.Test;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Field;
@@ -34,7 +33,7 @@ public class GenericTest {
 
     @AllArgsConstructor
     @Data
-    @ConvertibleBean(targetClass = BeanB.class, type = ConverteModeType.SOURCE)
+    @ConvertibleBean(targetClass = BeanB.class, type = ConvertibleBeanType.SOURCE)
     public static class BeanA<T> {
         private T fieldA;
     }

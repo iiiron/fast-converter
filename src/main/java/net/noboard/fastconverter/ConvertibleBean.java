@@ -9,12 +9,8 @@ import java.lang.annotation.*;
 @Repeatable(ConvertibleBeans.class)
 @Convertible
 public @interface ConvertibleBean {
-
-    @AliasFor("tip")
+    @AliasFor(annotation = Convertible.class)
     String group() default Converter.DEFAULT_GROUP;
-
-    @AliasFor("group")
-    String tip() default Converter.DEFAULT_GROUP;
 
     @Deprecated
     @AliasFor("relevantClassName")
@@ -30,5 +26,5 @@ public @interface ConvertibleBean {
     @AliasFor("targetClass")
     Class<?> relevantClass() default Void.class;
 
-    ConverteModeType type() default ConverteModeType.TARGET;
+    ConvertibleBeanType type() default ConvertibleBeanType.TARGET;
 }

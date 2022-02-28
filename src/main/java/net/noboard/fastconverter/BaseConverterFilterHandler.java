@@ -2,7 +2,6 @@ package net.noboard.fastconverter;
 
 import net.noboard.fastconverter.handler.*;
 import net.noboard.fastconverter.handler.bean.BeanConverterHandler;
-import net.noboard.fastconverter.handler.bean.ConvertInfo;
 import net.noboard.fastconverter.handler.container.CollectionToCollectionConverterHandler;
 import net.noboard.fastconverter.handler.container.MapToMapConverterHandler;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
@@ -87,8 +86,8 @@ public class BaseConverterFilterHandler implements ConverterFilter {
         currentConvertInfo.setTargetType(convertInfo.getTargetType());
 
         // 优先检查是否是被注解标注的实体, 是的话走bean转换器
-        if ((convertInfo.getModeType() == ConverteModeType.SOURCE && ConvertibleAnnotatedUtils.getMergedConvertBean(sourceClass, convertInfo.getGroup()) != null)
-                || (convertInfo.getModeType() == ConverteModeType.TARGET && ConvertibleAnnotatedUtils.getMergedConvertBean(targetClass, convertInfo.getGroup()) != null)) {
+        if ((convertInfo.getModeType() == ConvertibleBeanType.SOURCE && ConvertibleAnnotatedUtils.getMergedConvertBean(sourceClass, convertInfo.getGroup()) != null)
+                || (convertInfo.getModeType() == ConvertibleBeanType.TARGET && ConvertibleAnnotatedUtils.getMergedConvertBean(targetClass, convertInfo.getGroup()) != null)) {
             return () -> {
                 return beanConverterHandler.convert(value, currentConvertInfo);
             };
