@@ -1,5 +1,6 @@
 package net.noboard.expression;
 
+import net.noboard.Sex;
 import net.noboard.fastconverter.FastConverter;
 import org.junit.Test;
 import org.springframework.util.Assert;

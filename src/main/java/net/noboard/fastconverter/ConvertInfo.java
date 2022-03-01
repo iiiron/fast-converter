@@ -1,8 +1,6 @@
 package net.noboard.fastconverter;
 
 import lombok.Data;
-import net.noboard.fastconverter.ConvertibleBeanType;
-import net.noboard.fastconverter.ConverterFilter;
 
 import java.lang.reflect.Type;
 

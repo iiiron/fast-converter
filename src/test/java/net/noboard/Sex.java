@@ -1,4 +1,4 @@
-package net.noboard.expression;
+package net.noboard;
 
 public enum Sex {
 

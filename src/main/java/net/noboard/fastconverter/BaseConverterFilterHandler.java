@@ -78,29 +78,22 @@ public class BaseConverterFilterHandler implements ConverterFilter {
         Class sourceClass = ParameterizedType.class.isAssignableFrom(convertInfo.getSourceType().getClass()) ? (Class) ((ParameterizedType) convertInfo.getSourceType()).getRawType() : (Class) convertInfo.getSourceType();
         Class targetClass = ParameterizedType.class.isAssignableFrom(convertInfo.getTargetType().getClass()) ? (Class) ((ParameterizedType) convertInfo.getTargetType()).getRawType() : (Class) convertInfo.getTargetType();
 
-        ConvertInfo currentConvertInfo = new ConvertInfo();
-        currentConvertInfo.setModeType(convertInfo.getModeType());
-        currentConvertInfo.setConverterFilter(convertInfo.getConverterFilter());
-        currentConvertInfo.setGroup(convertInfo.getGroup());
-        currentConvertInfo.setSourceType(convertInfo.getSourceType());
-        currentConvertInfo.setTargetType(convertInfo.getTargetType());
-
         // 优先检查是否是被注解标注的实体, 是的话走bean转换器
         if ((convertInfo.getModeType() == ConvertibleBeanType.SOURCE && ConvertibleAnnotatedUtils.getMergedConvertBean(sourceClass, convertInfo.getGroup()) != null)
                 || (convertInfo.getModeType() == ConvertibleBeanType.TARGET && ConvertibleAnnotatedUtils.getMergedConvertBean(targetClass, convertInfo.getGroup()) != null)) {
             return () -> {
-                return beanConverterHandler.convert(value, currentConvertInfo);
+                return beanConverterHandler.convert(value, convertInfo);
             };
         }
 
         // 其次检查是否是容器
         if (Collection.class.isAssignableFrom(sourceClass)) {
             return () -> {
-                return collectionToCollectionConverterHandler.convert(value, currentConvertInfo);
+                return collectionToCollectionConverterHandler.convert(value, convertInfo);
             };
         } else if (Map.class.isAssignableFrom(sourceClass)) {
             return () -> {
-                return mapToMapConverterHandler.convert(value, currentConvertInfo);
+                return mapToMapConverterHandler.convert(value, convertInfo);
             };
         }
 
@@ -108,6 +101,10 @@ public class BaseConverterFilterHandler implements ConverterFilter {
         Converter converter = converterMap.get(sourceClass, targetClass);
         if (converter != null) {
             return () -> {
+                if (converter == nameToEnumConverterHandler) {
+                    return converter.convert(value, convertInfo.getTargetType());
+                }
+
                 return converter.convert(value);
             };
         }

@@ -1,14 +1,13 @@
-package net.noboard.expression;
+package net.noboard.enumConverter;
 
 import lombok.Data;
+import net.noboard.expression.Null2EnumFirstConstantConvertHandler;
 import net.noboard.Sex;
 import net.noboard.fastconverter.ConvertibleBean;
 import net.noboard.fastconverter.ConvertibleBeanType;
 import net.noboard.fastconverter.ConvertibleField;
 
 @Data
-@ConvertibleBean(relevantClass = BeanB.class, type = ConvertibleBeanType.SOURCE)
 public class BeanA {
-    @ConvertibleField(converter = Null2EnumFirstConstantConvertHandler.class, context = "T(net.noboard.Sex)", ignoreNull = false)
     private Sex sex;
 }
