@@ -33,7 +33,7 @@ public class GenericTest {
 
     @AllArgsConstructor
     @Data
-    @ConvertibleBean(targetClass = BeanB.class, type = ConvertibleBeanType.SOURCE)
+    @ConvertibleBean(targetClass = BeanB.class)
     public static class BeanA<T> {
         private T fieldA;
     }

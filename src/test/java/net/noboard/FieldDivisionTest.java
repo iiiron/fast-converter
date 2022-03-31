@@ -8,7 +8,7 @@ import net.noboard.fastconverter.ConvertibleBeanType;
 import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.FastConverter;
 import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
-import net.noboard.fastconverter.handler.DateToTimeStampConverterHandler;
+import net.noboard.fastconverter.handler.DateToLongConverterHandler;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
@@ -43,9 +43,9 @@ public class FieldDivisionTest {
 
     @AllArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = BeanB.class)
+    @ConvertibleBean(relevantClass = BeanB.class)
     public static class BeanA {
-        @ConvertibleField(aliasName = "time", converter = DateToTimeStampConverterHandler.class)
+        @ConvertibleField(aliasName = "time", converter = DateToLongConverterHandler.class)
         @ConvertibleField(aliasName = "timeString", converter = DateToFormatStringConverterHandler.class, context = "'yyyy-MM-dd HH:mm:ss'")
         private Date time;
     }
@@ -66,7 +66,7 @@ public class FieldDivisionTest {
     @Data
     @ConvertibleBean(targetClass = BeanC.class)
     public static class BeanD {
-        @ConvertibleField(converter = DateToTimeStampConverterHandler.class)
+        @ConvertibleField(converter = DateToLongConverterHandler.class)
         private Long time;
 
         @ConvertibleField(aliasName = "time", converter = DateToFormatStringConverterHandler.class)

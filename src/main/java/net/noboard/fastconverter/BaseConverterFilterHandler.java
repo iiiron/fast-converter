@@ -7,6 +7,8 @@ import net.noboard.fastconverter.handler.container.MapToMapConverterHandler;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
@@ -15,26 +17,40 @@ import java.util.Map;
 
 public class BaseConverterFilterHandler implements ConverterFilter {
 
-    private final static BooleanToStringConverterHandler booleanToStringConverterHandler = new BooleanToStringConverterHandler();
-    private final static DateToFormatStringConverterHandler dateToFormatStringConverterHandler = new DateToFormatStringConverterHandler();
-    private final static DateToTimeStampConverterHandler dateToTimeStampConverterHandler = new DateToTimeStampConverterHandler();
-    private final static EnumToNameConverterHandler enumToNameConverterHandler = new EnumToNameConverterHandler();
-    private final static NameToEnumConverterHandler nameToEnumConverterHandler = new NameToEnumConverterHandler();
-    private final static NumberToBigDecimalConverterHandler numberToBigDecimalConverterHandler = new NumberToBigDecimalConverterHandler();
-    private final static NumberToStringConverterHandler numberToStringConverterHandler = new NumberToStringConverterHandler();
+    private static final BooleanToStringConverterHandler booleanToStringConverterHandler = new BooleanToStringConverterHandler();
+    private static final BooleanToIntegerConverterHandler booleanToIntegerConverterHandler = new BooleanToIntegerConverterHandler();
+    private static final StringToBooleanConverterHandler stringToBooleanConverterHandler = new StringToBooleanConverterHandler();
+    private static final StringToIntegerConverterHandler stringToIntegerConverterHandler = new StringToIntegerConverterHandler();
+    private static final StringToLongConverterHandler stringToLongConverterHandler = new StringToLongConverterHandler();
+    private static final StringToDoubleConverterHandler stringToDoubleConverterHandler = new StringToDoubleConverterHandler();
+    private static final FormatStringToDateConverterHandler formatStringToDateConverterHandler = new FormatStringToDateConverterHandler();
+    private static final DateToFormatStringConverterHandler dateToFormatStringConverterHandler = new DateToFormatStringConverterHandler();
+    private static final DateToLongConverterHandler dateToLongConverterHandler = new DateToLongConverterHandler();
+    private static final LongToDateConverterHandler longToDateConverterHandler = new LongToDateConverterHandler();
+    private static final EnumToNameConverterHandler enumToNameConverterHandler = new EnumToNameConverterHandler();
+    private static final NameToEnumConverterHandler nameToEnumConverterHandler = new NameToEnumConverterHandler();
+    private static final NumberToBigDecimalConverterHandler numberToBigDecimalConverterHandler = new NumberToBigDecimalConverterHandler();
+    private static final NumberToStringConverterHandler numberToStringConverterHandler = new NumberToStringConverterHandler();
 
-    private final static CollectionToCollectionConverterHandler collectionToCollectionConverterHandler = new CollectionToCollectionConverterHandler();
-    private final static MapToMapConverterHandler mapToMapConverterHandler = new MapToMapConverterHandler();
-    private final static BeanConverterHandler beanConverterHandler = new BeanConverterHandler();
+    private static final CollectionToCollectionConverterHandler collectionToCollectionConverterHandler = new CollectionToCollectionConverterHandler();
+    private static final MapToMapConverterHandler mapToMapConverterHandler = new MapToMapConverterHandler();
+    private static final BeanConverterHandler beanConverterHandler = new BeanConverterHandler();
 
     private static ConverterMap converterMap = new ConverterMap();
 
     static {
         converterMap.put(Boolean.class, String.class, booleanToStringConverterHandler);
-        converterMap.put(Date.class, String.class, dateToFormatStringConverterHandler);
-        converterMap.put(Date.class, Long.class, dateToTimeStampConverterHandler);
-        converterMap.put(Enum.class, String.class, enumToNameConverterHandler);
+        converterMap.put(Boolean.class, Integer.class, booleanToIntegerConverterHandler);
+        converterMap.put(String.class, Boolean.class, stringToBooleanConverterHandler);
         converterMap.put(String.class, Enum.class, nameToEnumConverterHandler);
+        converterMap.put(String.class, Date.class, formatStringToDateConverterHandler);
+        converterMap.put(String.class, Integer.class, stringToIntegerConverterHandler);
+        converterMap.put(String.class, Long.class, stringToLongConverterHandler);
+        converterMap.put(String.class, Double.class, stringToDoubleConverterHandler);
+        converterMap.put(Date.class, String.class, dateToFormatStringConverterHandler);
+        converterMap.put(Date.class, Long.class, dateToLongConverterHandler);
+        converterMap.put(Enum.class, String.class, enumToNameConverterHandler);
+        converterMap.put(Long.class, Date.class, longToDateConverterHandler);
 
         converterMap.put(Integer.class, BigDecimal.class, numberToBigDecimalConverterHandler);
         converterMap.put(Double.class, BigDecimal.class, numberToBigDecimalConverterHandler);
@@ -75,10 +91,22 @@ public class BaseConverterFilterHandler implements ConverterFilter {
 
     @Override
     public ConverterFacade filter(Object value, ConvertInfo convertInfo) {
-        Class sourceClass = ParameterizedType.class.isAssignableFrom(convertInfo.getSourceType().getClass()) ? (Class) ((ParameterizedType) convertInfo.getSourceType()).getRawType() : (Class) convertInfo.getSourceType();
-        Class targetClass = ParameterizedType.class.isAssignableFrom(convertInfo.getTargetType().getClass()) ? (Class) ((ParameterizedType) convertInfo.getTargetType()).getRawType() : (Class) convertInfo.getTargetType();
+        Class sourceClass = parse(convertInfo.getSourceType());
+        Class targetClass = parse(convertInfo.getTargetType());
 
-        // 优先检查是否是被注解标注的实体, 是的话走bean转换器
+        // if 优先检查是否是被注解标注的实体, 并且是source转换, 如果是, 直接取实体上标注的target类型
+        if (convertInfo.getModeType() == ConvertibleBeanType.SOURCE && value != null) {
+            ConvertibleBean mergedConvertBean = ConvertibleAnnotatedUtils.getMergedConvertBean(value.getClass(), convertInfo.getGroup());
+            if (mergedConvertBean != null) {
+                convertInfo.setSourceType(value.getClass());
+                convertInfo.setTargetType(ConvertibleAnnotatedUtils.getRelevantClass(mergedConvertBean));
+                return () -> {
+                    return beanConverterHandler.convert(value, convertInfo);
+                };
+            }
+        }
+
+        // if 优先检查是否是被注解标注的实体, 是的话走bean转换器
         if ((convertInfo.getModeType() == ConvertibleBeanType.SOURCE && ConvertibleAnnotatedUtils.getMergedConvertBean(sourceClass, convertInfo.getGroup()) != null)
                 || (convertInfo.getModeType() == ConvertibleBeanType.TARGET && ConvertibleAnnotatedUtils.getMergedConvertBean(targetClass, convertInfo.getGroup()) != null)) {
             return () -> {
@@ -110,5 +138,16 @@ public class BaseConverterFilterHandler implements ConverterFilter {
         }
 
         return () -> value;
+    }
+
+    private Class parse(Type type) {
+        if (ParameterizedType.class.isAssignableFrom(type.getClass())) {
+            return (Class) ((ParameterizedType) type).getRawType();
+        }
+        if (WildcardType.class.isAssignableFrom(type.getClass())) {
+            return (Class) ((WildcardType) type).getUpperBounds()[0];
+        }
+
+        return (Class) type;
     }
 }

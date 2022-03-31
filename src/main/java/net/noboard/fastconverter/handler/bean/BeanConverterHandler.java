@@ -8,14 +8,13 @@ import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 import org.springframework.util.StringUtils;
 
+import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, ConvertInfo> {
@@ -50,16 +49,34 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
     }
 
     protected Map<String, Object> parse(Object data, ConvertInfo convertInfo) {
+        // data == null的控制逻辑, 校验转换所需要的source和data的类型能否对应上
+
         // 标注直接的class
         Class<?> tagClass = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? (Class<?>) convertInfo.getSourceType() : (Class<?>) convertInfo.getTargetType();
         // 相对的另一个class
         Class<?> relevantClass = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? (Class<?>) convertInfo.getTargetType() : (Class<?>) convertInfo.getSourceType();
-
-        Map<String, Field> relevantFieldMap = Arrays.stream(relevantClass.getDeclaredFields()).collect(Collectors.toMap(Field::getName, o -> o));
+        Map<String, Field> relevantFieldMap = getFields(relevantClass).stream().collect(Collectors.toMap(Field::getName, o -> o));
+        Map<String, Field> fieldMap = getFields(tagClass).stream().collect(Collectors.toMap(Field::getName, o -> o, (b, a) -> b));
 
         Map<String, Object> result = new HashMap<>();
 
-        for (Field declaredField : tagClass.getDeclaredFields()) {
+        PropertyDescriptor[] targetDescriptor = null, relevantDescriptors = null;
+        try {
+            targetDescriptor = Introspector.getBeanInfo(tagClass).getPropertyDescriptors();
+            relevantDescriptors = Introspector.getBeanInfo(relevantClass).getPropertyDescriptors();
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, PropertyDescriptor> relevantDPMap = Arrays.stream(relevantDescriptors).collect(Collectors.toMap(FeatureDescriptor::getName, o -> o, (b, a) -> b));
+
+        for (PropertyDescriptor targetPD : targetDescriptor) {
+            if ("class".equals(targetPD.getName())) {
+                continue;
+            }
+
+            Field declaredField = fieldMap.get(targetPD.getName());
+
             ConvertibleMap currentMap = ConvertibleAnnotatedUtils.parse(declaredField, convertInfo.getGroup());
 
             // 结果集
@@ -73,16 +90,15 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
                 String fieldName = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? aliasName : declaredField.getName();
 
                 // 找到关联类下的关联字段
+                PropertyDescriptor relevantDP = relevantDPMap.get(aliasName);
                 Field field = relevantFieldMap.get(aliasName);
-                if (field != null) {
+                if (field != null && relevantDP != null) {
                     // 读取数据
                     Object fieldData = null;
                     if (!fieldResult.containsKey(fieldName)) {
-                        declaredField.setAccessible(true);
-                        field.setAccessible(true);
                         try {
-                            fieldData = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? declaredField.get(data) : field.get(data);
-                        } catch (IllegalAccessException e) {
+                            fieldData = convertInfo.getModeType() == ConvertibleBeanType.SOURCE ? targetPD.getReadMethod().invoke(data) : relevantDP.getReadMethod().invoke(data);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
                             throw new ConvertException("获取数据失败");
                         }
                     } else {
@@ -126,5 +142,15 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
             throw new ConvertException(
                     String.format("the target class %s can not be implemented", target), e);
         }
+    }
+
+    private List<Field> getFields(Class clazz) {
+        List<Field> fields = new ArrayList<>();
+        Class current = clazz;
+        while (current != null) {
+            fields.addAll(Arrays.asList(current.getDeclaredFields()));
+            current = current.getSuperclass();
+        }
+        return fields;
     }
 }

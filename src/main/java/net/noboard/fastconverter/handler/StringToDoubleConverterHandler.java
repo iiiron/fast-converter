@@ -2,12 +2,10 @@ package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.AbstractConverterHandler;
 
-import java.util.Date;
-
-public class TimestampToDateConverter extends AbstractConverterHandler<Long, Date, Void> {
+public class StringToDoubleConverterHandler extends AbstractConverterHandler<String, Double, Void> {
     @Override
-    protected Date doConvert(Long value, Void context) {
-        return new Date(value);
+    protected Double doConvert(String value, Void context) {
+        return Double.parseDouble(value);
     }
 
     @Override

@@ -59,7 +59,7 @@ public class CollectionTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, relevantClass = ItemB.class)
+    @ConvertibleBean(relevantClass = ItemB.class)
     public static class ItemA {
         @ConvertibleField(converter = DateToFormatStringConverterHandler.class)
         private Date time;
@@ -68,7 +68,7 @@ public class CollectionTest {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, relevantClass = ListB.class)
+    @ConvertibleBean(relevantClass = ListB.class)
     public static class ListA {
         List<ItemA> list;
     }

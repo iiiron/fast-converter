@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * @author wanxm
  */
-public class DateToTimeStampConverterHandler extends AbstractConverterHandler<Date, Long, Void> {
+public class DateToLongConverterHandler extends AbstractConverterHandler<Date, Long, Void> {
 
     @Override
     protected Long doConvert(Date value, Void context) {

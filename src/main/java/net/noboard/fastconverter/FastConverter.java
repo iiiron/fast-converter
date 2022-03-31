@@ -34,7 +34,7 @@ public class FastConverter {
         if (target == null) {
             convertInfo.setModeType(ConvertibleBeanType.SOURCE);
             ConvertibleBean convertibleBean = ConvertibleAnnotatedUtils.getMergedConvertBean(source.getClass(), group);
-            if (convertibleBean != null && ConvertibleBeanType.SOURCE.equals(convertibleBean.type())) {
+            if (convertibleBean != null) {
                 convertInfo.setTargetType(ConvertibleAnnotatedUtils.getRelevantClass(convertibleBean));
             } else {
                 throw new ConvertException(String.format("the source bean %s defect @ConvertibleBean with type of ConvertibleBeanType.SOURCE", source.getClass().getName()));

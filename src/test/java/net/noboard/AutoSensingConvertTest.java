@@ -27,7 +27,7 @@ public class AutoSensingConvertTest {
 
     @AllArgsConstructor
     @Data
-    @ConvertibleBean(type = ConvertibleBeanType.SOURCE, targetClass = BeanB.class)
+    @ConvertibleBean(relevantClass = BeanB.class)
     public static class BeanA {
         private BeanEnum type;
 

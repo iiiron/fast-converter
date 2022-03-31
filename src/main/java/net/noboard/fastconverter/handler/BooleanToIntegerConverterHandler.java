@@ -2,10 +2,10 @@ package net.noboard.fastconverter.handler;
 
 import net.noboard.fastconverter.AbstractConverterHandler;
 
-public class SkipConverterHandler extends AbstractConverterHandler<Object, Object, Void> {
+public class BooleanToIntegerConverterHandler extends AbstractConverterHandler<Boolean, Integer, Void> {
     @Override
-    protected Object doConvert(Object value, Void context) {
-        return value;
+    protected Integer doConvert(Boolean value, Void context) {
+        return value ? 1 : 0;
     }
 
     @Override
