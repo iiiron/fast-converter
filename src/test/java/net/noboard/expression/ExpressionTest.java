@@ -11,7 +11,7 @@ public class ExpressionTest {
     public void test() {
         BeanA beanA = new BeanA();
 
-        BeanB beanB = (BeanB) FastConverter.autoConvert(beanA);
+        BeanB beanB = (BeanB) FastConverter.upCasting(beanA);
 
         Assert.isTrue(beanB.getSex().equals(Sex.MAN.name()));
     }

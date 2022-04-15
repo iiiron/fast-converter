@@ -6,6 +6,7 @@ public class FastConverter {
 
     private static final BaseConverterFilterHandler baseConvertFilterHandler = new BaseConverterFilterHandler();
 
+    @Deprecated
     public static <T> T autoConvert(Object bean, String group) {
         if (bean == null) {
             return null;
@@ -13,14 +14,36 @@ public class FastConverter {
         return autoConvert(bean, null, group);
     }
 
+    @Deprecated
     public static <T> T autoConvert(Object bean) {
         return autoConvert(bean, null, Converter.DEFAULT_GROUP);
     }
 
+    @Deprecated
     public static <T> T autoConvert(Object source, Class<T> target) {
         return autoConvert(source, target, Converter.DEFAULT_GROUP);
     }
 
+    public static <T> T upCasting(Object bean, String group) {
+        if (bean == null) {
+            return null;
+        }
+        return autoConvert(bean, null, group);
+    }
+
+    public static <T> T upCasting(Object bean) {
+        return autoConvert(bean, null, Converter.DEFAULT_GROUP);
+    }
+
+    public static <T> T downCasting(Object source, Class<T> target) {
+        return autoConvert(source, target, Converter.DEFAULT_GROUP);
+    }
+
+    public static <T> T downCasting(Object source, Class<T> target, String group) {
+        return autoConvert(source, target, group);
+    }
+
+    @Deprecated
     public static <T> T autoConvert(Object source, Class<T> target, String group) {
         if (source == null) {
             return null;
