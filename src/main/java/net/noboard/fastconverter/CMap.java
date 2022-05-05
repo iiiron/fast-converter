@@ -4,33 +4,42 @@ import net.noboard.fastconverter.parser.ConvertibleMap;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * 转换地图, 转换逻辑会根据这个地图信息进行数据转换
+ *
+ * @date 2022/4/19 18:11
+ * @author by wanxm
+ */
 public class CMap implements ConvertibleMap {
 
+    /**
+     * 转换器
+     */
     private Converter converter;
 
+    /**
+     * 下一个转换地图
+     */
     private ConvertibleMap next;
 
-    private boolean abandon;
+    /**
+     * 是否忽略当前字段
+     */
+    private boolean abandon = false;
 
-    private boolean ignoreNull;
+    /**
+     * 是否忽略null值, 为true表示不对null值进行转换操作, 将null值直接传递给结果, 默认为true
+     */
+    private boolean ignoreNull = true;
 
+    /**
+     * 是否有下一个
+     */
     private boolean hasNext = false;
 
     private String aliasName;
 
-    private Class<?> relevantClass;
-
-    private Object convertInfo;
-
-    @Override
-    public Class<?> getRelevantClass() {
-        return relevantClass;
-    }
-
-    @Override
-    public void setRelevantClass(Class<?> collectionElementClass) {
-        this.relevantClass = collectionElementClass;
-    }
+    private Object convertContext;
 
     @Override
     public String getAliasName() {
@@ -64,12 +73,12 @@ public class CMap implements ConvertibleMap {
 
     @Override
     public void setConvertContext(Object context) {
-        this.convertInfo = context;
+        this.convertContext = context;
     }
 
     @Override
     public Object getConvertContext() {
-        return this.convertInfo;
+        return this.convertContext;
     }
 
     @Override
@@ -108,8 +117,7 @@ public class CMap implements ConvertibleMap {
                 ", ignoreNull=" + ignoreNull +
                 ", hasNext=" + hasNext +
                 ", aliasName='" + aliasName + '\'' +
-                ", relevantClass=" + relevantClass +
-                ", convertInfo=" + convertInfo +
+                ", convertInfo=" + convertContext +
                 '}';
     }
 }

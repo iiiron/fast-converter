@@ -5,8 +5,10 @@ import net.noboard.fastconverter.Converter;
 import javax.validation.constraints.NotNull;
 
 /**
- * tip：用于转换的tip
- * converter：转换器
+ * 转换地图, 转换逻辑会根据这个地图信息进行数据转换
+ *
+ * @date 2022/4/19 18:14
+ * @author by wanxm
  */
 public interface ConvertibleMap {
     void setAbandon(boolean abandon);
@@ -20,7 +22,7 @@ public interface ConvertibleMap {
     void setIgnoreNull(boolean ignoreNull);
 
     /**
-     * 是否保留空值
+     * 是否忽略空值, 单
      * @return
      */
     boolean ignoreNull();
@@ -52,14 +54,6 @@ public interface ConvertibleMap {
      * @return
      */
     boolean hasNext();
-
-    void setRelevantClass(Class<?> clazz);
-
-    /**
-     * 获取该字段的关联类型
-     * @return
-     */
-    Class<?> getRelevantClass();
 
     /**
      * 获取下一个ConvertibleMap

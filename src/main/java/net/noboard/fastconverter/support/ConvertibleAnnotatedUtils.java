@@ -99,7 +99,6 @@ public class ConvertibleAnnotatedUtils {
             cMap.setAbandon(false);
             cMap.setIgnoreNull(true);
             cMap.setConverter(null);
-            cMap.setRelevantClass(null);
             cMap.setConvertContext(null);
             return cMap;
         }
