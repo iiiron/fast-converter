@@ -32,6 +32,8 @@ public class BaseConverterFilterHandler implements ConverterFilter {
     private static final NumberToBigDecimalConverterHandler numberToBigDecimalConverterHandler = new NumberToBigDecimalConverterHandler();
     private static final NumberToStringConverterHandler numberToStringConverterHandler = new NumberToStringConverterHandler();
 
+    private static final IntegerToBooleanConvertHandler integerToBooleanConvertHandler = new IntegerToBooleanConvertHandler();
+
     private static final CollectionToCollectionConverterHandler collectionToCollectionConverterHandler = new CollectionToCollectionConverterHandler();
     private static final MapToMapConverterHandler mapToMapConverterHandler = new MapToMapConverterHandler();
     private static final BeanConverterHandler beanConverterHandler = new BeanConverterHandler();
@@ -41,6 +43,7 @@ public class BaseConverterFilterHandler implements ConverterFilter {
     static {
         converterMap.put(Boolean.class, String.class, booleanToStringConverterHandler);
         converterMap.put(Boolean.class, Integer.class, booleanToIntegerConverterHandler);
+        converterMap.put(Integer.class, Boolean.class, integerToBooleanConvertHandler);
         converterMap.put(String.class, Boolean.class, stringToBooleanConverterHandler);
         converterMap.put(String.class, Enum.class, nameToEnumConverterHandler);
         converterMap.put(String.class, Date.class, formatStringToDateConverterHandler);
