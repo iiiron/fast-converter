@@ -17,8 +17,12 @@ public @interface ConvertibleField {
 
     String context() default Converter.DEFAULT_TIP;
 
-    @AliasFor(annotation = Convertible.class)
+    @Deprecated
     Class<? extends Converter> converter() default Converter.class;
+
+    Class<? extends Converter> upCastingConverter() default Converter.class;
+
+    Class<? extends Converter> downCastingConverter() default Converter.class;
 
     boolean abandon() default false;
 

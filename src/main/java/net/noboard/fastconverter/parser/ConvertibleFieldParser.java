@@ -25,6 +25,12 @@ public class ConvertibleFieldParser implements ConvertibleParser {
             if (annotationAttributes.converter() != Converter.class) {
                 cMap.setConverter(ConverterCache.get(annotationAttributes.converter()));
             }
+            if (annotationAttributes.upCastingConverter() != Converter.class) {
+                cMap.setUpCastingConverter(ConverterCache.get(annotationAttributes.upCastingConverter()));
+            }
+            if (annotationAttributes.downCastingConverter() != Converter.class) {
+                cMap.setDownCastingConverter(ConverterCache.get(annotationAttributes.downCastingConverter()));
+            }
             cMap.setAbandon(annotationAttributes.abandon());
             cMap.setIgnoreNull(annotationAttributes.ignoreNull());
             cMap.setAliasName(annotationAttributes.aliasName());

@@ -9,6 +9,7 @@ import net.noboard.fastconverter.ConvertibleField;
 import net.noboard.fastconverter.FastConverter;
 import net.noboard.fastconverter.handler.DateToFormatStringConverterHandler;
 import net.noboard.fastconverter.handler.DateToLongConverterHandler;
+import net.noboard.fastconverter.handler.FormatStringToDateConverterHandler;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
@@ -35,10 +36,13 @@ public class FieldDivisionTest {
     @Test
     public void targetTest() {
         Date now = new Date();
-        BeanC beanC = new BeanC(now);
-        BeanD beanD = FastConverter.autoConvert(beanC, BeanD.class);
-        Assert.isTrue(beanD.getTime().equals(now.getTime()));
+        BeanC beanC = new BeanC();
+        beanC.setTime(now);
+        BeanD beanD = FastConverter.downCasting(beanC, BeanD.class);
         Assert.isTrue(beanD.getTimeString().equals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now)));
+
+        beanC = FastConverter.upCasting(beanD);
+        Assert.isTrue(beanD.getTimeString().equals(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(beanC.getTime())));
     }
 
     @AllArgsConstructor
@@ -57,19 +61,15 @@ public class FieldDivisionTest {
         private String timeString;
     }
 
-    @AllArgsConstructor
     @Data
     public static class BeanC {
         private Date time;
     }
 
     @Data
-    @ConvertibleBean(targetClass = BeanC.class)
+    @ConvertibleBean(relevantClass = BeanC.class)
     public static class BeanD {
-        @ConvertibleField(converter = DateToLongConverterHandler.class)
-        private Long time;
-
-        @ConvertibleField(aliasName = "time", converter = DateToFormatStringConverterHandler.class)
+        @ConvertibleField(aliasName = "time", downCastingConverter = DateToFormatStringConverterHandler.class, upCastingConverter = FormatStringToDateConverterHandler.class)
         private String timeString;
     }
 }

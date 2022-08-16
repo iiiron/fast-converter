@@ -11,6 +11,8 @@ import javax.validation.constraints.NotNull;
  * @author by wanxm
  */
 public interface ConvertibleMap {
+
+
     void setAbandon(boolean abandon);
 
     /**
@@ -39,13 +41,31 @@ public interface ConvertibleMap {
      */
     String getAliasName();
 
+    @Deprecated
     void setConverter(Converter converter);
 
     /**
      * 获取该字段设置的转换器
      * @return
      */
+    @Deprecated
     Converter getConverter();
+
+    void setUpCastingConverter(Converter converter);
+
+    /**
+     * 获取该字段设置的向上转换器
+     * @return
+     */
+    Converter getUpCastingConverter();
+
+    void setDownCastingConverter(Converter converter);
+
+    /**
+     * 获取该字段设置的向下转换器
+     * @return
+     */
+    Converter getDownCastingConverter();
 
     void join(ConvertibleMap convertibleMap);
 

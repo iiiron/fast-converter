@@ -13,6 +13,16 @@ import javax.validation.constraints.NotNull;
 public class CMap implements ConvertibleMap {
 
     /**
+     * 向上转换器
+     */
+    private Converter upCastingConverter;
+
+    /**
+     * 向下转换器
+     */
+    private Converter downCastingConverter;
+
+    /**
      * 转换器
      */
     private Converter converter;
@@ -91,6 +101,25 @@ public class CMap implements ConvertibleMap {
         this.converter = converter;
     }
 
+    @Override
+    public Converter getUpCastingConverter() {
+        return upCastingConverter;
+    }
+
+    @Override
+    public void setUpCastingConverter(Converter upCastingConverter) {
+        this.upCastingConverter = upCastingConverter;
+    }
+
+    @Override
+    public Converter getDownCastingConverter() {
+        return downCastingConverter;
+    }
+
+    @Override
+    public void setDownCastingConverter(Converter downCastingConverter) {
+        this.downCastingConverter = downCastingConverter;
+    }
 
     @Override
     public void join(ConvertibleMap convertibleMap) {

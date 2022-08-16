@@ -32,6 +32,12 @@ public class ConvertibleFieldsParser implements ConvertibleParser {
             if (convertibleField.converter() != Converter.class) {
                 last.setConverter(ConverterCache.get(convertibleField.converter()));
             }
+            if (convertibleField.upCastingConverter() != Converter.class) {
+                last.setUpCastingConverter(ConverterCache.get(convertibleField.upCastingConverter()));
+            }
+            if (convertibleField.downCastingConverter() != Converter.class) {
+                last.setDownCastingConverter(ConverterCache.get(convertibleField.downCastingConverter()));
+            }
             last.setAbandon(convertibleField.abandon());
             last.setIgnoreNull(convertibleField.ignoreNull());
             last.setAliasName(convertibleField.aliasName());

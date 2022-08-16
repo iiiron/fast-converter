@@ -1,9 +1,6 @@
 package net.noboard.fastconverter.handler.bean;
 
-import net.noboard.fastconverter.ConvertException;
-import net.noboard.fastconverter.ConvertibleBeanType;
-import net.noboard.fastconverter.AbstractConverterHandler;
-import net.noboard.fastconverter.ConvertInfo;
+import net.noboard.fastconverter.*;
 import net.noboard.fastconverter.parser.ConvertibleMap;
 import net.noboard.fastconverter.support.ConvertibleAnnotatedUtils;
 import org.springframework.util.StringUtils;
@@ -107,8 +104,18 @@ public class BeanConverterHandler<T, K> extends AbstractConverterHandler<T, K, C
 
                     // 转换
                     if (fieldData != null || !currentMap.ignoreNull()) {
-                        if (currentMap.getConverter() != null) {
-                            fieldData = currentMap.getConverter().convert(fieldData, currentMap.getConvertContext());
+                        Converter converter = null;
+                        if (convertInfo.getModeType().equals(ConvertibleBeanType.SOURCE)) {
+                            converter = currentMap.getUpCastingConverter();
+                        } else {
+                            converter = currentMap.getDownCastingConverter();
+                        }
+                        if (converter == null) {
+                            converter = currentMap.getConverter();
+                        }
+
+                        if (converter != null) {
+                            fieldData = converter.convert(fieldData, currentMap.getConvertContext());
                         } else {
                             ConvertInfo currentConvertInfo = new ConvertInfo();
                             currentConvertInfo.setModeType(convertInfo.getModeType());
